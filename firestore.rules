@@ -1,0 +1,89 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ==================== HELPER FUNCTIONS ====================
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && 
+             get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function isActiveShop(userId) {
+      let shop = get(/databases/$(database)/documents/shops/$(userId)).data;
+      return shop.status == 'active';
+    }
+
+    function isActiveShopWithValidSubscription(userId) {
+      let shop = get(/databases/$(database)/documents/shops/$(userId)).data;
+      return shop.status == 'active' && shop.subscriptionEnd != null;
+    }
+
+    function getShopStatus(userId) {
+      return get(/databases/$(database)/documents/shops/$(userId)).data.status;
+    }
+
+    // ==================== SHOPS COLLECTION ====================
+
+    // Allow admin to query/list shops (needed for activation code lookup)
+    match /shops/{shopId} {
+      allow list: if isAdmin();
+      allow read: if isAuthenticated() && (isOwner(shopId) || isAdmin());
+      
+      allow create: if isAuthenticated() && isOwner(shopId) && request.resource.data.status == 'pending';
+      
+      allow update: if isAdmin();
+      
+      // Shop subcollections
+      match /menu/{menuId} {
+        allow read: if isAuthenticated() && (isOwner(shopId) || isAdmin());
+        allow create: if isAuthenticated() && (isOwner(shopId) || isAdmin()) && isActiveShopWithValidSubscription(shopId);
+        allow update: if isAuthenticated() && (isOwner(shopId) || isAdmin()) && isActiveShopWithValidSubscription(shopId);
+        allow delete: if isAuthenticated() && (isOwner(shopId) || isAdmin()) && isActiveShopWithValidSubscription(shopId);
+      }
+
+      match /transactions/{transactionId} {
+        allow read: if isAuthenticated() && (isOwner(shopId) || isAdmin());
+        allow create: if isAuthenticated() && (isOwner(shopId) || isAdmin()) && isActiveShopWithValidSubscription(shopId);
+        allow update: if isAdmin();
+        allow delete: if isAdmin();
+      }
+
+      match /activeTables/{docId} {
+        allow read: if isAuthenticated() && (isOwner(shopId) || isAdmin());
+        allow write: if isAuthenticated() && (isOwner(shopId) || isAdmin()) && isActiveShopWithValidSubscription(shopId);
+      }
+
+      match /settings/{docId} {
+        allow read: if isAuthenticated() && (isOwner(shopId) || isAdmin());
+        allow write: if isAuthenticated() && (isOwner(shopId) || isAdmin()) && isActiveShopWithValidSubscription(shopId);
+      }
+    }
+
+    // ==================== ADMINS COLLECTION ====================
+
+    match /admins/{adminId} {
+      allow read: if isAuthenticated() && isOwner(adminId);
+      allow create: if false; // Only create via Firebase Console
+      allow update: if isAdmin();
+      allow delete: if false;
+    }
+
+    // ==================== ACTIVITY LOG ====================
+
+    match /activityLog/{logId} {
+      allow read: if isAdmin();
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+  }
+}
