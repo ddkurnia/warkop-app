@@ -777,11 +777,11 @@
   <script>
     // ===== FIREBASE CONFIG =====
     const firebaseConfig = {
-      apiKey: "AIzaSyBJNdjMEYFov2rE-LkQ75VN3UPdfICmbBc",
-      authDomain: "warkop-app-20449.firebaseapp.com",
-      projectId: "warkop-app-20449",
-      storageBucket: "warkop-app-20449.firebasestorage.app",
-      messagingSenderId: "896934754762",
+      apiKey: "AIzaSyDemoKeyReplaceMe123456",
+      authDomain: "warung-kopi-pos.firebaseapp.com",
+      projectId: "warung-kopi-pos",
+      storageBucket: "warung-kopi-pos.appspot.com",
+      messagingSenderId: "123456789",
       appId: "1:123456789:web:abcdef123456"
     };
     firebase.initializeApp(firebaseConfig);
@@ -1254,6 +1254,10 @@
 
         showPOS();
         switchPage('kasir');
+
+        // Render kasir UI immediately
+        renderTables();
+        renderMenuGrid();
 
         // Start demo countdown if demo mode is active
         if (isDemoActive()) {
