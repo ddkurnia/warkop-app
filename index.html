@@ -403,26 +403,25 @@
   <!-- ============================================== -->
   <div id="pos-app" class="hidden">
 
-    <!-- HEADER -->
-    <header class="bg-coffee-800 text-white px-4 py-3 sticky top-0 z-40 shadow-lg no-print">
+    <!-- HEADER (compact) -->
+    <header class="bg-coffee-800 text-white px-3 py-2 sticky top-0 z-40 shadow-lg no-print">
       <div class="max-w-7xl mx-auto flex items-center justify-between">
-        <div class="flex items-center gap-3 min-w-0 flex-1">
-          <div id="header-shop-photo" class="w-10 h-10 rounded-full bg-coffee-600 flex items-center justify-center overflow-hidden flex-shrink-0">
-            <i class="fas fa-mug-hot text-coffee-200 text-lg"></i>
+        <div class="flex items-center gap-2 min-w-0 flex-1">
+          <div id="header-shop-photo" class="w-8 h-8 rounded-full bg-coffee-600 flex items-center justify-center overflow-hidden flex-shrink-0">
+            <i class="fas fa-mug-hot text-coffee-200 text-sm"></i>
           </div>
           <div class="min-w-0">
-            <h1 id="header-shop-name" class="font-display text-base font-bold leading-tight truncate">Warung Kopi</h1>
-            <p id="header-shop-tagline" class="text-coffee-300 text-xs truncate">Kopi Nusantara Asli</p>
+            <h1 id="header-shop-name" class="font-display text-sm font-bold leading-tight truncate">Warung Kopi</h1>
+            <p id="header-shop-tagline" class="text-coffee-300 text-[10px] truncate leading-tight">Kopi Nusantara Asli</p>
           </div>
         </div>
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2">
           <div class="text-right hidden sm:block">
-            <div class="text-coffee-300 text-xs">Hari Ini</div>
-            <div id="header-daily-total" class="font-bold text-coffee-100 text-sm">Rp 0</div>
-            <div id="header-daily-count" class="text-coffee-400 text-xs">0 transaksi</div>
+            <div id="header-daily-total" class="font-bold text-coffee-100 text-xs">Rp 0</div>
+            <div id="header-daily-count" class="text-coffee-400 text-[10px]">0 transaksi</div>
           </div>
-          <button onclick="doLogout()" class="w-9 h-9 rounded-full bg-coffee-700 flex items-center justify-center hover:bg-coffee-600 transition" title="Keluar">
-            <i class="fas fa-sign-out-alt text-sm text-coffee-200"></i>
+          <button onclick="doLogout()" class="w-8 h-8 rounded-full bg-coffee-700 flex items-center justify-center hover:bg-coffee-600 transition" title="Keluar">
+            <i class="fas fa-sign-out-alt text-xs text-coffee-200"></i>
           </button>
         </div>
       </div>
@@ -1376,12 +1375,27 @@
 
     // Get transactions filtered by date range from localStorage
     function getTransactionsFiltered(startDate, endDate) {
+      if (!currentShop || !currentShop.id) {
+        console.warn('getTransactionsFiltered: currentShop not ready');
+        return [];
+      }
       const uid = currentShop.id;
       const allTx = lsGet(LS_KEYS.transactions(uid)) || [];
+      if (allTx.length === 0) return [];
+      console.log('getTransactionsFiltered: totalTx=', allTx.length, 'startDate=', startDate, 'endDate=', endDate);
       return allTx
         .filter(tx => {
-          if (!tx.date) return false;
-          const txDate = typeof tx.date === 'string' ? tx.date.split('T')[0] : formatDateInput(new Date(tx.date));
+          if (!tx || !tx.date) return false;
+          let txDate;
+          if (typeof tx.date === 'string') {
+            // Handle ISO format: 2026-04-10T12:30:00.000Z or 2026-04-10T12:30:00
+            txDate = tx.date.split('T')[0].split(' ')[0];
+          } else if (tx.date instanceof Date) {
+            txDate = formatDateInput(tx.date);
+          } else {
+            txDate = formatDateInput(new Date(tx.date));
+          }
+          if (!txDate || txDate.length < 10) return false;
           if (startDate && txDate < startDate) return false;
           if (endDate && txDate > endDate) return false;
           return true;
@@ -1403,16 +1417,19 @@
     // ===== UPDATE HEADER (computes from localStorage) =====
     function updateDailyStats() {
       try {
+        if (!currentShop || !currentShop.id) return;
         const todayStr = today();
         const allTx = lsGet(LS_KEYS.transactions(currentShop.id)) || [];
         const todayTx = allTx.filter(tx => {
-          if (!tx.date) return false;
-          const txDate = typeof tx.date === 'string' ? tx.date.split('T')[0] : formatDateInput(new Date(tx.date));
+          if (!tx || !tx.date) return false;
+          const txDate = typeof tx.date === 'string' ? tx.date.split('T')[0].split(' ')[0] : formatDateInput(new Date(tx.date));
           return txDate === todayStr;
         });
         const total = todayTx.reduce((s, t) => s + (t.total || 0), 0);
-        document.getElementById('header-daily-total').textContent = formatIDR(total);
-        document.getElementById('header-daily-count').textContent = todayTx.length + ' transaksi';
+        const totalEl = document.getElementById('header-daily-total');
+        const countEl = document.getElementById('header-daily-count');
+        if (totalEl) totalEl.textContent = formatIDR(total);
+        if (countEl) countEl.textContent = todayTx.length + ' transaksi';
       } catch (e) {
         console.error('Error updating daily stats:', e);
       }
@@ -1820,30 +1837,51 @@
         t.className = t.className.replace('bg-coffee-700 text-white shadow-sm', 'bg-white text-coffee-600 border-2 border-coffee-200');
       });
       const activeTab = document.getElementById('tab-' + tab);
-      activeTab.classList.add('active-tab');
-      activeTab.className = activeTab.className.replace('bg-white text-coffee-600 border-2 border-coffee-200', 'bg-coffee-700 text-white shadow-sm');
+      if (activeTab) {
+        activeTab.classList.add('active-tab');
+        activeTab.className = activeTab.className.replace('bg-white text-coffee-600 border-2 border-coffee-200', 'bg-coffee-700 text-white shadow-sm');
+      }
 
       document.querySelectorAll('.report-panel').forEach(p => p.classList.add('hidden'));
-      document.getElementById('panel-' + tab).classList.remove('hidden');
+      const panel = document.getElementById('panel-' + tab);
+      if (panel) panel.classList.remove('hidden');
+
+      // Ensure date inputs are set to current date before loading
+      if (tab === 'daily') {
+        const dateInput = document.getElementById('daily-date');
+        if (dateInput && !dateInput.value) dateInput.value = today();
+      } else if (tab === 'monthly') {
+        const monthInput = document.getElementById('monthly-picker');
+        if (monthInput && !monthInput.value) monthInput.value = thisMonth();
+      }
 
       loadHistory(tab);
     }
 
     function loadHistory(tab) {
+      if (!currentShop || !currentShop.id) {
+        console.warn('loadHistory: currentShop not ready, retrying in 500ms');
+        setTimeout(() => loadHistory(tab), 500);
+        return;
+      }
       const summaryEl = document.getElementById('history-summary');
       const reportEl = document.getElementById('history-report');
       const emptyEl = document.getElementById('history-empty');
       const topEl = document.getElementById('top-items-section');
+      if (!summaryEl || !reportEl) return;
       summaryEl.innerHTML = '<div class="col-span-2 text-center py-8"><div class="spinner-dark mx-auto mb-2"></div><p class="text-sm text-coffee-400">Memuat data...</p></div>';
       reportEl.innerHTML = '';
-      emptyEl.classList.add('hidden');
-      topEl.classList.add('hidden');
+      if (emptyEl) emptyEl.classList.add('hidden');
+      if (topEl) topEl.classList.add('hidden');
 
       let startDate, endDate;
       if (tab === 'daily') {
-        startDate = endDate = document.getElementById('daily-date').value || today();
+        const dateVal = document.getElementById('daily-date').value || today();
+        document.getElementById('daily-date').value = dateVal;
+        startDate = endDate = dateVal;
       } else if (tab === 'monthly') {
         const monthVal = document.getElementById('monthly-picker').value || thisMonth();
+        document.getElementById('monthly-picker').value = monthVal;
         startDate = monthVal + '-01';
         const [y, m] = monthVal.split('-');
         const daysInMonth = new Date(parseInt(y), parseInt(m), 0).getDate();
