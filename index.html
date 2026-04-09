@@ -306,6 +306,29 @@
       <button onclick="refreshActivationStatus()" id="refresh-activation-btn" class="px-6 py-2.5 bg-coffee-700 text-white rounded-xl font-semibold hover:bg-coffee-800 transition shadow-md mb-3">
         <i class="fas fa-sync-alt mr-2"></i> Cek Status Aktivasi
       </button>
+
+      <!-- Demo Code Input -->
+      <div class="border-t border-coffee-200 pt-4 mt-4">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="w-6 h-6 bg-purple-100 flex items-center justify-center rounded-full">
+            <i class="fas fa-play-circle text-purple-600 text-xs"></i>
+          </span>
+          <p class="text-sm font-bold text-coffee-700">Coba Demo 24 Jam?</p>
+        </div>
+        <p class="text-xs text-coffee-500 mb-3">Punya kode demo? Masukkan untuk mencoba aplikasi selama 24 jam.</p>
+        <div class="flex gap-2">
+          <input type="text" id="demo-code-input" placeholder="DEMO-XXXXXX"
+            oninput="this.value=this.value.toUpperCase()"
+            class="flex-1 px-3 py-2 border border-coffee-200 rounded-xl text-sm font-mono tracking-wider focus:outline-none focus:ring-2 focus:ring-purple-400">
+          <button onclick="redeemDemoCode()" id="redeem-demo-btn" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-sm font-semibold transition whitespace-nowrap">
+            <i class="fas fa-play mr-1"></i> Mulai Demo
+          </button>
+        </div>
+        <div id="demo-code-error" class="hidden bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl p-2 mt-2">
+          <i class="fas fa-exclamation-circle mr-1"></i><span id="demo-code-error-text"></span>
+        </div>
+      </div>
+
       <button onclick="doLogout()" class="w-full px-6 py-2.5 bg-coffee-200 text-coffee-800 rounded-xl font-semibold hover:bg-coffee-300 transition">
         <i class="fas fa-sign-out-alt mr-2"></i> Keluar
       </button>
@@ -329,17 +352,25 @@
   </div>
 
   <!-- ============================================== -->
-  <!-- ============ AUTH: SUBSCRIPTION EXPIRED ======= -->
+  <!-- ============ AUTH: DEMO EXPIRED ============== -->
   <!-- ============================================== -->
-  <div id="screen-expired" class="screen auth-bg items-center justify-center p-4">
+  <div id="screen-demo-expired" class="screen auth-bg items-center justify-center p-4">
     <div class="auth-card w-full max-w-md p-8 text-center animate-fade-in">
       <div class="w-24 h-24 bg-orange-100 rounded-full mx-auto mb-5 flex items-center justify-center">
-        <i class="fas fa-exclamation-triangle text-4xl text-orange-500"></i>
+        <i class="fas fa-hourglass-end text-4xl text-orange-500"></i>
       </div>
-      <h1 class="font-display text-2xl font-bold text-coffee-900 mb-2">Langganan Berakhir</h1>
-      <p class="text-coffee-600 mb-2">Langganan akun Anda telah berakhir pada <strong id="expired-date"></strong>.</p>
-      <p class="text-coffee-500 text-sm mb-6">Silakan hubungi admin untuk memperpanjang langganan Anda.</p>
-      <button onclick="doLogout()" class="px-6 py-2.5 bg-coffee-200 text-coffee-800 rounded-xl font-semibold hover:bg-coffee-300 transition">
+      <h1 class="font-display text-2xl font-bold text-coffee-900 mb-2">Masa Demo Berakhir</h1>
+      <p class="text-coffee-600 mb-2">Masa demo 24 jam Anda telah berakhir.</p>
+      <p class="text-coffee-500 text-sm mb-2">Untuk mendapatkan akses permanen, hubungi admin:</p>
+      <div class="bg-green-50 border border-green-200 rounded-2xl p-4 mb-5">
+        <p class="text-xs font-bold text-green-800 mb-2">Kode Aktivasi Anda</p>
+        <div id="demo-expired-code" class="font-mono text-xl font-bold text-green-800 tracking-wider select-all">WK-XXXXXX</div>
+      </div>
+      <a href="#" id="demo-expired-wa-link" target="_blank"
+        class="flex items-center justify-center gap-2 w-full py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl text-sm font-bold transition shadow-md mb-3">
+        <i class="fab fa-whatsapp text-lg"></i> Hubungi Admin via WhatsApp
+      </a>
+      <button onclick="doLogout()" class="w-full px-6 py-2.5 bg-coffee-200 text-coffee-800 rounded-xl font-semibold hover:bg-coffee-300 transition">
         <i class="fas fa-sign-out-alt mr-2"></i> Keluar
       </button>
     </div>
@@ -381,7 +412,6 @@
             <div id="header-daily-total" class="font-bold text-coffee-100 text-sm">Rp 0</div>
             <div id="header-daily-count" class="text-coffee-400 text-xs">0 transaksi</div>
           </div>
-          <div id="header-sub-badge" class="hidden px-2 py-1 rounded-lg text-xs font-semibold"></div>
           <button onclick="doLogout()" class="w-9 h-9 rounded-full bg-coffee-700 flex items-center justify-center hover:bg-coffee-600 transition" title="Keluar">
             <i class="fas fa-sign-out-alt text-sm text-coffee-200"></i>
           </button>
@@ -389,10 +419,15 @@
       </div>
     </header>
 
-    <!-- SUBSCRIPTION WARNING BANNER -->
-    <div id="sub-warning-banner" class="hidden bg-amber-500 text-amber-900 px-4 py-2 text-center text-sm font-semibold no-print">
-      <i class="fas fa-exclamation-triangle mr-1"></i>
-      <span id="sub-warning-text"></span>
+    <!-- DEMO MODE BANNER -->
+    <div id="demo-banner" class="hidden bg-gradient-to-r from-purple-600 to-purple-500 text-white px-4 py-2 text-center text-sm font-semibold no-print">
+      <i class="fas fa-flask mr-1"></i> MODE DEMO — <span id="demo-countdown">23:59:59</span> tersisa
+      <span class="ml-2 text-purple-200 text-xs">(Hubungi admin untuk akses permanen)</span>
+    </div>
+
+    <!-- DEMO WATERMARK -->
+    <div id="demo-watermark" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-30 opacity-[0.04] rotate-[-30deg] no-print">
+      <span class="text-coffee-900 font-bold text-6xl sm:text-8xl whitespace-nowrap tracking-wider">DEMO</span>
     </div>
 
     <!-- POS CONTENT -->
@@ -533,11 +568,6 @@
       <div id="page-toko" class="page">
         <div class="max-w-lg mx-auto p-4">
           <h2 class="text-lg font-bold text-coffee-800 mb-4 flex items-center gap-2"><i class="fas fa-store text-coffee-500"></i> Pengaturan Toko</h2>
-          <!-- Subscription Info Card -->
-          <div id="settings-sub-card" class="bg-white rounded-2xl p-4 shadow-sm border border-coffee-100 mb-4">
-            <h3 class="text-sm font-bold text-coffee-800 mb-2"><i class="fas fa-crown mr-2 text-yellow-500"></i>Langganan</h3>
-            <div id="settings-sub-info"></div>
-          </div>
           <div class="bg-white rounded-2xl p-5 shadow-sm border border-coffee-100 space-y-5">
             <div class="text-center">
               <div id="shop-photo-preview" class="w-24 h-24 rounded-full bg-coffee-100 mx-auto mb-3 flex items-center justify-center overflow-hidden border-3 border-coffee-200 cursor-pointer" onclick="document.getElementById('shop-photo-input').click()">
@@ -571,6 +601,35 @@
               <i class="fas fa-save mr-2"></i> Simpan Pengaturan
             </button>
           </div>
+
+          <!-- Backup & Restore Card -->
+          <div class="bg-white rounded-2xl p-5 shadow-sm border border-coffee-100 mt-4">
+            <h3 class="text-sm font-bold text-coffee-800 mb-3"><i class="fas fa-database mr-2 text-blue-500"></i>Backup & Restore Data</h3>
+
+            <!-- Data Summary -->
+            <div id="data-summary" class="mb-4 text-xs text-coffee-500 space-y-1">
+              <!-- Filled dynamically -->
+            </div>
+
+            <!-- Last Backup Info -->
+            <div id="last-backup-info" class="mb-4 text-xs text-coffee-500"></div>
+
+            <!-- Buttons -->
+            <div class="grid grid-cols-2 gap-3">
+              <button onclick="exportBackup()" class="py-2.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-xl text-sm font-semibold hover:bg-blue-100 transition">
+                <i class="fas fa-download mr-1"></i> Export Backup
+              </button>
+              <button onclick="document.getElementById('import-backup-input').click()" class="py-2.5 bg-orange-50 text-orange-700 border border-orange-200 rounded-xl text-sm font-semibold hover:bg-orange-100 transition">
+                <i class="fas fa-upload mr-1"></i> Import Restore
+              </button>
+              <input type="file" id="import-backup-input" accept=".json" class="hidden" onchange="importBackup(event)">
+            </div>
+
+            <button onclick="confirmClearData()" class="w-full mt-3 py-2 bg-red-50 text-red-600 border border-red-200 rounded-xl text-xs font-semibold hover:bg-red-100 transition">
+              <i class="fas fa-trash mr-1"></i> Hapus Semua Data Lokal
+            </button>
+          </div>
+
           <div class="mt-4">
             <button onclick="doLogout()" class="w-full py-3 bg-red-50 text-red-600 border border-red-200 rounded-xl font-semibold hover:bg-red-100 transition">
               <i class="fas fa-sign-out-alt mr-2"></i> Keluar dari Akun
@@ -719,6 +778,16 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
+    // ===== LOCALSTORAGE HELPERS =====
+    const LS_KEYS = {
+      menu: (uid) => 'warkop_menu_' + uid,
+      transactions: (uid) => 'warkop_transactions_' + uid,
+      settings: (uid) => 'warkop_settings_' + uid,
+      activeTables: (uid) => 'warkop_activeTables_' + uid
+    };
+    function lsGet(key) { try { return JSON.parse(localStorage.getItem(key)); } catch(e) { return null; } }
+    function lsSet(key, data) { try { localStorage.setItem(key, JSON.stringify(data)); } catch(e) { console.warn('localStorage write error:', e); } }
+
     // ===== APP STATE =====
     let currentShop = null;
     let menuData = [];
@@ -732,26 +801,12 @@
     let selectedPayMethod = 'Tunai';
     let selectedMenuKategori = 'Minuman';
     let currentFilteredTransactions = [];
-    let subscriptionCheckInterval = null;
-    let isSaving = false;
-
     const TABLE_COUNT = 30;
     const today = () => formatDateInput(new Date());
     const thisMonth = () => formatMonthInput(new Date());
 
-    // ===== LOCAL CACHE (reduces Firestore reads by ~80%) =====
-    const CACHE_DURATION = {
-      menu: 30 * 60 * 1000,       // 30 minutes
-      settings: 60 * 60 * 1000,    // 1 hour
-      transactions: 5 * 60 * 1000  // 5 minutes
-    };
-    let dataCache = {
-      menu: { data: null, lastFetch: 0 },
-      settings: { data: null, lastFetch: 0 },
-      transactions: { data: null, lastFetch: 0, key: '' }
-    };
-    let activeTablesSaveTimer = null;
-    let historyPagination = { lastDoc: null, hasMore: false, isLoading: false };
+    // Pagination state for localStorage-based history
+    let historyPagination = { offset: 0, hasMore: false, isLoading: false, _allFiltered: [] };
 
     const defaultMenu = [
       { id: 'M01', nama_menu: 'Kopi Hitam', harga: 5000, kategori: 'Minuman' },
@@ -944,7 +999,6 @@
             shopPhoto: '',
             status: 'pending',
             activationCode: activationCode,
-            subscriptionEnd: null,
             createdAt: firebase.firestore.FieldValue.serverTimestamp(),
             activatedAt: null
           });
@@ -962,7 +1016,7 @@
             'Email: ' + email + '\n' +
             'No. HP: ' + phone + '\n\n' +
             'Kode Aktivasi: *' + activationCode + '*\n\n' +
-            'Mohon info biaya langganan dan cara pembayaran. Terima kasih!'
+            'Mohon info biaya pembelian (sekali bayar) dan cara pembayaran. Terima kasih!'
           );
           document.getElementById('wa-admin-link').href = 'https://wa.me/' + ADMIN_WA_NUMBER + '?text=' + waText;
           showScreen('pending');
@@ -1037,7 +1091,7 @@
             const shopDoc = await db.collection('shops').doc(user.uid).get();
             if (shopDoc.exists) {
               const shop = shopDoc.data();
-              if (shop.status === 'active') {
+              if (shop.status === 'active' || shop.status === 'demo') {
                 showToast('Akun sudah diaktifkan! Mengalihkan...', 'success');
                 setTimeout(() => location.reload(), 1500);
                 return;
@@ -1052,12 +1106,7 @@
     }
 
     function doLogout() {
-      if (subscriptionCheckInterval) clearInterval(subscriptionCheckInterval);
-      // Clear all caches on logout
-      dataCache.menu = { data: null, lastFetch: 0 };
-      dataCache.settings = { data: null, lastFetch: 0 };
-      dataCache.transactions = { data: null, lastFetch: 0, key: '' };
-      if (activeTablesSaveTimer) clearTimeout(activeTablesSaveTimer);
+      stopDemoCountdown();
       auth.signOut();
     }
 
@@ -1096,10 +1145,9 @@
                 'Email: ' + shop.email + '\n' +
                 'No. HP: ' + (shop.phone || '') + '\n\n' +
                 'Kode Aktivasi: *' + shop.activationCode + '*\n\n' +
-                'Mohon info biaya langganan dan cara pembayaran. Terima kasih!'
+                'Mohon info biaya pembelian (sekali bayar) atau minta kode demo untuk mencoba 24 jam gratis. Terima kasih!'
               );
-              const adminWANumber = document.querySelector('script')?.textContent?.match(/ADMIN_WA_NUMBER\s*=\s*['"]([^'"]+)['"/)?.[1] || '6281234567890';
-              document.getElementById('wa-admin-link').href = 'https://wa.me/' + adminWANumber + '?text=' + waText;
+              document.getElementById('wa-admin-link').href = 'https://wa.me/' + ADMIN_WA_NUMBER + '?text=' + waText;
             }
             showScreen('pending');
             return;
@@ -1108,38 +1156,63 @@
             showScreen('rejected');
             return;
           }
-          if (shop.status === 'inactive') {
-            const expEl = document.getElementById('expired-date');
-            if (shop.subscriptionEnd) {
-              expEl.textContent = formatDateShort(shop.subscriptionEnd);
-            } else {
-              expEl.textContent = '-';
-            }
-            showScreen('expired');
-            return;
-          }
 
-          // Check subscription expiry
-          if (shop.subscriptionEnd) {
-            const endDate = new Date(shop.subscriptionEnd);
-            if (endDate < new Date()) {
-              await db.collection('shops').doc(user.uid).update({ status: 'inactive' });
-              const expEl = document.getElementById('expired-date');
-              expEl.textContent = formatDateShort(shop.subscriptionEnd);
-              showScreen('expired');
+          // DEMO - check localStorage expiry
+          if (shop.status === 'demo') {
+            let expiry = getDemoExpiry();
+            if (!expiry) {
+              // First time entering demo - set 24hr countdown
+              setDemoExpiry();
+              expiry = getDemoExpiry();
+            }
+            if (Date.now() < expiry) {
+              // Demo still active - load POS with demo features
+              currentShop = { id: user.uid, ...shop };
+              loadPOS();
+              startDemoCountdown();
+              return;
+            } else {
+              // Demo expired
+              document.getElementById('demo-expired-code').textContent = shop.activationCode || '-';
+              const dShopName = shop.shopName || 'Toko';
+              const dOwnerName = shop.ownerName || '';
+              const dWaText = encodeURIComponent(
+                'Halo Admin Warung Kopi POS,\n\n' +
+                'Saya sudah mencoba demo dan ingin membeli akses permanen.\n\n' +
+                'Nama Toko: ' + dShopName + '\n' +
+                'Nama Pemilik: ' + dOwnerName + '\n' +
+                'Email: ' + shop.email + '\n\n' +
+                'Kode Aktivasi: *' + (shop.activationCode || '') + '*\n\n' +
+                'Mohon info cara pembayaran. Terima kasih!'
+              );
+              document.getElementById('demo-expired-wa-link').href = 'https://wa.me/' + ADMIN_WA_NUMBER + '?text=' + dWaText;
+              showScreen('demo-expired');
               return;
             }
-          } else {
-            showScreen('expired');
+          }
+
+          // INACTIVE - show demo-expired screen
+          if (shop.status === 'inactive') {
+            document.getElementById('demo-expired-code').textContent = shop.activationCode || '-';
+            const iShopName = shop.shopName || 'Toko';
+            const iOwnerName = shop.ownerName || '';
+            const iWaText = encodeURIComponent(
+              'Halo Admin Warung Kopi POS,\n\n' +
+              'Saya ingin mengaktifkan kembali akun saya.\n\n' +
+              'Nama Toko: ' + iShopName + '\n' +
+              'Nama Pemilik: ' + iOwnerName + '\n' +
+              'Email: ' + shop.email + '\n\n' +
+              'Kode Aktivasi: *' + (shop.activationCode || '') + '*\n\n' +
+              'Mohon info cara pembayaran. Terima kasih!'
+            );
+            document.getElementById('demo-expired-wa-link').href = 'https://wa.me/' + ADMIN_WA_NUMBER + '?text=' + iWaText;
+            showScreen('demo-expired');
             return;
           }
 
-          // ACTIVE - load POS
+          // ACTIVE - load POS directly (lifetime access, no subscription check)
           currentShop = { id: user.uid, ...shop };
-          await loadPOS();
-
-          // Check subscription every hour
-          subscriptionCheckInterval = setInterval(checkSubscription, 3600000);
+          loadPOS();
 
         } catch (error) {
           console.error('Error checking shop status:', error);
@@ -1152,52 +1225,28 @@
       }
     });
 
-    // ===== CHECK SUBSCRIPTION =====
-    async function checkSubscription() {
-      if (!currentShop) return;
+    // ===== LOAD POS (from localStorage) =====
+    function loadPOS() {
       try {
-        const shopDoc = await db.collection('shops').doc(currentShop.id).get();
-        if (!shopDoc.exists) return;
-        const shop = shopDoc.data();
-        if (shop.status !== 'active') {
-          doLogout();
-          return;
-        }
-        if (shop.subscriptionEnd) {
-          const endDate = new Date(shop.subscriptionEnd);
-          if (endDate < new Date()) {
-            await db.collection('shops').doc(currentShop.id).update({ status: 'inactive' });
-            showToast('Langganan telah berakhir.', 'error');
-            doLogout();
-            return;
-          }
-          currentShop.subscriptionEnd = shop.subscriptionEnd;
-          updateSubscriptionUI();
-        }
-      } catch (e) {
-        console.error('Subscription check error:', e);
-      }
-    }
-
-    // ===== LOAD POS =====
-    async function loadPOS() {
-      try {
-        await Promise.all([
-          loadMenuFromFirestore(),
-          loadActiveTablesFromFirestore(),
-          loadSettingsFromFirestore()
-        ]);
+        loadMenuFromLS();
+        loadActiveTablesFromLS();
+        loadSettingsFromLS();
 
         // Update header
         document.getElementById('header-shop-name').textContent = currentShop.shopName || 'Warung Kopi';
         document.title = (currentShop.shopName || 'Warung Kopi') + ' - POS';
 
         updateHeaderPhoto();
-        updateSubscriptionUI();
-        await updateDailyStats();
+        updateHeaderTagline();
+        updateDailyStats();
 
         showPOS();
         switchPage('kasir');
+
+        // Start demo countdown if demo mode is active
+        if (isDemoActive()) {
+          startDemoCountdown();
+        }
 
         // Set default dates for history
         document.getElementById('daily-date').value = today();
@@ -1212,162 +1261,131 @@
       }
     }
 
-    // ===== FIRESTORE: LOAD DATA (with caching) =====
-    async function loadMenuFromFirestore() {
-      const cacheKey = currentShop.id;
-      if (dataCache.menu.data && dataCache.menu.lastFetch > 0 &&
-          Date.now() - dataCache.menu.lastFetch < CACHE_DURATION.menu &&
-          dataCache.menu.key === cacheKey) {
-        menuData = dataCache.menu.data;
-        return;
+    // ===== LOCALSTORAGE: LOAD DATA =====
+    function loadMenuFromLS() {
+      const uid = currentShop.id;
+      menuData = lsGet(LS_KEYS.menu(uid));
+      if (!menuData || menuData.length === 0) {
+        // Seed default menu on first use
+        seedDefaultMenuLS();
+        menuData = lsGet(LS_KEYS.menu(uid));
       }
-      const snapshot = await db.collection('shops').doc(currentShop.id)
-        .collection('menu').orderBy('nama_menu').get();
-      menuData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      if (menuData.length === 0) {
-        // Check if shop was just activated, load default menu
-        await seedDefaultMenu();
-      }
-      dataCache.menu = { data: menuData, lastFetch: Date.now(), key: cacheKey };
     }
 
-    async function seedDefaultMenu() {
-      // Check if menu has been seeded before
-      const metaDoc = await db.collection('shops').doc(currentShop.id)
-        .collection('settings').doc('meta').get();
-      if (metaDoc.exists && metaDoc.data().menuSeeded) return;
-
-      const batch = db.batch();
-      for (const item of defaultMenu) {
-        const ref = db.collection('shops').doc(currentShop.id).collection('menu').doc();
-        batch.set(ref, { nama_menu: item.nama_menu, harga: item.harga, kategori: item.kategori });
-      }
-      await batch.commit();
-      await db.collection('shops').doc(currentShop.id)
-        .collection('settings').doc('meta').set({ menuSeeded: true });
-
-      // Reload menu
-      const snapshot = await db.collection('shops').doc(currentShop.id)
-        .collection('menu').orderBy('nama_menu').get();
-      menuData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    function seedDefaultMenuLS() {
+      const uid = currentShop.id;
+      const existing = lsGet(LS_KEYS.menu(uid));
+      if (existing && existing.length > 0) return; // Already seeded
+      lsSet(LS_KEYS.menu(uid), defaultMenu);
     }
 
-    async function loadActiveTablesFromFirestore() {
-      const doc = await db.collection('shops').doc(currentShop.id)
-        .collection('activeTables').doc('state').get();
-      if (doc.exists && doc.data().data) {
-        activeTables = JSON.parse(doc.data().data);
+    function loadActiveTablesFromLS() {
+      const uid = currentShop.id;
+      activeTables = lsGet(LS_KEYS.activeTables(uid)) || {};
+    }
+
+    function loadSettingsFromLS() {
+      const uid = currentShop.id;
+      const saved = lsGet(LS_KEYS.settings(uid));
+      if (saved && Object.keys(saved).length > 0) {
+        shopSettings = saved;
       } else {
-        activeTables = {};
+        // Initialize with defaults from Firestore shop doc
+        shopSettings = {
+          shopName: currentShop.shopName || '',
+          shopTagline: '',
+          shopPhone: currentShop.phone || '',
+          shopAddress: currentShop.address || '',
+          cashierName: currentShop.ownerName || 'Admin',
+          shopPhoto: ''
+        };
+        lsSet(LS_KEYS.settings(uid), shopSettings);
       }
-    }
-
-    async function loadSettingsFromFirestore() {
-      const cacheKey = currentShop.id;
-      if (dataCache.settings.data && dataCache.settings.lastFetch > 0 &&
-          Date.now() - dataCache.settings.lastFetch < CACHE_DURATION.settings &&
-          dataCache.settings.key === cacheKey) {
-        shopSettings = dataCache.settings.data;
-        // Restore photo from localStorage if available
-        const localPhoto = localStorage.getItem('shopPhoto_' + cacheKey);
-        if (localPhoto) shopSettings.shopPhoto = localPhoto;
-        return;
-      }
-      const doc = await db.collection('shops').doc(currentShop.id)
-        .collection('settings').doc('profile').get();
-      if (doc.exists) {
-        shopSettings = doc.data();
-      } else {
-        shopSettings = { shopPhoto: '', cashierName: 'Admin', shopTagline: 'Kopi Nusantara Asli' };
-      }
-      // Restore photo from localStorage (photos are never stored in Firestore)
-      const localPhoto = localStorage.getItem('shopPhoto_' + cacheKey);
+      // Restore photo from localStorage
+      const localPhoto = localStorage.getItem('shopPhoto_' + uid);
       if (localPhoto) shopSettings.shopPhoto = localPhoto;
-      dataCache.settings = { data: shopSettings, lastFetch: Date.now(), key: cacheKey };
     }
 
-    // Load transactions with server-side filtering (efficient queries)
-    async function loadTransactionsForPeriod(startDate, endDate) {
-      let query = db.collection('shops').doc(currentShop.id).collection('transactions');
-      if (startDate) query = query.where('date', '>=', startDate);
-      if (endDate) query = query.where('date', '<=', endDate + 'T23:59:59');
-      const snapshot = await query.orderBy('date', 'desc').limit(200).get();
-      return snapshot.docs.map(doc => doc.data());
+    // ===== LOCALSTORAGE: SAVE DATA =====
+    function saveTransactionToLS(trx) {
+      const uid = currentShop.id;
+      const transactions = lsGet(LS_KEYS.transactions(uid)) || [];
+      transactions.push(trx);
+      lsSet(LS_KEYS.transactions(uid), transactions);
     }
 
-    // Paginated transaction loader for Riwayat page
-    async function loadTransactionsPaginated(startDate, endDate, pageSize, startAfterDoc) {
-      let query = db.collection('shops').doc(currentShop.id).collection('transactions').orderBy('date', 'desc');
-      if (startDate) query = query.where('date', '>=', startDate);
-      if (endDate) query = query.where('date', '<=', endDate + 'T23:59:59');
-      if (startAfterDoc) query = query.startAfter(startAfterDoc);
-      query = query.limit(pageSize || 20);
-      const snapshot = await query.get();
+    function saveActiveTablesToLS() {
+      const uid = currentShop.id;
+      lsSet(LS_KEYS.activeTables(uid), activeTables);
+    }
+
+    function addMenuItemToLS(item) {
+      const uid = currentShop.id;
+      const menu = lsGet(LS_KEYS.menu(uid)) || [];
+      const newId = generateId();
+      item.id = newId;
+      menu.push(item);
+      menu.sort((a, b) => a.nama_menu.localeCompare(b.nama_menu));
+      lsSet(LS_KEYS.menu(uid), menu);
+      return newId;
+    }
+
+    function updateMenuItemInLS(docId, fields) {
+      const uid = currentShop.id;
+      const menu = lsGet(LS_KEYS.menu(uid)) || [];
+      const idx = menu.findIndex(m => m.id === docId);
+      if (idx >= 0) {
+        menu[idx] = { ...menu[idx], ...fields };
+        lsSet(LS_KEYS.menu(uid), menu);
+      }
+    }
+
+    function deleteMenuItemFromLS(docId) {
+      const uid = currentShop.id;
+      const menu = lsGet(LS_KEYS.menu(uid)) || [];
+      const filtered = menu.filter(m => m.id !== docId);
+      lsSet(LS_KEYS.menu(uid), filtered);
+    }
+
+    // Get transactions filtered by date range from localStorage
+    function getTransactionsFiltered(startDate, endDate) {
+      const uid = currentShop.id;
+      const allTx = lsGet(LS_KEYS.transactions(uid)) || [];
+      return allTx
+        .filter(tx => {
+          if (!tx.date) return false;
+          const txDate = typeof tx.date === 'string' ? tx.date.split('T')[0] : formatDateInput(new Date(tx.date));
+          if (startDate && txDate < startDate) return false;
+          if (endDate && txDate > endDate) return false;
+          return true;
+        })
+        .sort((a, b) => new Date(b.date) - new Date(a.date));
+    }
+
+    // Paginated access (client-side slicing)
+    function getTransactionsPaginated(startDate, endDate, pageSize, offset) {
+      const allFiltered = getTransactionsFiltered(startDate, endDate);
+      const start = offset || 0;
+      const page = allFiltered.slice(start, start + (pageSize || 20));
       return {
-        transactions: snapshot.docs.map(doc => doc.data()),
-        lastDoc: snapshot.docs[snapshot.docs.length - 1] || null,
-        hasMore: snapshot.size === (pageSize || 20)
+        transactions: page,
+        hasMore: start + page.length < allFiltered.length
       };
     }
 
-    async function loadTodayTransactions() {
-      const todayStr = today();
-      return await loadTransactionsForPeriod(todayStr, todayStr);
-    }
-
-    // ===== FIRESTORE: SAVE DATA =====
-    async function saveTransactionToFirestore(trx) {
-      await db.collection('shops').doc(currentShop.id)
-        .collection('transactions').doc(trx.id).set(trx);
-    }
-
-    // Debounced save - reduces Firestore writes by batching rapid changes
-    async function saveActiveTablesToFirestore() {
-      await db.collection('shops').doc(currentShop.id)
-        .collection('activeTables').doc('state').set({
-          data: JSON.stringify(activeTables)
-        });
-    }
-    function debouncedSaveActiveTables() {
-      if (activeTablesSaveTimer) clearTimeout(activeTablesSaveTimer);
-      activeTablesSaveTimer = setTimeout(() => {
-        saveActiveTablesToFirestore().catch(e => console.error('Save activeTables error:', e));
-      }, 2000);
-    }
-
-    async function addMenuItemToFirestore(item) {
-      const ref = await db.collection('shops').doc(currentShop.id)
-        .collection('menu').add(item);
-      return ref.id;
-    }
-
-    async function updateMenuItemInFirestore(docId, item) {
-      await db.collection('shops').doc(currentShop.id)
-        .collection('menu').doc(docId).update(item);
-    }
-
-    async function deleteMenuItemFromFirestore(docId) {
-      await db.collection('shops').doc(currentShop.id)
-        .collection('menu').doc(docId).delete();
-    }
-
-    // ===== UPDATE HEADER (uses daily summary for 1 read instead of N reads) =====
-    async function updateDailyStats() {
+    // ===== UPDATE HEADER (computes from localStorage) =====
+    function updateDailyStats() {
       try {
         const todayStr = today();
-        const summaryDoc = await db.collection('shops').doc(currentShop.id)
-          .collection('dailySummaries').doc(todayStr).get();
-        if (summaryDoc.exists) {
-          const data = summaryDoc.data();
-          document.getElementById('header-daily-total').textContent = formatIDR(data.totalRevenue || 0);
-          document.getElementById('header-daily-count').textContent = (data.transactionCount || 0) + ' transaksi';
-        } else {
-          // Fallback: load transactions directly (for shops without summaries yet)
-          const trxs = await loadTodayTransactions();
-          const total = trxs.reduce((s, t) => s + (t.total || 0), 0);
-          document.getElementById('header-daily-total').textContent = formatIDR(total);
-          document.getElementById('header-daily-count').textContent = trxs.length + ' transaksi';
-        }
+        const allTx = lsGet(LS_KEYS.transactions(currentShop.id)) || [];
+        const todayTx = allTx.filter(tx => {
+          if (!tx.date) return false;
+          const txDate = typeof tx.date === 'string' ? tx.date.split('T')[0] : formatDateInput(new Date(tx.date));
+          return txDate === todayStr;
+        });
+        const total = todayTx.reduce((s, t) => s + (t.total || 0), 0);
+        document.getElementById('header-daily-total').textContent = formatIDR(total);
+        document.getElementById('header-daily-count').textContent = todayTx.length + ' transaksi';
       } catch (e) {
         console.error('Error updating daily stats:', e);
       }
@@ -1382,45 +1400,7 @@
       }
     }
 
-    function updateSubscriptionUI() {
-      if (!currentShop || !currentShop.subscriptionEnd) return;
-      const endDate = new Date(currentShop.subscriptionEnd);
-      const now = new Date();
-      const diffMs = endDate - now;
-      const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-      const formattedDate = endDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
-
-      // Header badge
-      const badge = document.getElementById('header-sub-badge');
-      badge.classList.remove('hidden');
-      if (diffDays <= 7) {
-        badge.className = 'px-2 py-1 rounded-lg text-xs font-semibold bg-amber-500 text-amber-900';
-        badge.innerHTML = '<i class="fas fa-exclamation-triangle mr-1"></i>' + diffDays + ' hari';
-      } else {
-        badge.className = 'px-2 py-1 rounded-lg text-xs font-semibold bg-green-500 text-green-100';
-        badge.innerHTML = '<i class="fas fa-check mr-1"></i>Aktif';
-      }
-
-      // Warning banner
-      const banner = document.getElementById('sub-warning-banner');
-      const bannerText = document.getElementById('sub-warning-text');
-      if (diffDays <= 7) {
-        banner.classList.remove('hidden');
-        bannerText.textContent = 'Langganan Anda berakhir dalam ' + diffDays + ' hari (' + formattedDate + '). Hubungi admin untuk memperpanjang.';
-      } else {
-        banner.classList.add('hidden');
-      }
-
-      // Settings subscription info
-      const settingsSubInfo = document.getElementById('settings-sub-info');
-      if (settingsSubInfo) {
-        const statusClass = diffDays <= 7 ? 'text-amber-600' : 'text-green-600';
-        const statusIcon = diffDays <= 7 ? 'fa-exclamation-triangle' : 'fa-check-circle';
-        settingsSubInfo.innerHTML = '<div class="flex items-center gap-2 mb-1"><span class="' + statusClass + '"><i class="fas ' + statusIcon + ' mr-1"></i><strong>' + (diffDays <= 7 ? 'Berakhir dalam ' + diffDays + ' hari' : 'Aktif') + '</strong></span></div>' +
-          '<p class="text-sm text-coffee-600">Berlaku hingga: <strong>' + formattedDate + '</strong></p>';
-      }
-
-      // Tagline
+    function updateHeaderTagline() {
       const taglineEl = document.getElementById('header-shop-tagline');
       if (shopSettings && shopSettings.shopTagline) {
         taglineEl.textContent = shopSettings.shopTagline;
@@ -1450,6 +1430,7 @@
         renderMenuManagement();
       } else if (page === 'toko') {
         loadSettingsForm();
+        renderDataSummary();
       }
     }
 
@@ -1472,11 +1453,11 @@
       grid.innerHTML = html;
     }
 
-    async function selectTable(tableId) {
+    function selectTable(tableId) {
       currentTableId = tableId;
       if (!activeTables[tableId]) {
         activeTables[tableId] = [];
-        debouncedSaveActiveTables();
+        saveActiveTablesToLS();
       }
       renderTables();
       renderMenuGrid();
@@ -1517,7 +1498,7 @@
     }
 
     // ===== KASIR: CART =====
-    async function addToCart(menuId) {
+    function addToCart(menuId) {
       if (!currentTableId) { showToast('Pilih meja terlebih dahulu!', 'error'); return; }
       const menuItem = menuData.find(m => m.id === menuId);
       if (!menuItem) return;
@@ -1525,38 +1506,38 @@
       const existing = activeTables[currentTableId].find(i => i.id === menuId);
       if (existing) { existing.qty++; }
       else { activeTables[currentTableId].push({ id: menuItem.id, nama_menu: menuItem.nama_menu, harga: menuItem.harga, kategori: menuItem.kategori, qty: 1 }); }
-      debouncedSaveActiveTables();
+      saveActiveTablesToLS();
       renderTables();
       renderOrderPanel('panel-content-desktop');
       renderOrderPanel('panel-content-mobile');
     }
 
-    async function updateQty(menuId, delta) {
+    function updateQty(menuId, delta) {
       if (!currentTableId || !activeTables[currentTableId]) return;
       const item = activeTables[currentTableId].find(i => i.id === menuId);
       if (!item) return;
       item.qty += delta;
       if (item.qty <= 0) activeTables[currentTableId] = activeTables[currentTableId].filter(i => i.id !== menuId);
-      debouncedSaveActiveTables();
+      saveActiveTablesToLS();
       renderTables();
       renderOrderPanel('panel-content-desktop');
       renderOrderPanel('panel-content-mobile');
     }
 
-    async function removeItem(menuId) {
+    function removeItem(menuId) {
       if (!currentTableId || !activeTables[currentTableId]) return;
       activeTables[currentTableId] = activeTables[currentTableId].filter(i => i.id !== menuId);
-      debouncedSaveActiveTables();
+      saveActiveTablesToLS();
       renderTables();
       renderOrderPanel('panel-content-desktop');
       renderOrderPanel('panel-content-mobile');
     }
 
-    async function resetOrder() {
+    function resetOrder() {
       if (!currentTableId) return;
       if (!confirm('Reset semua pesanan meja ini?')) return;
       activeTables[currentTableId] = [];
-      debouncedSaveActiveTables();
+      saveActiveTablesToLS();
       renderTables();
       renderOrderPanel('panel-content-desktop');
       renderOrderPanel('panel-content-mobile');
@@ -1656,7 +1637,7 @@
       }
     }
 
-    async function confirmPayment() {
+    function confirmPayment() {
       const items = activeTables[currentTableId] || [];
       if (items.length === 0) return;
       const subtotal = items.reduce((s, i) => s + i.harga * i.qty, 0);
@@ -1687,27 +1668,15 @@
       };
 
       try {
-        // 1. Save transaction + daily summary in a batch
-        const batch = db.batch();
-        const trxRef = db.collection('shops').doc(currentShop.id).collection('transactions').doc(trx.id);
-        batch.set(trxRef, trx);
-        // Update daily summary for fast stats
-        const dateKey = trx.date.split('T')[0];
-        const summaryRef = db.collection('shops').doc(currentShop.id).collection('dailySummaries').doc(dateKey);
-        batch.set(summaryRef, {
-          totalRevenue: firebase.firestore.FieldValue.increment(trx.total),
-          transactionCount: firebase.firestore.FieldValue.increment(1),
-          date: dateKey,
-          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        }, { merge: true });
-        await batch.commit();
+        // 1. Save transaction to localStorage
+        saveTransactionToLS(trx);
 
         // 2. Clear active tables for that table
         activeTables[currentTableId] = [];
         const savedTableId = currentTableId;
 
-        // 3. Save active tables to Firestore (debounced)
-        debouncedSaveActiveTables();
+        // 3. Save active tables to localStorage
+        saveActiveTablesToLS();
 
         // 4. Re-render tables, order panels
         renderTables();
@@ -1715,7 +1684,7 @@
         renderOrderPanel('panel-content-mobile');
 
         // 5. Update daily stats in header
-        await updateDailyStats();
+        updateDailyStats();
 
         // 6. Close payment modal
         closePaymentModal();
@@ -1809,7 +1778,7 @@
       loadHistory(tab);
     }
 
-    async function loadHistory(tab) {
+    function loadHistory(tab) {
       const summaryEl = document.getElementById('history-summary');
       const reportEl = document.getElementById('history-report');
       const emptyEl = document.getElementById('history-empty');
@@ -1838,46 +1807,39 @@
       }
 
       try {
-        // Reset pagination state
-        historyPagination = { lastDoc: null, hasMore: false, isLoading: false };
-        const result = await loadTransactionsPaginated(startDate, endDate, 20, null);
-        currentFilteredTransactions = result.transactions;
-        historyPagination.lastDoc = result.lastDoc;
-        historyPagination.hasMore = result.hasMore;
-        historyPagination._startDate = startDate;
-        historyPagination._endDate = endDate;
-        renderHistoryReport(result.transactions, tab, startDate, endDate);
+        // Get all filtered transactions and store for pagination
+        const allFiltered = getTransactionsFiltered(startDate, endDate);
+        historyPagination = { offset: 0, hasMore: allFiltered.length > 20, isLoading: false, _allFiltered: allFiltered };
+        const pageTx = allFiltered.slice(0, 20);
+        currentFilteredTransactions = pageTx;
+        renderHistoryReport(pageTx, tab, startDate, endDate);
         // Show/hide load more button
-        document.getElementById('history-load-more-container').classList.toggle('hidden', !result.hasMore);
+        document.getElementById('history-load-more-container').classList.toggle('hidden', allFiltered.length <= 20);
       } catch (error) {
         console.error('Load history error:', error);
         summaryEl.innerHTML = '<div class="col-span-2 bg-white rounded-2xl p-4 shadow-sm border border-coffee-100 text-center text-red-500 text-sm">Gagal memuat data</div>';
       }
     }
 
-    // Load more transactions (pagination)
-    async function loadMoreTransactions() {
+    // Load more transactions (pagination from memory)
+    function loadMoreTransactions() {
       if (historyPagination.isLoading || !historyPagination.hasMore) return;
       historyPagination.isLoading = true;
       const btn = document.getElementById('load-more-btn');
       btn.innerHTML = '<span class="spinner-dark"></span> Memuat...';
       btn.disabled = true;
       try {
-        const result = await loadTransactionsPaginated(
-          historyPagination._startDate,
-          historyPagination._endDate,
-          20,
-          historyPagination.lastDoc
-        );
-        currentFilteredTransactions = currentFilteredTransactions.concat(result.transactions);
-        historyPagination.lastDoc = result.lastDoc;
-        historyPagination.hasMore = result.hasMore;
+        const currentOffset = historyPagination._allFiltered.length;
+        const nextOffset = currentFilteredTransactions.length + 20;
+        const nextPage = historyPagination._allFiltered.slice(currentFilteredTransactions.length, nextOffset);
+        currentFilteredTransactions = currentFilteredTransactions.concat(nextPage);
+        historyPagination.hasMore = nextOffset < historyPagination._allFiltered.length;
         // Append to report
         const reportEl = document.getElementById('history-report');
-        result.transactions.forEach(trx => {
+        nextPage.forEach(trx => {
           reportEl.innerHTML += renderSingleTrxCard(trx);
         });
-        document.getElementById('history-load-more-container').classList.toggle('hidden', !result.hasMore);
+        document.getElementById('history-load-more-container').classList.toggle('hidden', !historyPagination.hasMore);
       } catch (e) {
         console.error('Load more error:', e);
         showToast('Gagal memuat data tambahan', 'error');
@@ -1938,9 +1900,10 @@
           '<div class="text-xs text-coffee-400 mt-1">Rata-rata ' + formatIDR(avgTrx) + '/trx</div>' +
         '</div>';
 
-      // Top items
+      // Top items (use all filtered for accurate stats, not just the page)
+      const allForStats = historyPagination._allFiltered || trxs;
       const itemCounts = {};
-      trxs.forEach(t => {
+      allForStats.forEach(t => {
         (t.items || []).forEach(i => {
           if (!itemCounts[i.nama_menu]) itemCounts[i.nama_menu] = { name: i.nama_menu, qty: 0, revenue: 0 };
           itemCounts[i.nama_menu].qty += i.qty;
@@ -2097,7 +2060,7 @@
       document.getElementById('menu-edit-modal').classList.remove('hidden');
     }
 
-    async function saveMenuFormItem() {
+    function saveMenuFormItem() {
       const editId = document.getElementById('menu-edit-id').value;
       const name = document.getElementById('menu-edit-name').value.trim();
       const price = parseInt(document.getElementById('menu-edit-price').value) || 0;
@@ -2111,18 +2074,14 @@
 
       try {
         if (editId) {
-          await updateMenuItemInFirestore(editId, { nama_menu: name, harga: price, kategori: selectedMenuKategori });
+          updateMenuItemInLS(editId, { nama_menu: name, harga: price, kategori: selectedMenuKategori });
           const idx = menuData.findIndex(m => m.id === editId);
           if (idx >= 0) { menuData[idx] = { ...menuData[idx], nama_menu: name, harga: price, kategori: selectedMenuKategori }; }
-          // Invalidate menu cache so next load fetches fresh data
-          dataCache.menu = { data: menuData, lastFetch: Date.now(), key: currentShop.id };
           showToast('Menu berhasil diperbarui');
         } else {
-          const newId = await addMenuItemToFirestore({ nama_menu: name, harga: price, kategori: selectedMenuKategori });
+          const newId = addMenuItemToLS({ nama_menu: name, harga: price, kategori: selectedMenuKategori });
           menuData.push({ id: newId, nama_menu: name, harga: price, kategori: selectedMenuKategori });
           menuData.sort((a, b) => a.nama_menu.localeCompare(b.nama_menu));
-          // Invalidate menu cache
-          dataCache.menu = { data: menuData, lastFetch: Date.now(), key: currentShop.id };
           showToast('Menu berhasil ditambahkan');
         }
         closeMenuModal();
@@ -2141,9 +2100,9 @@
       if (confirm('Hapus menu "' + nama + '"?')) deleteMenuItemAction(docId);
     }
 
-    async function deleteMenuItemAction(docId) {
+    function deleteMenuItemAction(docId) {
       try {
-        await deleteMenuItemFromFirestore(docId);
+        deleteMenuItemFromLS(docId);
         menuData = menuData.filter(m => m.id !== docId);
         showToast('Menu berhasil dihapus');
         renderMenuManagement();
@@ -2170,10 +2129,10 @@
           document.getElementById('shop-photo-placeholder').classList.add('hidden');
         }
       }
-      updateSubscriptionUI();
+      updateHeaderTagline();
     }
 
-    // Photo stored in localStorage only (NOT Firestore) — saves ~50KB per shop
+    // Photo stored in localStorage only
     function handleShopPhoto(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -2185,9 +2144,14 @@
       reader.onload = function(e) {
         const base64 = e.target.result;
         shopSettings.shopPhoto = base64;
-        // Save to localStorage only (not Firestore)
+        // Save to localStorage
         try {
           localStorage.setItem('shopPhoto_' + currentShop.id, base64);
+          // Also update settings object in localStorage
+          const uid = currentShop.id;
+          const saved = lsGet(LS_KEYS.settings(uid)) || {};
+          saved.shopPhoto = base64;
+          lsSet(LS_KEYS.settings(uid), saved);
         } catch (e) {
           console.warn('localStorage full, photo not saved locally');
         }
@@ -2212,29 +2176,29 @@
       if (!shopName) { showToast('Nama toko wajib diisi', 'error'); saveBtn.disabled = false; saveBtn.innerHTML = '<i class="fas fa-save mr-2"></i> Simpan Pengaturan'; return; }
 
       try {
-        // Update shop doc
+        // Update shop doc in Firestore (for admin panel display)
         await db.collection('shops').doc(currentShop.id).update({
           shopName: shopName,
           phone: phone,
           address: address
         });
 
-        // Update settings doc (photo NOT saved to Firestore — stored in localStorage)
-        await db.collection('shops').doc(currentShop.id)
-          .collection('settings').doc('profile').set({
-            shopPhoto: '', // Always empty in Firestore — photo lives in localStorage
-            cashierName: cashierName || 'Admin',
-            shopTagline: tagline
-          }, { merge: true });
+        // Update settings in localStorage
+        const uid = currentShop.id;
+        shopSettings = {
+          shopName: shopName,
+          shopTagline: tagline,
+          shopPhone: phone,
+          shopAddress: address,
+          cashierName: cashierName || 'Admin',
+          shopPhoto: shopSettings.shopPhoto || ''
+        };
+        lsSet(LS_KEYS.settings(uid), shopSettings);
 
         // Update local state
         currentShop.shopName = shopName;
         currentShop.phone = phone;
         currentShop.address = address;
-        shopSettings.cashierName = cashierName || 'Admin';
-        shopSettings.shopTagline = tagline;
-        // Invalidate settings cache
-        dataCache.settings = { data: shopSettings, lastFetch: Date.now(), key: currentShop.id };
 
         // Update UI
         document.getElementById('header-shop-name').textContent = shopName;
@@ -2250,6 +2214,298 @@
 
       saveBtn.disabled = false;
       saveBtn.innerHTML = '<i class="fas fa-save mr-2"></i> Simpan Pengaturan';
+    }
+
+    // ===== BACKUP & RESTORE =====
+    function getDataSummary() {
+      const uid = auth.currentUser?.uid;
+      if (!uid) return {};
+      const menu = lsGet(LS_KEYS.menu(uid)) || [];
+      const tx = lsGet(LS_KEYS.transactions(uid)) || [];
+      const settings = lsGet(LS_KEYS.settings(uid)) || {};
+      const tables = lsGet(LS_KEYS.activeTables(uid)) || {};
+
+      let totalSize = 0;
+      [LS_KEYS.menu(uid), LS_KEYS.transactions(uid), LS_KEYS.settings(uid), LS_KEYS.activeTables(uid)].forEach(k => {
+        totalSize += (localStorage.getItem(k) || '').length;
+      });
+
+      return {
+        menuCount: menu.length,
+        transactionCount: tx.length,
+        totalSize: (totalSize / 1024).toFixed(1) + ' KB',
+        maxLimit: '5-10 MB'
+      };
+    }
+
+    function renderDataSummary() {
+      const summary = getDataSummary();
+      const el = document.getElementById('data-summary');
+      if (!el) return;
+      el.innerHTML = `
+        <p><i class="fas fa-utensils mr-1"></i> Menu: <strong>${summary.menuCount || 0}</strong> item</p>
+        <p><i class="fas fa-receipt mr-1"></i> Transaksi: <strong>${summary.transactionCount || 0}</strong> record</p>
+        <p><i class="fas fa-hdd mr-1"></i> Ukuran Data: <strong>${summary.totalSize || '0 KB'}</strong> / ${summary.maxLimit || '5-10 MB'}</p>
+      `;
+
+      const lastBackup = lsGet('warkop_last_backup');
+      const lastEl = document.getElementById('last-backup-info');
+      if (lastEl && lastBackup) {
+        lastEl.innerHTML = '<p><i class="fas fa-clock mr-1"></i> Backup terakhir: ' + lastBackup.date + '</p>';
+      } else if (lastEl) {
+        lastEl.innerHTML = '';
+      }
+    }
+
+    function exportBackup() {
+      const uid = auth.currentUser?.uid;
+      if (!uid) return;
+
+      const backup = {
+        version: '2.0',
+        type: 'warkop-pos-backup',
+        shopId: uid,
+        exportDate: new Date().toISOString(),
+        data: {
+          menu: lsGet(LS_KEYS.menu(uid)) || [],
+          transactions: lsGet(LS_KEYS.transactions(uid)) || [],
+          settings: lsGet(LS_KEYS.settings(uid)) || {},
+          activeTables: lsGet(LS_KEYS.activeTables(uid)) || {},
+        }
+      };
+
+      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'backup_warkop_' + new Date().toISOString().slice(0,10) + '.json';
+      a.click();
+      URL.revokeObjectURL(url);
+
+      lsSet('warkop_last_backup', { date: new Date().toLocaleString('id-ID') });
+      renderDataSummary();
+      showToast('Backup berhasil diunduh!', 'success');
+    }
+
+    function importBackup(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const backup = JSON.parse(e.target.result);
+          if (backup.type !== 'warkop-pos-backup') {
+            showToast('File backup tidak valid.', 'error');
+            return;
+          }
+
+          if (confirm('Restore data dari backup?\n\nData saat ini akan digabungkan (tidak ditimpa).\n\nMenu: ' + (backup.data.menu?.length || 0) + ' item\nTransaksi: ' + (backup.data.transactions?.length || 0) + ' record')) {
+            const uid = auth.currentUser?.uid;
+
+            if (backup.data.menu?.length) {
+              const existing = lsGet(LS_KEYS.menu(uid)) || [];
+              const merged = [...existing.filter(m => !backup.data.menu.find(b => b.id === m.id)), ...backup.data.menu];
+              lsSet(LS_KEYS.menu(uid), merged);
+            }
+
+            if (backup.data.transactions?.length) {
+              const existing = lsGet(LS_KEYS.transactions(uid)) || [];
+              const existingIds = new Set(existing.map(t => t.localId || t.id));
+              const newTx = backup.data.transactions.filter(t => !existingIds.has(t.localId || t.id));
+              lsSet(LS_KEYS.transactions(uid), [...existing, ...newTx]);
+            }
+
+            if (backup.data.settings && Object.keys(backup.data.settings).length) {
+              lsSet(LS_KEYS.settings(uid), { ...lsGet(LS_KEYS.settings(uid)) || {}, ...backup.data.settings });
+            }
+
+            showToast('Data berhasil di-restore! Halaman akan di-refresh...', 'success');
+            setTimeout(() => location.reload(), 2000);
+          }
+        } catch (err) {
+          showToast('File backup rusak: ' + err.message, 'error');
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = '';
+    }
+
+    function confirmClearData() {
+      if (confirm('⚠️ PERINGATAN!\n\nSemua data lokal (menu, transaksi, pengaturan) akan dihapus permanen.\n\nPastikan Anda sudah backup terlebih dahulu!\n\nYakin ingin melanjutkan?')) {
+        const uid = auth.currentUser?.uid;
+        if (!uid) return;
+        localStorage.removeItem(LS_KEYS.menu(uid));
+        localStorage.removeItem(LS_KEYS.transactions(uid));
+        localStorage.removeItem(LS_KEYS.settings(uid));
+        localStorage.removeItem(LS_KEYS.activeTables(uid));
+        showToast('Semua data lokal telah dihapus. Halaman akan di-refresh...', 'success');
+        setTimeout(() => location.reload(), 2000);
+      }
+    }
+
+    // ===== DEMO CODE FUNCTIONS =====
+
+    const DEMO_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+    function getDemoExpiry() {
+      const uid = auth.currentUser?.uid;
+      if (!uid) return null;
+      const data = localStorage.getItem(`warkop_demo_${uid}`);
+      return data ? parseInt(data) : null;
+    }
+
+    function setDemoExpiry() {
+      const uid = auth.currentUser?.uid;
+      if (!uid) return;
+      localStorage.setItem(`warkop_demo_${uid}`, (Date.now() + DEMO_DURATION_MS).toString());
+    }
+
+    function clearDemoExpiry() {
+      const uid = auth.currentUser?.uid;
+      if (!uid) return;
+      localStorage.removeItem(`warkop_demo_${uid}`);
+    }
+
+    function isDemoActive() {
+      const expiry = getDemoExpiry();
+      return expiry !== null && Date.now() < expiry;
+    }
+
+    function getDemoRemaining() {
+      const expiry = getDemoExpiry();
+      if (!expiry) return 0;
+      return Math.max(0, expiry - Date.now());
+    }
+
+    function formatCountdown(ms) {
+      const totalSec = Math.floor(ms / 1000);
+      const h = Math.floor(totalSec / 3600);
+      const m = Math.floor((totalSec % 3600) / 60);
+      const s = totalSec % 60;
+      return `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+    }
+
+    let demoCountdownInterval = null;
+
+    function startDemoCountdown() {
+      const banner = document.getElementById('demo-banner');
+      const watermark = document.getElementById('demo-watermark');
+      const countdownEl = document.getElementById('demo-countdown');
+      
+      banner.classList.remove('hidden');
+      watermark.classList.remove('hidden');
+      
+      function updateCountdown() {
+        const remaining = getDemoRemaining();
+        if (remaining <= 0) {
+          // Demo expired
+          stopDemoCountdown();
+          showToast('Masa demo Anda telah berakhir.', 'error');
+          setTimeout(() => location.reload(), 2000);
+          return;
+        }
+        countdownEl.textContent = formatCountdown(remaining);
+      }
+      
+      updateCountdown();
+      demoCountdownInterval = setInterval(updateCountdown, 1000);
+    }
+
+    function stopDemoCountdown() {
+      if (demoCountdownInterval) {
+        clearInterval(demoCountdownInterval);
+        demoCountdownInterval = null;
+      }
+      const banner = document.getElementById('demo-banner');
+      const watermark = document.getElementById('demo-watermark');
+      if (banner) banner.classList.add('hidden');
+      if (watermark) watermark.classList.add('hidden');
+    }
+
+    async function redeemDemoCode() {
+      const input = document.getElementById('demo-code-input');
+      const code = (input ? input.value.trim() : '').toUpperCase();
+      const errorDiv = document.getElementById('demo-code-error');
+      const errorText = document.getElementById('demo-code-error-text');
+      const btn = document.getElementById('redeem-demo-btn');
+      
+      errorDiv.classList.add('hidden');
+      
+      if (!code) {
+        errorText.textContent = 'Masukkan kode demo.';
+        errorDiv.classList.remove('hidden');
+        return;
+      }
+      
+      if (!code.startsWith('DEMO-') || code.length !== 10) {
+        errorText.textContent = 'Format kode tidak valid. Contoh: DEMO-ABC123';
+        errorDiv.classList.remove('hidden');
+        return;
+      }
+      
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Memverifikasi...';
+      
+      try {
+        // Look up demo code in Firestore
+        const snapshot = await db.collection('demoCodes')
+          .where('code', '==', code)
+          .where('used', '==', false)
+          .limit(1)
+          .get();
+        
+        if (snapshot.empty) {
+          errorText.textContent = 'Kode demo tidak valid atau sudah digunakan.';
+          errorDiv.classList.remove('hidden');
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-play mr-1"></i> Mulai Demo';
+          return;
+        }
+        
+        const codeDoc = snapshot.docs[0];
+        const codeData = codeDoc.data();
+        
+        // Check if demo code itself is expired (7 days from creation for admin distribution)
+        const codeAge = Date.now() - (codeData.createdAt?.toMillis() || 0);
+        if (codeAge > 7 * 24 * 60 * 60 * 1000) {
+          errorText.textContent = 'Kode demo sudah kadaluarsa (lebih dari 7 hari).';
+          errorDiv.classList.remove('hidden');
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-play mr-1"></i> Mulai Demo';
+          return;
+        }
+        
+        const uid = auth.currentUser.uid;
+        
+        // Mark code as used
+        await codeDoc.ref.update({
+          used: true,
+          usedBy: uid,
+          usedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        
+        // Update shop status to 'demo'
+        await db.collection('shops').doc(uid).update({
+          status: 'demo'
+        });
+        
+        // Set demo expiry in localStorage (24 hours from NOW)
+        setDemoExpiry();
+        
+        showToast('Demo berhasil diaktifkan! Selamat mencoba selama 24 jam.', 'success');
+        
+        // Reload to enter demo mode
+        setTimeout(() => location.reload(), 1500);
+        
+      } catch (error) {
+        console.error('Demo code error:', error);
+        errorText.textContent = 'Gagal memverifikasi kode: ' + error.message;
+        errorDiv.classList.remove('hidden');
+      }
+      
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-play mr-1"></i> Mulai Demo';
     }
 
     // ===== INITIALIZE =====
