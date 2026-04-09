@@ -62,6 +62,8 @@
     }
     .animate-fade-in { animation: fadeIn 0.4s ease; }
     .animate-pulse-slow { animation: pulse-slow 2s ease-in-out infinite; }
+    .page { display: none; }
+    .page.active { display: block; }
     .report-tab.active-tab {
       background-color: #6F4E37 !important;
       color: white !important;
@@ -442,6 +444,14 @@
                 <h2 class="text-lg font-bold text-coffee-800 mb-3 flex items-center gap-2">
                   <i class="fas fa-chair text-coffee-500"></i> Pilih Meja
                 </h2>
+                            <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-sm font-semibold text-coffee-700"><i class="fas fa-chair mr-1 text-coffee-500"></i> Daftar Meja</h3>
+                  <div class="flex items-center gap-2">
+                    <button onclick="changeTableCount(-1)" class="w-7 h-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition text-xs font-bold" title="Kurangi meja"><i class="fas fa-minus"></i></button>
+                    <span id="table-count-display" class="text-sm font-bold text-coffee-800 min-w-[24px] text-center">30</span>
+                    <button onclick="changeTableCount(1)" class="w-7 h-7 rounded-lg bg-green-50 hover:bg-green-100 text-green-600 flex items-center justify-center transition text-xs font-bold" title="Tambah meja"><i class="fas fa-plus"></i></button>
+                  </div>
+                </div>
                 <div id="tables-grid" class="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-2"></div>
               </div>
               <div class="mb-4">
@@ -767,12 +777,12 @@
   <script>
     // ===== FIREBASE CONFIG =====
     const firebaseConfig = {
-      apiKey: "AIzaSyBJNdjMEYFov2rE-LkQ75VN3UPdfICmbBc",
-      authDomain: "warkop-app-20449.firebaseapp.com",
-      projectId: "warkop-app-20449",
-      storageBucket: "warkop-app-20449.firebasestorage.app",
-      messagingSenderId: "896934754762",
-      appId: "1:896934754762:web:72df8ab8b9269959d23733"
+      apiKey: "AIzaSyDemoKeyReplaceMe123456",
+      authDomain: "warung-kopi-pos.firebaseapp.com",
+      projectId: "warung-kopi-pos",
+      storageBucket: "warung-kopi-pos.appspot.com",
+      messagingSenderId: "123456789",
+      appId: "1:123456789:web:abcdef123456"
     };
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
@@ -801,7 +811,9 @@
     let selectedPayMethod = 'Tunai';
     let selectedMenuKategori = 'Minuman';
     let currentFilteredTransactions = [];
-    const TABLE_COUNT = 30;
+    let TABLE_COUNT = 30;
+    // Load custom table count from settings
+    try { const savedTC = JSON.parse(localStorage.getItem('warkop_tableCount')); if (savedTC && savedTC > 0 && savedTC <= 100) TABLE_COUNT = savedTC; } catch(e) {}
     const today = () => formatDateInput(new Date());
     const thisMonth = () => formatMonthInput(new Date());
 
@@ -953,7 +965,7 @@
 
     // ===== AUTH: REGISTER =====
     // Nomor WhatsApp admin — ganti dengan nomor Anda
-    const ADMIN_WA_NUMBER = '6289685157213';
+    const ADMIN_WA_NUMBER = '6281234567890';
 
     function generateActivationCode() {
       const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -1435,8 +1447,32 @@
     }
 
     // ===== KASIR: TABLES =====
+    function changeTableCount(delta) {
+      const newVal = TABLE_COUNT + delta;
+      if (newVal < 1 || newVal > 100) {
+        showToast('Jumlah meja harus antara 1-100.', 'warning');
+        return;
+      }
+      // Check if removing tables would lose active orders
+      if (delta < 0) {
+        for (let i = TABLE_COUNT; i > newVal; i--) {
+          if (activeTables[i] && activeTables[i].length > 0) {
+            showToast('Meja ' + i + ' masih memiliki pesanan! Kosongkan dulu.', 'warning');
+            return;
+          }
+        }
+      }
+      TABLE_COUNT = newVal;
+      localStorage.setItem('warkop_tableCount', JSON.stringify(TABLE_COUNT));
+      document.getElementById('table-count-display').textContent = TABLE_COUNT;
+      renderTables();
+      showToast('Jumlah meja: ' + TABLE_COUNT, 'success');
+    }
+
     function renderTables() {
       const grid = document.getElementById('tables-grid');
+      const countDisplay = document.getElementById('table-count-display');
+      if (countDisplay) countDisplay.textContent = TABLE_COUNT;
       let html = '';
       for (let i = 1; i <= TABLE_COUNT; i++) {
         const isActive = activeTables[i] && activeTables[i].length > 0;
