@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panduan Penggunaan - Warung Kopi POS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --coffee-900: #2C1810;
+      --coffee-800: #4A3428;
+      --coffee-700: #6F4E37;
+      --coffee-600: #8B6844;
+      --coffee-500: #A0785A;
+      --coffee-400: #C49A6C;
+      --coffee-300: #D4B896;
+      --coffee-200: #E8D0B3;
+      --coffee-100: #F5E6D3;
+      --coffee-50: #FDF8F3;
+      --accent: #197999;
+      --accent-light: #E8F4F8;
+      --text-primary: #1b1c1e;
+      --text-muted: #737980;
+      --surface: #f5f5f5;
+      --border: #e0e0e0;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--text-primary);
+      background: #fff;
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    /* Print button */
+    .print-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--coffee-700);
+      color: white;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      z-index: 100;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+    }
+    .print-bar button {
+      background: white;
+      color: var(--coffee-700);
+      border: none;
+      padding: 10px 28px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'Inter', sans-serif;
+      transition: transform 0.2s;
+    }
+    .print-bar button:hover { transform: scale(1.05); }
+    .print-bar span { font-size: 13px; opacity: 0.8; }
+
+    /* Cover Page */
+    .cover-page {
+      min-height: 100vh;
+      background: var(--coffee-50);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      position: relative;
+      overflow: hidden;
+      page-break-after: always;
+    }
+    .cover-page::before {
+      content: '';
+      position: absolute;
+      top: -100px;
+      right: -80px;
+      width: 350px;
+      height: 350px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(111,78,55,0.08) 0%, transparent 70%);
+    }
+    .cover-page::after {
+      content: '';
+      position: absolute;
+      bottom: 40px;
+      left: -80px;
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(25,121,153,0.06) 0%, transparent 70%);
+    }
+    .cover-inner {
+      text-align: center;
+      max-width: 520px;
+      position: relative;
+      z-index: 2;
+    }
+    .cover-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #6F4E37, #A0785A);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 28px;
+      box-shadow: 0 8px 30px rgba(111,78,55,0.3);
+    }
+    .cover-icon svg { width: 38px; height: 38px; fill: white; }
+    .cover-kicker {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--coffee-500);
+      margin-bottom: 16px;
+    }
+    .cover-title {
+      font-size: 42px;
+      font-weight: 800;
+      color: var(--coffee-900);
+      line-height: 1.15;
+      margin-bottom: 6px;
+    }
+    .cover-title .highlight { color: var(--coffee-700); }
+    .cover-subtitle {
+      font-size: 17px;
+      color: var(--coffee-600);
+      margin-top: 8px;
+      line-height: 1.6;
+    }
+    .cover-divider {
+      width: 60px;
+      height: 3px;
+      background: linear-gradient(to right, var(--coffee-700), var(--coffee-500));
+      border-radius: 2px;
+      margin: 28px auto;
+    }
+    .cover-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.8;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    .cover-meta {
+      margin-top: 40px;
+      font-size: 12px;
+      color: var(--coffee-400);
+    }
+
+    /* Content pages */
+    .content-page {
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 40px 50px 100px;
+    }
+
+    /* TOC */
+    .toc {
+      page-break-after: always;
+      padding-top: 60px;
+    }
+    .toc h2 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--coffee-700);
+      margin-bottom: 24px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--coffee-200);
+    }
+    .toc-list { list-style: none; }
+    .toc-list li { margin-bottom: 6px; }
+    .toc-list a {
+      text-decoration: none;
+      color: var(--text-primary);
+      font-size: 14px;
+      display: block;
+      padding: 6px 0;
+      border-bottom: 1px dotted var(--border);
+      transition: color 0.2s;
+    }
+    .toc-list a:hover { color: var(--coffee-700); }
+    .toc-list .toc-h2 { padding-left: 24px; font-size: 13px; color: var(--text-muted); }
+
+    /* Sections */
+    .section {
+      padding-top: 20px;
+      page-break-inside: avoid;
+    }
+    h1.section-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--coffee-700);
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--coffee-100);
+      page-break-after: avoid;
+    }
+    h2.sub-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--accent);
+      margin-top: 22px;
+      margin-bottom: 10px;
+      page-break-after: avoid;
+    }
+    h3.sub-sub-title {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-top: 16px;
+      margin-bottom: 8px;
+      page-break-after: avoid;
+    }
+
+    p {
+      margin-bottom: 10px;
+      text-align: justify;
+    }
+    b, strong { color: var(--coffee-900); }
+
+    /* Lists */
+    .step-list {
+      counter-reset: step;
+      list-style: none;
+      padding-left: 0;
+      margin: 12px 0 16px 0;
+    }
+    .step-list li {
+      counter-increment: step;
+      padding: 6px 0 6px 36px;
+      position: relative;
+      margin-bottom: 4px;
+    }
+    .step-list li::before {
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      top: 6px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--coffee-700);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .bullet-list {
+      list-style: none;
+      padding-left: 0;
+      margin: 10px 0 16px 0;
+    }
+    .bullet-list li {
+      padding: 4px 0 4px 22px;
+      position: relative;
+    }
+    .bullet-list li::before {
+      content: '';
+      position: absolute;
+      left: 4px;
+      top: 13px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    /* Tables */
+    .info-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 20px 0;
+      font-size: 13px;
+    }
+    .info-table thead th {
+      background: var(--coffee-700);
+      color: white;
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 600;
+      font-size: 12px;
+    }
+    .info-table tbody td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    .info-table tbody tr:nth-child(odd) { background: #fafafa; }
+    .info-table caption {
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      font-style: italic;
+    }
+
+    /* Callout boxes */
+    .callout {
+      background: var(--coffee-50);
+      border-left: 4px solid var(--coffee-500);
+      padding: 14px 18px;
+      border-radius: 0 10px 10px 0;
+      margin: 14px 0;
+      font-size: 13px;
+    }
+    .callout.tip {
+      background: var(--accent-light);
+      border-left-color: var(--accent);
+    }
+    .callout b { color: inherit; }
+
+    .faq-item {
+      margin: 14px 0;
+      page-break-inside: avoid;
+    }
+    .faq-q {
+      font-weight: 600;
+      color: var(--coffee-900);
+      margin-bottom: 4px;
+    }
+    .faq-a {
+      color: var(--text-primary);
+      padding-left: 16px;
+      font-size: 13px;
+      border-left: 3px solid var(--coffee-200);
+      margin-top: 4px;
+    }
+
+    /* Page numbers */
+    .page-num {
+      text-align: center;
+      font-size: 11px;
+      color: var(--text-muted);
+      padding-top: 30px;
+      margin-top: 40px;
+      border-top: 1px solid var(--border);
+    }
+
+    /* ==================== PRINT STYLES ==================== */
+    @media print {
+      @page {
+        size: A4;
+        margin: 20mm 18mm 25mm 18mm;
+      }
+      .print-bar { display: none !important; }
+      body { font-size: 12pt; }
+      .cover-page {
+        min-height: auto;
+        height: 100vh;
+        page-break-after: always;
+      }
+      .content-page { padding: 0; max-width: 100%; }
+      .section { page-break-inside: auto; }
+      h1.section-title { page-break-after: avoid; }
+      h2.sub-title { page-break-after: avoid; }
+      h3.sub-sub-title { page-break-after: avoid; }
+      .info-table, .callout, .faq-item { page-break-inside: avoid; }
+      .toc { page-break-after: always; }
+      a { color: inherit; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- PRINT BAR -->
+  <div class="print-bar">
+    <button onclick="window.print()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      Simpan sebagai PDF / Cetak
+    </button>
+    <span>Klik tombol ini, lalu pilih "Save as PDF" sebagai tujuan printer</span>
+  </div>
+
+  <!-- ==================== COVER PAGE ==================== -->
+  <div class="cover-page">
+    <div class="cover-inner">
+      <div class="cover-icon">
+        <svg viewBox="0 0 24 24"><path d="M2 21V19H20V21H2ZM20 8V5H22V8H24V10H22V13H20V10H18V8H20ZM18 17H4V15C4 14.4477 4.44772 14 5 14H17C17.5523 14 18 14.4477 18 15V17ZM14 11H4V9C4 8.44772 4.44772 8 5 8H13C13.5523 8 14 8.44772 14 9V11ZM18 5H4V3C4 2.44772 4.44772 2 5 2H17C17.5523 2 18 2.44772 18 3V5Z"/></svg>
+      </div>
+      <div class="cover-kicker">Panduan Penggunaan</div>
+      <h1 class="cover-title">Warung Kopi<br><span class="highlight">POS</span></h1>
+      <p class="cover-subtitle">Aplikasi Point of Sale untuk pengelolaan kedai kopi. Pencatatan pesanan, laporan penjualan, dan kelola menu dalam satu platform.</p>
+      <div class="cover-divider"></div>
+      <p class="cover-desc">Panduan lengkap mulai dari pendaftaran akun, proses aktivasi, penggunaan fitur kasir, riwayat penjualan, pengaturan toko, hingga backup dan restore data.</p>
+      <div class="cover-meta">Versi 1.0 &mdash; April 2026</div>
+    </div>
+  </div>
+
+  <!-- ==================== TABLE OF CONTENTS ==================== -->
+  <div class="content-page toc">
+    <h2>Daftar Isi</h2>
+    <ul class="toc-list">
+      <li><a href="#pendahuluan">1. Pendahuluan</a></li>
+      <li><a href="#pendaftaran">2. Pendaftaran Akun Baru</a></li>
+      <li><a href="#aktivasi">3. Aktivasi Akun</a>
+        <ul class="toc-list">
+          <li><a href="#aktivasi-permanen" class="toc-h2">3.1 Aktivasi Permanen (Jual Putus)</a></li>
+          <li><a href="#akun-demo" class="toc-h2">3.2 Akun Demo (24 Jam)</a></li>
+        </ul>
+      </li>
+      <li><a href="#dasbor">4. Dasbor Aplikasi</a>
+        <ul class="toc-list">
+          <li><a href="#header" class="toc-h2">4.1 Tampilan Header</a></li>
+          <li><a href="#navigasi" class="toc-h2">4.2 Navigasi Menu</a></li>
+        </ul>
+      </li>
+      <li><a href="#kasir">5. Menu Kasir (Pencatatan Pesanan)</a>
+        <ul class="toc-list">
+          <li><a href="#meja" class="toc-h2">5.1 Pengelolaan Meja</a></li>
+          <li><a href="#pilih-menu" class="toc-h2">5.2 Memilih Menu untuk Pesanan</a></li>
+          <li><a href="#proses-pesanan" class="toc-h2">5.3 Proses Pemesanan</a></li>
+          <li><a href="#pembayaran" class="toc-h2">5.4 Proses Pembayaran</a></li>
+        </ul>
+      </li>
+      <li><a href="#riwayat">6. Riwayat Penjualan</a>
+        <ul class="toc-list">
+          <li><a href="#harian" class="toc-h2">6.1 Laporan Harian</a></li>
+          <li><a href="#bulanan" class="toc-h2">6.2 Laporan Bulanan</a></li>
+          <li><a href="#kustom" class="toc-h2">6.3 Laporan Kustom</a></li>
+          <li><a href="#export" class="toc-h2">6.4 Export CSV dan Cetak</a></li>
+        </ul>
+      </li>
+      <li><a href="#kelola-menu">7. Kelola Menu</a></li>
+      <li><a href="#pengaturan-toko">8. Pengaturan Toko</a></li>
+      <li><a href="#backup">9. Backup dan Restore Data</a></li>
+      <li><a href="#tips-faq">10. Tips dan Pertanyaan Umum</a></li>
+    </ul>
+  </div>
+
+  <!-- ==================== CONTENT ==================== -->
+  <div class="content-page">
+
+    <!-- 1. PENDAHULUAN -->
+    <div class="section" id="pendahuluan">
+      <h1 class="section-title">1. Pendahuluan</h1>
+      <p>Warung Kopi POS adalah aplikasi Point of Sale (POS) berbasis web yang dirancang khusus untuk membantu pengelolaan kedai kopi dan usaha kuliner sejenis. Aplikasi ini menyediakan solusi lengkap mulai dari pencatatan pesanan, pengelolaan menu, pengaturan meja, hingga laporan penjualan yang terperinci. Dengan tampilan yang modern dan mudah dipahami, aplikasi ini cocok digunakan oleh siapa saja tanpa memerlukan pelatihan khusus.</p>
+      <p>Aplikasi ini menggunakan sistem <b>jual putus (sekali bayar)</b>, artinya Anda cukup membayar sekali untuk mendapatkan akses permanen selamanya. Tidak ada biaya langganan bulanan atau tahunan. Seluruh data penjualan Anda tersimpan secara lokal di perangkat masing-masing pengguna melalui localStorage browser, sehingga menjamin privasi dan keamanan data. Sistem autentikasi akun menggunakan Firebase Authentication, sementara kontrol aktivasi akun dikelola melalui Firebase Firestore. Arsitektur ini memastikan penggunaan bandwidth server yang sangat minimal, menjadikan aplikasi tetap responsif dan efisien.</p>
+      <p>Panduan ini akan membantu Anda memahami seluruh fitur yang tersedia, mulai dari cara mendaftar akun, proses aktivasi, hingga penggunaan setiap menu di dalam aplikasi. Bacalah panduan ini secara lengkap untuk memaksimalkan penggunaan aplikasi Warung Kopi POS di kedai kopi Anda.</p>
+
+      <h2 class="sub-title">Fitur Utama</h2>
+      <table class="info-table">
+        <thead>
+          <tr><th>Fitur</th><th>Keterangan</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Pencatatan Pesanan</td><td>Mencatat pesanan per meja dengan mudah, menambah atau mengurangi item, serta menghitung total otomatis.</td></tr>
+          <tr><td>Pembayaran</td><td>Mendukung metode Tunai, QRIS, dan Transfer Bank dengan kalkulasi kembalian otomatis.</td></tr>
+          <tr><td>Cetak Struk</td><td>Mencetak struk pembayaran langsung dari browser atau menyimpannya sebagai PDF.</td></tr>
+          <tr><td>Laporan Penjualan</td><td>Laporan harian, bulanan, dan kustom dengan fitur export CSV untuk analisis lebih lanjut.</td></tr>
+          <tr><td>Kelola Menu</td><td>Tambah, ubah, dan hapus menu makanan dan minuman beserta harga.</td></tr>
+          <tr><td>Pengaturan Meja</td><td>Atur jumlah meja sesuai kapasitas kedai kopi Anda (default 30 meja).</td></tr>
+          <tr><td>Backup &amp; Restore</td><td>Export dan import seluruh data dalam format JSON untuk keamanan data.</td></tr>
+        </tbody>
+        <caption>Tabel 1. Daftar Fitur Utama Aplikasi</caption>
+      </table>
+    </div>
+
+    <!-- 2. PENDAFTARAN AKUN -->
+    <div class="section" id="pendaftaran">
+      <h1 class="section-title">2. Pendaftaran Akun Baru</h1>
+      <p>Untuk mulai menggunakan aplikasi Warung Kopi POS, Anda perlu mendaftarkan akun terlebih dahulu. Proses pendaftaran sangat sederhana dan hanya memerlukan beberapa informasi dasar tentang kedai kopi Anda. Berikut adalah langkah-langkah lengkap untuk membuat akun baru:</p>
+
+      <h2 class="sub-title">Langkah Pendaftaran</h2>
+      <ol class="step-list">
+        <li>Buka aplikasi di browser melalui alamat yang telah disediakan oleh admin.</li>
+        <li>Pada halaman utama, klik tombol <b>Daftar</b> yang terletak di bagian bawah form login.</li>
+        <li>Isi formulir pendaftaran dengan data berikut: Nama Pemilik, Nama Toko, Alamat Email, Nomor Telepon, dan Password (minimal 6 karakter).</li>
+        <li>Konfirmasi password dengan memasukkan ulang password yang sama.</li>
+        <li>Klik tombol <b>Daftar</b> untuk mengirim data pendaftaran.</li>
+        <li>Setelah berhasil, Anda akan menerima halaman <b>Aktivasi Akun</b> yang berisi kode aktivasi unik Anda.</li>
+      </ol>
+      <p>Pastikan email yang Anda gunakan masih aktif dan dapat diakses, karena email tersebut akan menjadi identitas utama akun Anda untuk login dan komunikasi dengan admin. Gunakan password yang kuat dan mudah diingat.</p>
+
+      <div class="callout">
+        <b>Catatan Penting:</b> Setelah mendaftar, akun Anda akan berstatus <b>pending (menunggu)</b>. Anda belum dapat menggunakan aplikasi secara penuh sebelum akun diaktivasi oleh admin. Namun, Anda dapat mencoba aplikasi selama 24 jam menggunakan kode demo jika tersedia (lihat bagian Akun Demo).
+      </div>
+    </div>
+
+    <!-- 3. AKTIVASI AKUN -->
+    <div class="section" id="aktivasi">
+      <h1 class="section-title">3. Aktivasi Akun</h1>
+      <p>Setelah berhasil mendaftar, langkah selanjutnya adalah mengaktifkan akun Anda. Terdapat dua cara untuk mengaktifkan akun: melalui aktivasi permanen (jual putus) atau melalui akun demo 24 jam. Kedua cara ini memiliki prosedur yang berbeda namun sama-sama mudah dilakukan.</p>
+
+      <h2 class="sub-title" id="aktivasi-permanen">3.1 Aktivasi Permanen (Jual Putus)</h2>
+      <p>Aktivasi permanen memberikan Anda akses penuh selamanya dengan sekali pembayaran. Berikut langkah-langkahnya:</p>
+      <ol class="step-list">
+        <li>Setelah mendaftar, Anda akan melihat halaman <b>Aktivasi Akun</b> yang menampilkan kode aktivasi dengan format <b>WK-XXXXXX</b>.</li>
+        <li>Klik tombol <b>Salin Kode</b> untuk menyalin kode aktivasi ke clipboard, atau catat kode tersebut secara manual.</li>
+        <li>Klik tombol <b>Hubungi Admin via WhatsApp</b>. Tombol ini akan membuka aplikasi WhatsApp dengan pesan otomatis yang sudah berisi data toko dan kode aktivasi Anda.</li>
+        <li>Kirim pesan tersebut kepada admin dan tunggu balasan terkait informasi pembayaran.</li>
+        <li>Setelah admin menerima pembayaran, akun Anda akan diaktifkan secara permanen. Klik tombol <b>Cek Status Aktivasi</b> atau login ulang untuk memasuki aplikasi.</li>
+      </ol>
+
+      <div class="callout tip">
+        <b>Informasi:</b> Kode aktivasi bersifat unik dan hanya dapat digunakan satu kali. Setelah diaktivasi, kode tersebut tidak dapat dipindahkan ke akun lain. Pastikan Anda menyimpan bukti pembayaran sebagai dokumen referensi.
+      </div>
+
+      <h2 class="sub-title" id="akun-demo">3.2 Akun Demo (24 Jam)</h2>
+      <p>Jika Anda ingin mencoba aplikasi sebelum membeli, Anda dapat menggunakan fitur akun demo yang berlaku selama 24 jam. Fitur ini memungkinkan Anda menjelajahi seluruh fitur aplikasi tanpa batasan:</p>
+      <ol class="step-list">
+        <li>Pada halaman <b>Aktivasi Akun</b>, scroll ke bagian bawah hingga menemukan bagian <b>Coba Demo 24 Jam</b>.</li>
+        <li>Masukkan kode demo dengan format <b>DEMO-XXXXXX</b> yang telah Anda terima dari admin.</li>
+        <li>Klik tombol <b>Mulai Demo</b> untuk mengaktifkan mode demo.</li>
+        <li>Aplikasi akan masuk ke mode demo selama 24 jam. Anda dapat melihat sisa waktu demo pada banner ungu di bagian atas aplikasi.</li>
+        <li>Setelah 24 jam berakhir, Anda akan diminta untuk mengaktifkan akun secara permanen atau menghubungi admin.</li>
+      </ol>
+
+      <div class="callout tip">
+        <b>Penting:</b> Mode demo berfungsi penuh termasuk semua fitur pencatatan dan laporan. Semua data yang Anda masukkan selama masa demo akan tetap tersimpan setelah Anda beralih ke akun permanen, sehingga Anda tidak perlu memasukkan ulang data.
+      </div>
+    </div>
+
+    <!-- 4. DASBOR APLIKASI -->
+    <div class="section" id="dasbor">
+      <h1 class="section-title">4. Dasbor Aplikasi</h1>
+      <p>Setelah berhasil login dan akun Anda aktif (permanen atau demo), Anda akan masuk ke halaman utama aplikasi yang disebut Dasbor. Dasbor ini memiliki empat menu utama yang dapat diakses melalui navigasi di bagian bawah layar.</p>
+
+      <h2 class="sub-title" id="header">4.1 Tampilan Header</h2>
+      <p>Di bagian atas layar terdapat header yang menampilkan informasi dasar toko Anda. Header ini mencakup foto profil toko (yang dapat diubah di pengaturan toko), nama toko, tagline, serta ringkasan penjualan hari ini berupa total pendapatan dan jumlah transaksi yang telah dilakukan. Tombol keluar (logout) juga terletak di bagian kanan atas header.</p>
+
+      <h2 class="sub-title" id="navigasi">4.2 Navigasi Menu</h2>
+      <p>Di bagian bawah layar terdapat empat tombol navigasi utama yang menghubungkan Anda ke setiap fitur aplikasi:</p>
+
+      <table class="info-table">
+        <thead><tr><th>Menu</th><th>Fungsi</th></tr></thead>
+        <tbody>
+          <tr><td><b>Kasir</b></td><td>Halaman utama untuk mencatat pesanan per meja dan melakukan pembayaran.</td></tr>
+          <tr><td><b>Riwayat</b></td><td>Melihat laporan penjualan harian, bulanan, dan kustom beserta export CSV.</td></tr>
+          <tr><td><b>Menu</b></td><td>Mengelola daftar menu makanan dan minuman (tambah, ubah, hapus).</td></tr>
+          <tr><td><b>Toko</b></td><td>Mengatur profil toko, nama kasir, dan fitur backup/restore data.</td></tr>
+        </tbody>
+        <caption>Tabel 2. Menu Navigasi Dasbor</caption>
+      </table>
+    </div>
+
+    <!-- 5. MENU KASIR -->
+    <div class="section" id="kasir">
+      <h1 class="section-title">5. Menu Kasir (Pencatatan Pesanan)</h1>
+      <p>Menu Kasir adalah halaman utama dan paling sering digunakan dalam aplikasi POS ini. Halaman ini menyediakan seluruh alat yang dibutuhkan untuk mencatat pesanan pelanggan, mengelola meja, dan melakukan proses pembayaran. Desain halaman ini dirancang agar kasir dapat bekerja dengan cepat dan efisien, bahkan saat jam sibuk.</p>
+
+      <h2 class="sub-title" id="meja">5.1 Pengelolaan Meja</h2>
+      <p>Bagian atas halaman Kasir menampilkan daftar seluruh meja dalam format grid. Setiap meja ditampilkan sebagai kartu yang menunjukkan nomor meja dan statusnya. Secara default, aplikasi menyediakan 30 meja yang dapat disesuaikan dengan jumlah meja aktual di kedai kopi Anda.</p>
+      <p>Untuk menyesuaikan jumlah meja, gunakan tombol tambah (+) dan kurang (-) yang terletak di samping label "Daftar Meja". Tombol ini memungkinkan Anda menambah atau mengurangi jumlah meja secara fleksibel sesuai kebutuhan. Jumlah meja yang telah diatur akan tersimpan otomatis, sehingga Anda tidak perlu mengaturnya ulang setiap kali membuka aplikasi.</p>
+
+      <h3 class="sub-sub-title">Status Meja</h3>
+      <p>Setiap meja memiliki dua status yang ditampilkan dengan warna berbeda. Meja <b>kosong</b> ditandai dengan warna putih standar, sedangkan meja yang <b>sedang digunakan</b> (memiliki pesanan aktif) akan ditandai dengan warna krem/coklat muda dan menampilkan ringkasan pesanan seperti jumlah item dan total harga. Hal ini memudahkan kasir untuk memantau kapasitas kedai secara sekilas.</p>
+
+      <h2 class="sub-title" id="pilih-menu">5.2 Memilih Menu untuk Pesanan</h2>
+      <p>Di bawah daftar meja terdapat katalog menu yang menampilkan semua item makanan dan minuman yang tersedia. Menu ini ditampilkan dalam format grid yang mudah dilihat, lengkap dengan nama menu, harga, dan ikon kategori. Terdapat fitur pencarian dan filter untuk memudahkan menemukan menu tertentu:</p>
+      <ul class="bullet-list">
+        <li><b>Pencarian:</b> Ketik nama menu di kolom pencarian untuk menampilkan hasil yang sesuai secara real-time.</li>
+        <li><b>Filter Kategori:</b> Gunakan tombol "Semua", "Minuman", atau "Makanan" untuk menampilkan menu berdasarkan kategori.</li>
+        <li><b>Menambah Pesanan:</b> Ketuk/klik item menu untuk menambahkannya ke pesanan meja yang sedang aktif.</li>
+      </ul>
+
+      <h2 class="sub-title" id="proses-pesanan">5.3 Proses Pemesanan</h2>
+      <p>Untuk membuat pesanan baru, ikuti langkah-langkah berikut:</p>
+      <ol class="step-list">
+        <li>Klik/tap kartu meja yang ingin digunakan. Meja kosong akan berubah menjadi "aktif" dan panel pesanan akan muncul.</li>
+        <li>Pilih menu yang diinginkan dari katalog menu di bawah daftar meja. Setiap item yang diklik akan otomatis ditambahkan ke daftar pesanan.</li>
+        <li>Jika diperlukan, atur jumlah item menggunakan tombol tambah (+) dan kurang (-) di samping setiap item.</li>
+        <li>Setelah semua item dimasukkan, klik tombol <b>Bayar</b> untuk memproses pembayaran.</li>
+        <li>Pada jendela pembayaran, pilih metode pembayaran (Tunai, QRIS, atau Transfer), masukkan jumlah diskon (jika ada), dan masukkan jumlah uang yang diterima untuk metode Tunai.</li>
+        <li>Klik <b>Konfirmasi Pembayaran</b> untuk menyimpan transaksi dan mencetak struk.</li>
+        <li>Setelah pembayaran berhasil, meja akan otomatis dikosongkan dan siap digunakan untuk pelanggan berikutnya.</li>
+      </ol>
+
+      <h2 class="sub-title" id="pembayaran">5.4 Proses Pembayaran</h2>
+      <p>Jendela pembayaran akan muncul ketika Anda mengklik tombol Bayar. Jendela ini menampilkan ringkasan pesanan lengkap beserta subtotal, opsi diskon dalam persentase, dan total akhir yang harus dibayar. Terdapat tiga metode pembayaran yang dapat dipilih:</p>
+
+      <table class="info-table">
+        <thead><tr><th>Metode</th><th>Keterangan</th></tr></thead>
+        <tbody>
+          <tr><td><b>Tunai</b></td><td>Anda memasukkan jumlah uang yang diterima dan sistem menghitung kembalian secara otomatis.</td></tr>
+          <tr><td><b>QRIS</b></td><td>Pelanggan melakukan pembayaran melalui QR code. Pastikan pelanggan sudah membayar sebelum mengkonfirmasi.</td></tr>
+          <tr><td><b>Transfer</b></td><td>Pembayaran via transfer bank. Pastikan transfer sudah masuk sebelum mengkonfirmasi.</td></tr>
+        </tbody>
+        <caption>Tabel 3. Metode Pembayaran</caption>
+      </table>
+      <p>Setelah pembayaran dikonfirmasi, sistem akan otomatis menyimpan transaksi ke riwayat penjualan, mengosongkan meja, dan menampilkan struk pembayaran. Struk dapat dicetak langsung atau disimpan sebagai PDF melalui fitur cetak browser.</p>
+    </div>
+
+    <!-- 6. RIWAYAT PENJUALAN -->
+    <div class="section" id="riwayat">
+      <h1 class="section-title">6. Riwayat Penjualan</h1>
+      <p>Menu Riwayat Penjualan menyediakan laporan terperinci mengenai seluruh transaksi yang telah dilakukan. Fitur ini sangat berguna untuk menganalisis performa penjualan, mengidentifikasi menu terlaris, dan membuat perencanaan bisnis yang lebih baik.</p>
+
+      <h2 class="sub-title" id="harian">6.1 Laporan Harian</h2>
+      <p>Laporan harian menampilkan seluruh transaksi yang terjadi pada tanggal tertentu. Secara default, aplikasi akan menampilkan data untuk hari ini. Anda dapat mengubah tanggal menggunakan date picker yang tersedia, lalu klik tombol "Cari" untuk memuat data. Laporan ini mencakup ringkasan jumlah transaksi, total pendapatan, dan rata-rata per transaksi. Selain itu, terdapat bagian "Menu Terlaris" yang menampilkan item-menu dengan penjualan terbanyak pada hari tersebut.</p>
+
+      <h2 class="sub-title" id="bulanan">6.2 Laporan Bulanan</h2>
+      <p>Laporan bulanan memberikan gambaran yang lebih luas tentang performa penjualan dalam satu bulan penuh. Pilih bulan yang ingin dilihat menggunakan month picker, lalu klik tombol "Cari". Laporan ini menampilkan ringkasan total pendapatan, jumlah transaksi, dan rata-rata harian selama satu bulan. Data ini sangat berguna untuk membandingkan performa antar bulan dan mengidentifikasi tren penjualan.</p>
+
+      <h2 class="sub-title" id="kustom">6.3 Laporan Kustom</h2>
+      <p>Laporan kustom memungkinkan Anda menentukan rentang tanggal sendiri untuk analisis yang lebih fleksibel. Pilih tanggal mulai dan tanggal akhir, lalu klik "Cari". Fitur ini cocok digunakan untuk menganalisis penjualan selama periode tertentu seperti saat event khusus, hari libur, atau setelah promosi.</p>
+
+      <h2 class="sub-title" id="export">6.4 Export CSV dan Cetak</h2>
+      <p>Setiap laporan dapat diekspor ke format CSV untuk keperluan analisis lebih lanjut di aplikasi spreadsheet seperti Microsoft Excel atau Google Sheets. Klik tombol <b>Export CSV</b> untuk mengunduh file. Selain itu, Anda juga dapat mencetak laporan langsung dari browser menggunakan tombol cetak (printer icon) yang tersedia. Fitur ini sangat membantu untuk dokumentasi atau pelaporan kepada pemilik usaha.</p>
+    </div>
+
+    <!-- 7. KELOLA MENU -->
+    <div class="section" id="kelola-menu">
+      <h1 class="section-title">7. Kelola Menu</h1>
+      <p>Menu Kelola memungkinkan Anda mengatur daftar makanan dan minuman yang tersedia di kedai kopi Anda. Anda dapat menambahkan menu baru, mengubah harga atau nama menu yang sudah ada, atau menghapus menu yang tidak lagi disajikan. Setiap perubahan akan langsung tercermin di halaman Kasir tanpa perlu me-restart aplikasi.</p>
+
+      <h2 class="sub-title">Menambah Menu Baru</h2>
+      <ol class="step-list">
+        <li>Buka menu <b>Menu</b> (ikon utensils) di navigasi bawah.</li>
+        <li>Klik tombol <b>Tambah</b> di pojok kanan atas.</li>
+        <li>Isi formulir: Nama Menu, Harga (dalam Rupiah), dan pilih Kategori (Minuman atau Makanan).</li>
+        <li>Klik <b>Simpan</b> untuk menyimpan menu baru.</li>
+      </ol>
+
+      <h2 class="sub-title">Mengedit atau Menghapus Menu</h2>
+      <p>Pada daftar menu, setiap item memiliki tombol <b>Ubah</b> (ikon pensil) dan <b>Hapus</b> (ikon tempat sampah). Klik tombol Ubah untuk mengedit nama, harga, atau kategori menu. Klik tombol Hapus untuk menghapus menu dari daftar. Perhatikan bahwa menghapus menu tidak akan memengaruhi data transaksi yang sudah tercatat sebelumnya. Menu yang dihapus masih akan terlihat pada struk dan riwayat transaksi lama.</p>
+
+      <div class="callout tip">
+        <b>Tips:</b> Secara default, aplikasi telah menyediakan 20 menu awal yang terdiri dari berbagai minuman kopi, minuman lainnya, dan makanan ringan. Anda dapat mengubah atau menambah menu sesuai dengan menu aktual di kedai kopi Anda.
+      </div>
+    </div>
+
+    <!-- 8. PENGATURAN TOKO -->
+    <div class="section" id="pengaturan-toko">
+      <h1 class="section-title">8. Pengaturan Toko</h1>
+      <p>Menu Pengaturan Toko memungkinkan Anda mengatur informasi profil kedai kopi yang akan ditampilkan di header aplikasi dan pada struk pembayaran. Informasi ini juga membantu admin dalam mengidentifikasi akun Anda jika diperlukan. Berikut adalah pengaturan yang tersedia:</p>
+
+      <table class="info-table">
+        <thead><tr><th>Pengaturan</th><th>Keterangan</th></tr></thead>
+        <tbody>
+          <tr><td><b>Foto Toko</b></td><td>Gambar profil kedai kopi yang ditampilkan di header. Klik foto untuk mengganti.</td></tr>
+          <tr><td><b>Nama Toko</b></td><td>Nama kedai kopi Anda yang ditampilkan di header dan struk.</td></tr>
+          <tr><td><b>Tagline</b></td><td>Slogan atau deskripsi singkat kedai kopi (contoh: "Kopi Nusantara Asli").</td></tr>
+          <tr><td><b>Telepon</b></td><td>Nomor telepon kedai kopi untuk informasi kontak.</td></tr>
+          <tr><td><b>Alamat</b></td><td>Alamat lengkap kedai kopi yang ditampilkan pada struk.</td></tr>
+          <tr><td><b>Nama Kasir</b></td><td>Nama kasir yang bertugas, ditampilkan pada struk pembayaran.</td></tr>
+        </tbody>
+        <caption>Tabel 4. Daftar Pengaturan Toko</caption>
+      </table>
+      <p>Untuk menyimpan perubahan, klik tombol <b>Simpan Pengaturan</b>. Semua pengaturan disimpan secara lokal di perangkat Anda, sehingga perubahan hanya berlaku di perangkat yang sama.</p>
+    </div>
+
+    <!-- 9. BACKUP & RESTORE -->
+    <div class="section" id="backup">
+      <h1 class="section-title">9. Backup dan Restore Data</h1>
+      <p>Fitur Backup dan Restore sangat penting untuk menjaga keamanan data Anda. Karena seluruh data penjualan disimpan secara lokal di perangkat (localStorage browser), ada risiko data hilang jika browser di-reset atau perangkat mengalami masalah. Fitur ini memungkinkan Anda membuat salinan cadangan dan memulihkan data kapan saja diperlukan.</p>
+
+      <h2 class="sub-title">Export Backup</h2>
+      <p>Klik tombol <b>Export Backup</b> untuk mengunduh seluruh data Anda dalam format file JSON. File ini berisi data menu, transaksi, pengaturan toko, dan konfigurasi meja. Simpan file ini di lokasi yang aman seperti Google Drive atau flash disk. Disarankan untuk melakukan backup secara berkala, misalnya setiap akhir minggu, agar data Anda selalu terlindungi.</p>
+
+      <h2 class="sub-title">Import Restore</h2>
+      <p>Jika Anda perlu memulihkan data (misalnya setelah ganti perangkat atau browser), klik tombol <b>Import Restore</b> dan pilih file backup JSON yang sebelumnya telah Anda simpan. Data yang ada akan digantikan dengan data dari file backup. Pastikan Anda tidak memiliki transaksi penting yang belum di-backup sebelum melakukan restore, karena data lama akan ditimpa.</p>
+
+      <h2 class="sub-title">Hapus Semua Data</h2>
+      <div class="callout">
+        <b>Peringatan:</b> Tombol <b>Hapus Semua Data Lokal</b> memungkinkan Anda menghapus seluruh data yang tersimpan di perangkat saat ini. Fitur ini berguna jika Anda ingin memulai dari awal atau membersihkan data percobaan. Perhatikan bahwa tindakan ini bersifat permanen dan tidak dapat dibatalkan, pastikan Anda telah membuat backup sebelum menghapus data.
+      </div>
+    </div>
+
+    <!-- 10. TIPS & FAQ -->
+    <div class="section" id="tips-faq">
+      <h1 class="section-title">10. Tips dan Pertanyaan Umum</h1>
+
+      <h2 class="sub-title">Tips Penggunaan</h2>
+      <ul class="bullet-list">
+        <li><b>Lakukan backup rutin:</b> Buat salinan cadangan data setiap minggu untuk menghindari kehilangan data akibat masalah teknis pada browser atau perangkat.</li>
+        <li><b>Gunakan akun demo terlebih dahulu:</b> Jika ragu, coba akun demo 24 jam untuk memastikan aplikasi sesuai dengan kebutuhan Anda sebelum membeli.</li>
+        <li><b>Atur jumlah meja sesuai kapasitas:</b> Sesuaikan jumlah meja di pengaturan dengan jumlah meja aktual di kedai Anda agar tampilan lebih akurat.</li>
+        <li><b>Manfaatkan laporan penjualan:</b> Gunakan fitur export CSV untuk menganalisis tren penjualan dan membuat keputusan bisnis yang lebih baik.</li>
+        <li><b>Perbarui menu secara berkala:</b> Pastikan daftar menu selalu sesuai dengan menu yang tersedia agar pesanan tidak terjadi kesalahan.</li>
+        <li><b>Kelola password dengan baik:</b> Gunakan password yang kuat dan tidak mudah ditebak. Jika lupa password, gunakan fitur "Lupa Password" di halaman login.</li>
+      </ul>
+
+      <h2 class="sub-title">Pertanyaan Umum (FAQ)</h2>
+
+      <div class="faq-item">
+        <div class="faq-q">1. Apakah data penjualan saya aman?</div>
+        <div class="faq-a">Ya. Seluruh data penjualan disimpan secara lokal di perangkat Anda (localStorage browser) dan tidak dikirim ke server manapun. Data hanya ada di perangkat Anda. Namun, karena data tersimpan di browser, pastikan Anda rutin melakukan backup menggunakan fitur Export Backup.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">2. Bagaimana jika saya ganti perangkat atau browser?</div>
+        <div class="faq-a">Anda perlu melakukan Export Backup di perangkat lama, kemudian Import Restore di perangkat baru. File backup berisi seluruh data Anda dan dapat dipindahkan ke perangkat mana pun.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">3. Apakah aplikasi bisa digunakan tanpa koneksi internet?</div>
+        <div class="faq-a">Sebagian besar fitur dapat digunakan offline karena data disimpan lokal. Namun, untuk login dan pengecekan status akun, diperlukan koneksi internet. Setelah berhasil login, Anda dapat mengoperasikan aplikasi secara offline untuk transaksi sehari-hari.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">4. Bagaimana cara menghubungi admin?</div>
+        <div class="faq-a">Anda dapat menghubungi admin melalui tombol WhatsApp yang tersedia di halaman Aktivasi Akun atau langsung ke nomor WhatsApp admin yang tertera.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">5. Apakah ada biaya langganan bulanan?</div>
+        <div class="faq-a">Tidak. Aplikasi ini menggunakan sistem jual putus (sekali bayar). Anda hanya perlu membayar sekali untuk mendapatkan akses permanen selamanya. Tidak ada biaya tersembunyi atau langganan.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">6. Berapa jumlah maksimal meja yang didukung?</div>
+        <div class="faq-a">Aplikasi mendukung hingga 100 meja. Anda dapat menyesuaikan jumlah meja menggunakan tombol tambah dan kurang di halaman Kasir.</div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-q">7. Bagaimana jika saya lupa password?</div>
+        <div class="faq-a">Klik link "Lupa Password?" di halaman login, masukkan email terdaftar, dan ikuti instruksi di email yang dikirimkan oleh Firebase untuk mereset password Anda.</div>
+      </div>
+    </div>
+
+  </div><!-- end content-page -->
+
+</body>
+</html>
