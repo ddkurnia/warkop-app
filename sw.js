@@ -1,10 +1,8 @@
-const CACHE_NAME = 'warkop-pos-v1';
+const CACHE_NAME = 'warkop-pos-v3';
 const STATIC_ASSETS = [
   '/',
   '/manifest.json',
-  '/icon-192x192.png',
-  '/icon-512x512.png',
-  '/apple-touch-icon.png'
+  '/logo-wp.png'
 ];
 
 self.addEventListener('install', (event) => {
