@@ -859,6 +859,13 @@
       return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
     }
 
+    // Waktu lokal (bukan UTC) — penting agar transaksi tampil di hari yang benar
+    function nowLocal() {
+      const d = new Date();
+      const p = (n) => String(n).padStart(2, '0');
+      return d.getFullYear() + '-' + p(d.getMonth()+1) + '-' + p(d.getDate()) + 'T' + p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds());
+    }
+
     function formatMonthInput(date) {
       const d = date || new Date();
       return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
@@ -1724,7 +1731,7 @@
 
       const trx = {
         id: generateTrxId(),
-        date: new Date().toISOString(),
+        date: nowLocal(),
         table: currentTableId,
         items: [...items],
         subtotal: subtotal,
@@ -2265,14 +2272,7 @@
       if (!shopName) { showToast('Nama toko wajib diisi', 'error'); saveBtn.disabled = false; saveBtn.innerHTML = '<i class="fas fa-save mr-2"></i> Simpan Pengaturan'; return; }
 
       try {
-        // Update shop doc in Firestore (for admin panel display)
-        await db.collection('shops').doc(currentShop.id).update({
-          shopName: shopName,
-          phone: phone,
-          address: address
-        });
-
-        // Update settings in localStorage
+        // 1. SIMPAN KE LOCALSTORAGE DULU (prioritas utama)
         const uid = currentShop.id;
         shopSettings = {
           shopName: shopName,
@@ -2284,18 +2284,32 @@
         };
         lsSet(LS_KEYS.settings(uid), shopSettings);
 
-        // Update local state
+        // 2. Update local state
         currentShop.shopName = shopName;
         currentShop.phone = phone;
         currentShop.address = address;
 
-        // Update UI
+        // 3. Update UI langsung
         document.getElementById('header-shop-name').textContent = shopName;
         document.getElementById('header-shop-tagline').textContent = tagline;
         document.title = shopName + ' - POS';
         updateHeaderPhoto();
 
         showToast('Pengaturan berhasil disimpan!');
+
+        // 4. Coba sync ke Firestore (non-blocking, jika gagal tidak mengganggu)
+        if (typeof db !== 'undefined' && currentShop.id) {
+          try {
+            await db.collection('shops').doc(currentShop.id).set({
+              shopName: shopName,
+              phone: phone,
+              address: address,
+              tagline: tagline
+            }, { merge: true });
+          } catch (firestoreErr) {
+            console.warn('Firestore sync skipped:', firestoreErr.message);
+          }
+        }
       } catch (error) {
         console.error('Save settings error:', error);
         showToast('Gagal menyimpan pengaturan', 'error');
