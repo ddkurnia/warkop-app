@@ -296,10 +296,10 @@
           <p class="text-sm font-bold text-green-800">Hubungi Admin via WhatsApp</p>
         </div>
         <p class="text-xs text-green-700 mb-3">Kirim kode aktivasi di atas ke admin untuk pembayaran dan aktivasi akun Anda.</p>
-        <a href="#" id="wa-admin-link" target="_blank"
+        <button onclick="openWhatsApp()" id="wa-admin-btn"
           class="flex items-center justify-center gap-2 w-full py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl text-sm font-bold transition shadow-md">
           <i class="fab fa-whatsapp text-lg"></i> Hubungi Admin via WhatsApp
-        </a>
+        </button>
       </div>
 
       <!-- Step 3: Tunggu Aktivasi -->
@@ -375,10 +375,10 @@
         <p class="text-xs font-bold text-green-800 mb-2">Kode Aktivasi Anda</p>
         <div id="demo-expired-code" class="font-mono text-xl font-bold text-green-800 tracking-wider select-all">WK-XXXXXX</div>
       </div>
-      <a href="#" id="demo-expired-wa-link" target="_blank"
+      <button onclick="openWhatsAppDemoExpired()" id="demo-expired-wa-btn"
         class="flex items-center justify-center gap-2 w-full py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl text-sm font-bold transition shadow-md mb-3">
         <i class="fab fa-whatsapp text-lg"></i> Hubungi Admin via WhatsApp
-      </a>
+      </button>
       <button onclick="doLogout()" class="w-full px-6 py-2.5 bg-coffee-200 text-coffee-800 rounded-xl font-semibold hover:bg-coffee-300 transition">
         <i class="fas fa-sign-out-alt mr-2"></i> Keluar
       </button>
@@ -979,6 +979,28 @@
       }
     }
 
+    // WhatsApp link handler — bekerja di APK WebView & browser
+    let pendingWaUrl = '';
+    let demoExpiredWaUrl = 'https://wa.me/' + ADMIN_WA_NUMBER;
+
+    function openWhatsApp() {
+      if (!pendingWaUrl) {
+        pendingWaUrl = 'https://wa.me/' + ADMIN_WA_NUMBER;
+      }
+      window.open(pendingWaUrl, '_blank');
+      // Fallback untuk APK WebView
+      setTimeout(function() {
+        window.location.href = pendingWaUrl;
+      }, 300);
+    }
+
+    function openWhatsAppDemoExpired() {
+      window.open(demoExpiredWaUrl, '_blank');
+      setTimeout(function() {
+        window.location.href = demoExpiredWaUrl;
+      }, 300);
+    }
+
     function doLogin() {
       const email = document.getElementById('login-email').value.trim();
       const password = document.getElementById('login-password').value;
@@ -998,7 +1020,7 @@
 
     // ===== AUTH: REGISTER =====
     // Nomor WhatsApp admin — ganti dengan nomor Anda
-    const ADMIN_WA_NUMBER = '6289685157213';
+    const ADMIN_WA_NUMBER = '6281234567890';
 
     function generateActivationCode() {
       const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -1063,7 +1085,7 @@
             'Kode Aktivasi: *' + activationCode + '*\n\n' +
             'Mohon info biaya pembelian (sekali bayar) dan cara pembayaran. Terima kasih!'
           );
-          document.getElementById('wa-admin-link').href = 'https://wa.me/' + ADMIN_WA_NUMBER + '?text=' + waText;
+          pendingWaUrl = 'https://wa.me/' + ADMIN_WA_NUMBER + '?text=' + waText;
           showScreen('pending');
         })
         .catch(function(err) {
@@ -1184,7 +1206,7 @@
                 'Kode Aktivasi: *' + shop.activationCode + '*\n\n' +
                 'Mohon info biaya pembelian (sekali bayar) atau minta kode demo untuk mencoba 24 jam gratis. Terima kasih!'
               );
-              document.getElementById('wa-admin-link').href = 'https://wa.me/' + ADMIN_WA_NUMBER + '?text=' + waText;
+              pendingWaUrl = 'https://wa.me/' + ADMIN_WA_NUMBER + '?text=' + waText;
             }
             showScreen('pending');
             return;
@@ -1222,7 +1244,7 @@
                 'Kode Aktivasi: *' + (shop.activationCode || '') + '*\n\n' +
                 'Mohon info cara pembayaran. Terima kasih!'
               );
-              document.getElementById('demo-expired-wa-link').href = 'https://wa.me/' + ADMIN_WA_NUMBER + '?text=' + dWaText;
+              demoExpiredWaUrl = 'https://wa.me/' + ADMIN_WA_NUMBER + '?text=' + dWaText;
               showScreen('demo-expired');
               return;
             }
@@ -1242,7 +1264,7 @@
               'Kode Aktivasi: *' + (shop.activationCode || '') + '*\n\n' +
               'Mohon info cara pembayaran. Terima kasih!'
             );
-            document.getElementById('demo-expired-wa-link').href = 'https://wa.me/' + ADMIN_WA_NUMBER + '?text=' + iWaText;
+            demoExpiredWaUrl = 'https://wa.me/' + ADMIN_WA_NUMBER + '?text=' + iWaText;
             showScreen('demo-expired');
             return;
           }
