@@ -137,6 +137,51 @@
       box-shadow: 0 8px 24px rgba(13,148,136,0.35), 0 0 0 3px #0d9488, inset 0 1px 0 rgba(255,255,255,0.6);
       transform: translateY(-2px) scale(1.05);
     }
+    /* ===== ORDER MODE TABS ===== */
+    .order-mode-tab {
+      transition: all 0.25s cubic-bezier(.4,0,.2,1);
+      position: relative;
+      overflow: hidden;
+    }
+    .order-mode-tab::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 0;
+      height: 3px;
+      background: white;
+      border-radius: 3px 3px 0 0;
+      transition: all 0.3s cubic-bezier(.4,0,.2,1);
+      transform: translateX(-50%);
+    }
+    .order-mode-tab.active-mode::before {
+      width: 60%;
+    }
+    .order-mode-tab.active-mode {
+      transform: translateY(-1px);
+    }
+    .takeaway-order-card {
+      background: white;
+      border: 2px solid transparent;
+      border-radius: 1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      transition: all 0.3s cubic-bezier(.4,0,.2,1);
+    }
+    .takeaway-order-card.has-items {
+      border-color: #f59e0b;
+      background: linear-gradient(145deg, #fffbeb, #fef3c7, #fde68a);
+      box-shadow: 0 6px 20px rgba(245,158,11,0.2), 0 0 0 1px #f59e0b;
+    }
+    .takeaway-name-input {
+      border: 2px solid #fde68a;
+      border-radius: 0.75rem;
+      transition: all 0.2s;
+    }
+    .takeaway-name-input:focus {
+      border-color: #f59e0b;
+      box-shadow: 0 0 0 3px rgba(245,158,11,0.15);
+    }
     .tab-btn { transition: all 0.25s cubic-bezier(.4,0,.2,1); }
     .tab-btn:hover { transform: translateY(-1px); }
     .toast-enter { animation: slideUp 0.4s cubic-bezier(.4,0,.2,1); }
@@ -588,22 +633,56 @@
       <!-- PAGE: KASIR -->
       <div id="page-kasir" class="page active">
         <div class="max-w-7xl mx-auto p-4">
+
+          <!-- ORDER MODE TABS -->
+          <div class="flex gap-2 mb-4">
+            <button onclick="switchOrderMode('dine-in')" id="mode-dinein" class="order-mode-tab flex-1 py-3 rounded-xl font-bold text-sm bg-teal-600 text-white shadow-md active-mode">
+              <i class="fas fa-chair mr-2"></i> Di Tempat
+            </button>
+            <button onclick="switchOrderMode('takeaway')" id="mode-takeaway" class="order-mode-tab flex-1 py-3 rounded-xl font-bold text-sm bg-white text-gray-500 border-2 border-gray-200">
+              <i class="fas fa-shopping-bag mr-2"></i> Bungkus (Take Away)
+            </button>
+          </div>
+
           <div class="flex flex-col lg:flex-row gap-4">
             <div class="flex-1 min-w-0">
-              <div class="mb-4">
-                <h2 class="text-lg font-bold text-coffee-800 mb-3 flex items-center gap-2">
-                  <i class="fas fa-chair text-coffee-500"></i> Pilih Meja
-                </h2>
-                            <div class="flex items-center justify-between mb-2">
-                  <h3 class="text-sm font-semibold text-coffee-700"><i class="fas fa-chair mr-1 text-coffee-500"></i> Daftar Meja</h3>
-                  <div class="flex items-center gap-2">
-                    <button onclick="changeTableCount(-1)" class="w-7 h-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition text-xs font-bold" title="Kurangi meja"><i class="fas fa-minus"></i></button>
-                    <span id="table-count-display" class="text-sm font-bold text-coffee-800 min-w-[24px] text-center">30</span>
-                    <button onclick="changeTableCount(1)" class="w-7 h-7 rounded-lg bg-green-50 hover:bg-green-100 text-green-600 flex items-center justify-center transition text-xs font-bold" title="Tambah meja"><i class="fas fa-plus"></i></button>
+
+              <!-- DINING IN SECTION (Tables) -->
+              <div id="section-dinein">
+                <div class="mb-4">
+                  <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-sm font-bold text-coffee-700"><i class="fas fa-chair mr-1 text-coffee-500"></i> Daftar Meja</h3>
+                    <div class="flex items-center gap-2">
+                      <button onclick="changeTableCount(-1)" class="w-7 h-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition text-xs font-bold" title="Kurangi meja"><i class="fas fa-minus"></i></button>
+                      <span id="table-count-display" class="text-sm font-bold text-coffee-800 min-w-[24px] text-center">30</span>
+                      <button onclick="changeTableCount(1)" class="w-7 h-7 rounded-lg bg-green-50 hover:bg-green-100 text-green-600 flex items-center justify-center transition text-xs font-bold" title="Tambah meja"><i class="fas fa-plus"></i></button>
+                    </div>
+                  </div>
+                  <div id="tables-grid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2.5"></div>
+                </div>
+              </div>
+
+              <!-- TAKE AWAY SECTION -->
+              <div id="section-takeaway" class="hidden mb-4">
+                <div class="takeaway-order-card p-4 mb-3" id="takeaway-card">
+                  <div class="flex items-center gap-3 mb-3">
+                    <div class="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
+                      <i class="fas fa-shopping-bag text-xl text-amber-600"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <h3 class="font-bold text-amber-800 text-sm">Pesanan Bungkus</h3>
+                      <p class="text-xs text-amber-600" id="takeaway-subtitle">Tambahkan nama pelanggan & pesanan</p>
+                    </div>
+                    <div id="takeaway-item-badge" class="hidden w-8 h-8 rounded-full bg-amber-500 text-white font-extrabold text-sm flex items-center justify-center shadow">0</div>
+                  </div>
+                  <div class="relative">
+                    <i class="fas fa-user absolute left-3 top-1/2 -translate-y-1/2 text-amber-400 text-sm"></i>
+                    <input type="text" id="takeaway-name-input" placeholder="Nama pelanggan (opsional)..." class="takeaway-name-input w-full pl-9 pr-4 py-2.5 bg-white text-sm focus:outline-none" oninput="updateTakeawayName()">
                   </div>
                 </div>
-                <div id="tables-grid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2.5"></div>
               </div>
+
+              <!-- MENU SECTION (shared) -->
               <div class="mb-4">
                 <div class="relative mb-3">
                   <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-coffee-400"></i>
@@ -1208,6 +1287,9 @@
     let tableCustomerNames = {};
     let shopSettings = {};
     let currentTableId = null;
+    let currentOrderMode = 'dine-in'; // 'dine-in' or 'takeaway'
+    let takeawayCustomerName = '';
+    let takeawayOrderCounter = 0;
     let currentPage = 'kasir';
     let currentMenuCategory = 'Semua';
     let currentMgmtCategory = 'Semua';
@@ -2092,6 +2174,64 @@
       if (_customConfirmCallback) { _customConfirmCallback(false); _customConfirmCallback = null; }
     }
 
+    // ===== ORDER MODE SWITCHING =====
+    function switchOrderMode(mode) {
+      currentOrderMode = mode;
+      const dineinBtn = document.getElementById('mode-dinein');
+      const takeawayBtn = document.getElementById('mode-takeaway');
+      const dineinSection = document.getElementById('section-dinein');
+      const takeawaySection = document.getElementById('section-takeaway');
+
+      if (mode === 'dine-in') {
+        dineinBtn.className = 'order-mode-tab flex-1 py-3 rounded-xl font-bold text-sm bg-teal-600 text-white shadow-md active-mode';
+        takeawayBtn.className = 'order-mode-tab flex-1 py-3 rounded-xl font-bold text-sm bg-white text-gray-500 border-2 border-gray-200';
+        dineinSection.classList.remove('hidden');
+        takeawaySection.classList.add('hidden');
+        currentTableId = null;
+        renderTables();
+      } else {
+        takeawayBtn.className = 'order-mode-tab flex-1 py-3 rounded-xl font-bold text-sm bg-amber-500 text-white shadow-md active-mode';
+        dineinBtn.className = 'order-mode-tab flex-1 py-3 rounded-xl font-bold text-sm bg-white text-gray-500 border-2 border-gray-200';
+        takeawaySection.classList.remove('hidden');
+        dineinSection.classList.add('hidden');
+        // Auto-select takeaway as "table"
+        currentTableId = 'takeaway';
+        if (!activeTables['takeaway']) activeTables['takeaway'] = [];
+        updateTakeawayCard();
+      }
+      // Re-render panels
+      renderOrderPanel('panel-content-desktop');
+      renderOrderPanel('panel-content-mobile');
+      renderMenuGrid();
+    }
+
+    function updateTakeawayName() {
+      const input = document.getElementById('takeaway-name-input');
+      takeawayCustomerName = (input.value || '').trim();
+    }
+
+    function updateTakeawayCard() {
+      const items = activeTables['takeaway'] || [];
+      const card = document.getElementById('takeaway-card');
+      const badge = document.getElementById('takeaway-item-badge');
+      const subtitle = document.getElementById('takeaway-subtitle');
+
+      if (items.length > 0) {
+        card.classList.add('has-items');
+        badge.classList.remove('hidden');
+        badge.classList.add('flex');
+        const totalItems = items.reduce((s, i) => s + i.qty, 0);
+        badge.textContent = totalItems;
+        const total = items.reduce((s, i) => s + i.harga * i.qty, 0);
+        subtitle.textContent = totalItems + ' item — ' + formatIDR(total);
+      } else {
+        card.classList.remove('has-items');
+        badge.classList.add('hidden');
+        badge.classList.remove('flex');
+        subtitle.textContent = 'Tambahkan nama pelanggan & pesanan';
+      }
+    }
+
     function selectTable(tableId) {
       currentTableId = tableId;
       if (!activeTables[tableId]) {
@@ -2142,7 +2282,8 @@
 
     // ===== KASIR: CART =====
     function addToCart(menuId) {
-      if (!currentTableId) { showToast('Pilih meja terlebih dahulu!', 'error'); return; }
+      if (currentOrderMode === 'dine-in' && !currentTableId) { showToast('Pilih meja terlebih dahulu!', 'error'); return; }
+      if (currentOrderMode === 'takeaway') currentTableId = 'takeaway';
       const menuItem = menuData.find(m => m.id === menuId);
       if (!menuItem) return;
       if (!activeTables[currentTableId]) activeTables[currentTableId] = [];
@@ -2178,7 +2319,8 @@
 
     function resetOrder() {
       if (!currentTableId) return;
-      customConfirm('Reset semua pesanan meja ini?', function(ok) {
+      const msg = currentOrderMode === 'takeaway' ? 'Reset semua pesanan bungkus?' : 'Reset semua pesanan meja ini?';
+      customConfirm(msg, function(ok) {
         if (!ok) return;
         activeTables[currentTableId] = [];
         delete tableCustomerNames[currentTableId];
@@ -2202,11 +2344,14 @@
       const total = items.reduce((s, i) => s + i.harga * i.qty, 0);
       const totalItems = items.reduce((s, i) => s + i.qty, 0);
       panel.innerHTML = '<div class="flex items-center justify-between mb-3">' +
-        '<h3 class="font-bold text-coffee-800"><i class="fas fa-receipt mr-2 text-coffee-500"></i>Meja ' + currentTableId + '</h3>' +
+        '<h3 class="font-bold text-coffee-800"><i class="fas fa-' + (currentTableId === 'takeaway' ? 'shopping-bag text-amber-500' : 'receipt text-coffee-500') + ' mr-2"></i>' + (currentTableId === 'takeaway' ? 'Bungkus' : 'Meja ' + currentTableId) + '</h3>' +
         (totalItems > 0 ? '<button onclick="resetOrder()" class="text-xs text-red-500 hover:text-red-700"><i class="fas fa-trash mr-1"></i>Reset</button>' : '') +
         '</div>' +
         (items.length === 0 ?
           '<div class="flex-1 flex flex-col items-center justify-center py-8 text-coffee-400"><i class="fas fa-clipboard-list text-3xl mb-2"></i><p class="text-sm">Belum ada pesanan</p></div>' :
+          '<div class="flex items-center gap-2 mb-2">' +
+            (takeawayCustomerName ? '<span class="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-lg font-semibold"><i class="fas fa-user mr-1"></i>' + takeawayCustomerName + '</span>' : '') +
+          '</div>' +
           '<div class="space-y-2 flex-1 overflow-y-auto mb-3">' + items.map(item =>
             '<div class="flex items-center gap-2 bg-coffee-50 rounded-xl p-2">' +
               '<div class="flex-1 min-w-0"><div class="text-sm font-semibold text-coffee-800 truncate">' + item.nama_menu + '</div><div class="text-xs text-coffee-500">' + formatIDR(item.harga) + '</div></div>' +
@@ -2224,6 +2369,7 @@
             '<button onclick="openPaymentModal()" class="w-full py-3 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition shadow-md"><i class="fas fa-wallet mr-2"></i>Bayar</button>' +
           '</div>'
         );
+      if (currentOrderMode === 'takeaway') updateTakeawayCard();
     }
 
     function openMobilePanel() { document.getElementById('mobile-panel').classList.remove('hidden'); }
@@ -2305,8 +2451,8 @@
       const trx = {
         id: generateTrxId(),
         date: nowLocal(),
-        table: currentTableId,
-        customerName: tableCustomerNames[currentTableId] || '',
+        table: currentTableId === 'takeaway' ? 'Bungkus' : currentTableId,
+        customerName: currentTableId === 'takeaway' ? takeawayCustomerName : (tableCustomerNames[currentTableId] || ''),
         items: [...items],
         subtotal: subtotal,
         discountPct: discountPct,
@@ -2324,6 +2470,12 @@
         activeTables[currentTableId] = [];
         delete tableCustomerNames[currentTableId];
         lsSet(LS_KEYS.customerNames(currentShop.id), tableCustomerNames);
+        if (currentOrderMode === 'takeaway') {
+          takeawayCustomerName = '';
+          const nameInput = document.getElementById('takeaway-name-input');
+          if (nameInput) nameInput.value = '';
+          updateTakeawayCard();
+        }
         const savedTableId = currentTableId;
 
         // 3. Save active tables to localStorage
@@ -2379,7 +2531,7 @@
         '<div class="space-y-1 text-sm mb-3">' +
         '<div class="flex justify-between"><span class="text-coffee-500">No</span><span class="font-medium">' + trx.id + '</span></div>' +
         '<div class="flex justify-between"><span class="text-coffee-500">Tanggal</span><span class="font-medium">' + formatDateTime(trx.date) + '</span></div>' +
-        '<div class="flex justify-between"><span class="text-coffee-500">Meja</span><span class="font-medium">' + trx.table + '</span></div>' +
+        '<div class="flex justify-between"><span class="text-coffee-500">' + (trx.table === 'Bungkus' ? 'Jenis' : 'Meja') + '</span><span class="font-medium">' + (trx.table === 'Bungkus' ? '<i class="fas fa-shopping-bag text-amber-500 mr-1"></i>Bungkus (Take Away)' : 'Meja ' + trx.table) + '</span></div>' +
         (trx.customerName ? '<div class="flex justify-between"><span class="text-coffee-500">Pelanggan</span><span class="font-medium">' + trx.customerName + '</span></div>' : '') +
         '<div class="flex justify-between"><span class="text-coffee-500">Kasir</span><span class="font-medium">' + cashier + '</span></div>' +
         '</div>' +
@@ -2524,7 +2676,7 @@
       const nameBadge = trx.customerName ? '<span class="bg-teal-50 text-teal-700 text-xs font-semibold px-2 py-0.5 rounded-lg"><i class="fas fa-user text-[9px] mr-1"></i>' + trx.customerName + '</span>' : '';
       return '<div class="bg-white rounded-2xl p-4 shadow-sm border border-coffee-100 cursor-pointer hover:shadow-md transition" onclick="showTrxDetail(\'' + trx.id + '\')">' +
         '<div class="flex items-center justify-between mb-2">' +
-          '<div class="flex items-center gap-2"><span class="bg-coffee-100 text-coffee-700 text-xs font-bold px-2 py-0.5 rounded-lg">Meja ' + trx.table + '</span>' +
+          '<div class="flex items-center gap-2"><span class="' + (trx.table === 'Bungkus' ? 'bg-amber-100 text-amber-700' : 'bg-coffee-100 text-coffee-700') + ' text-xs font-bold px-2 py-0.5 rounded-lg">' + (trx.table === 'Bungkus' ? '<i class="fas fa-shopping-bag mr-1"></i>Bungkus' : 'Meja ' + trx.table) + '</span>' +
           nameBadge +
           '<span class="text-xs text-coffee-400">' + formatDateTime(trx.date) + '</span></div>' +
           '<span class="text-sm font-bold text-coffee-800">' + formatIDR(trx.total) + '</span>' +
@@ -2599,7 +2751,7 @@
       reportEl.innerHTML = trxs.map(trx =>
         '<div class="bg-white rounded-2xl p-4 shadow-sm border border-coffee-100 cursor-pointer hover:shadow-md transition" onclick="showTrxDetail(\'' + trx.id + '\')">' +
           '<div class="flex items-center justify-between mb-2">' +
-            '<div class="flex items-center gap-2"><span class="bg-coffee-100 text-coffee-700 text-xs font-bold px-2 py-0.5 rounded-lg">Meja ' + trx.table + '</span>' +
+            '<div class="flex items-center gap-2"><span class="' + (trx.table === 'Bungkus' ? 'bg-amber-100 text-amber-700' : 'bg-coffee-100 text-coffee-700') + ' text-xs font-bold px-2 py-0.5 rounded-lg">' + (trx.table === 'Bungkus' ? '<i class="fas fa-shopping-bag mr-1"></i>Bungkus' : 'Meja ' + trx.table) + '</span>' +
             '<span class="text-xs text-coffee-400">' + formatDateTime(trx.date) + '</span></div>' +
             '<span class="text-sm font-bold text-coffee-800">' + formatIDR(trx.total) + '</span>' +
           '</div>' +
