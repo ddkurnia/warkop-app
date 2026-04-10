@@ -1015,6 +1015,34 @@
       </div>
     </div>
 
+    <!-- CSV EXPORT MODAL -->
+    <div id="csv-export-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div class="absolute inset-0 modal-overlay" onclick="closeCSVModal()"></div>
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto relative z-10">
+        <div class="bg-green-600 text-white p-4 rounded-t-2xl flex items-center justify-between">
+          <h3 class="font-bold"><i class="fas fa-file-csv mr-2"></i>Export Laporan CSV</h3>
+          <button onclick="closeCSVModal()" class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center hover:bg-green-400"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="p-5 space-y-4">
+          <p class="text-sm text-coffee-600 text-center">Pilih cara untuk mendapatkan file CSV:</p>
+          <div class="space-y-2">
+            <a id="csv-download-link" href="#" class="block w-full py-3 bg-green-600 text-white rounded-xl font-semibold text-center text-sm hover:bg-green-700 transition shadow-sm">
+              <i class="fas fa-download mr-2"></i>Tap untuk Download CSV
+            </a>
+            <button onclick="shareCSVFile()" id="csv-share-btn" class="hidden w-full py-3 bg-blue-600 text-white rounded-xl font-semibold text-sm hover:bg-blue-700 transition shadow-sm">
+              <i class="fas fa-share-alt mr-2"></i>Bagikan via Share Menu
+            </button>
+            <button onclick="copyCSVText()" class="w-full py-3 bg-coffee-700 text-white rounded-xl font-semibold text-sm hover:bg-coffee-800 transition shadow-sm">
+              <i class="fas fa-copy mr-2"></i>Salin ke Clipboard
+            </button>
+          </div>
+          <div class="bg-coffee-50 rounded-xl p-3">
+            <p id="csv-info" class="text-xs text-coffee-500 text-center"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- TOAST -->
     <div id="toast-container" class="fixed bottom-24 left-1/2 -translate-x-1/2 z-[60] pointer-events-none"></div>
 
@@ -2990,78 +3018,111 @@
     function closeTrxDetailModal() { document.getElementById('trx-detail-modal').classList.add('hidden'); }
 
     // ===== EXPORT CSV =====
-    async function exportCSV() {
-      if (currentFilteredTransactions.length === 0) { showToast('Tidak ada data untuk diexport', 'error'); return; }
-      let csv = 'No,Date,Table,Items,Subtotal,Discount%,Discount,Total,Payment,Cashier\n';
-      currentFilteredTransactions.forEach(function(trx, idx) {
-        const itemsStr = '"' + (trx.items || []).map(function(i) { return i.qty + 'x ' + i.nama_menu; }).join('; ') + '"';
-        csv += [idx + 1, trx.date, trx.table, itemsStr, trx.subtotal, trx.discountPct, trx.discount, trx.total, trx.paymentMethod, trx.cashier || 'Admin'].join(',') + '\n';
-      });
+    let lastCSVData = '';
+    let lastCSVBlob = null;
+    let lastCSVFilename = '';
 
-      const shopName = shopSettings.shopName || currentShop.shopName || 'POS';
-      const filename = 'laporan_' + shopName.replace(/\s+/g, '_') + '_' + today() + '.csv';
-      const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-
-      // 1. Try Web Share API with File (best for mobile - can save/share to any app)
-      if (navigator.share && navigator.canShare) {
-        try {
-          const file = new File([blob], filename, { type: 'text/csv;charset=utf-8;' });
-          if (navigator.canShare({ files: [file] })) {
-            await navigator.share({
-              files: [file],
-              title: 'Laporan ' + shopName,
-              text: 'Laporan penjualan ' + shopName
-            });
-            showToast('File CSV berhasil dibagikan!');
-            return;
-          }
-        } catch (err) {
-          if (err.name === 'AbortError') return; // User cancelled
-        }
-      }
-
-      // 2. Try opening blob URL in new tab (works on most mobile browsers)
+    function exportCSV() {
       try {
-        const url = URL.createObjectURL(blob);
-        const newWindow = window.open(url, '_blank');
-        if (newWindow) {
-          showToast('File CSV dibuka. Simpan dari browser menu.');
+        if (!currentFilteredTransactions || currentFilteredTransactions.length === 0) {
+          showToast('Tidak ada data untuk diexport', 'error');
           return;
         }
-        URL.revokeObjectURL(url);
-      } catch(e) {
-        // continue to fallback
-      }
 
-      // 3. Fallback: data URI approach (more compatible than blob on some mobile browsers)
-      try {
-        const reader = new FileReader();
-        reader.onload = function() {
-          const dataUrl = reader.result;
-          const a = document.createElement('a');
-          a.href = dataUrl;
-          a.download = filename;
-          a.style.display = 'none';
-          document.body.appendChild(a);
-          a.click();
-          setTimeout(function() {
-            document.body.removeChild(a);
-          }, 1000);
-          showToast('CSV berhasil diunduh!');
+        // Build CSV
+        let csv = 'No,Date,Table,Items,Subtotal,Discount%,Discount,Total,Payment,Cashier\n';
+        currentFilteredTransactions.forEach(function(trx, idx) {
+          const itemsStr = '"' + (trx.items || []).map(function(i) { return i.qty + 'x ' + i.nama_menu; }).join('; ') + '"';
+          csv += [idx + 1, trx.date, trx.table, itemsStr, trx.subtotal, trx.discountPct, trx.discount, trx.total, trx.paymentMethod, trx.cashier || 'Admin'].join(',') + '\n';
+        });
+
+        const shopName = shopSettings.shopName || currentShop.shopName || 'POS';
+        lastCSVFilename = 'laporan_' + shopName.replace(/\s+/g, '_') + '_' + today() + '.csv';
+        lastCSVData = csv;
+        lastCSVBlob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+
+        // Create data URI for the download link (user will tap manually)
+        const dataUri = 'data:text/csv;charset=utf-8,' + encodeURIComponent('\uFEFF' + csv);
+        const downloadLink = document.getElementById('csv-download-link');
+        downloadLink.href = dataUri;
+        downloadLink.download = lastCSVFilename;
+        downloadLink.onclick = function(e) {
+          // Let the default <a> behavior handle the download
+          showToast('File CSV sedang diunduh...');
         };
-        reader.readAsDataURL(blob);
-        return;
-      } catch(e2) {
-        // continue to last fallback
-      }
 
-      // 4. Last resort: copy CSV to clipboard
-      try {
-        await navigator.clipboard.writeText(csv);
-        showToast('Data CSV disalin ke clipboard. Tempel ke aplikasi lain.', 'success');
-      } catch(e3) {
-        showToast('Gagal mengunduh CSV. Periksa izin browser.', 'error');
+        // Show share button only if Web Share API is available
+        const shareBtn = document.getElementById('csv-share-btn');
+        if (navigator.share) {
+          shareBtn.classList.remove('hidden');
+        } else {
+          shareBtn.classList.add('hidden');
+        }
+
+        // Show info
+        document.getElementById('csv-info').textContent =
+          currentFilteredTransactions.length + ' transaksi | ' + lastCSVFilename;
+
+        // Show modal
+        document.getElementById('csv-export-modal').classList.remove('hidden');
+
+      } catch (err) {
+        console.error('exportCSV error:', err);
+        showToast('Gagal export CSV: ' + err.message, 'error');
       }
+    }
+
+    async function shareCSVFile() {
+      if (!lastCSVBlob) return;
+      try {
+        const file = new File([lastCSVBlob], lastCSVFilename, { type: 'text/csv;charset=utf-8;' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: 'Laporan CSV',
+            text: 'Laporan penjualan'
+          });
+          closeCSVModal();
+        } else {
+          // Share as text fallback
+          await navigator.share({
+            title: 'Laporan CSV',
+            text: lastCSVData
+          });
+          closeCSVModal();
+        }
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          showToast('Share gagal. Coba tap Download.', 'error');
+        }
+      }
+    }
+
+    async function copyCSVText() {
+      if (!lastCSVData) return;
+      try {
+        await navigator.clipboard.writeText(lastCSVData);
+        showToast('Data CSV berhasil disalin! Buka Excel lalu Paste.', 'success');
+      } catch (err) {
+        // Fallback: create textarea and select
+        try {
+          const ta = document.createElement('textarea');
+          ta.value = lastCSVData;
+          ta.style.position = 'fixed';
+          ta.style.left = '-9999px';
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          document.body.removeChild(ta);
+          showToast('Data CSV berhasil disalin!', 'success');
+        } catch (e2) {
+          showToast('Gagal menyalin. Coba tap Download.', 'error');
+        }
+      }
+    }
+
+    function closeCSVModal() {
+      document.getElementById('csv-export-modal').classList.add('hidden');
     }
 
     // ===== MENU MANAGEMENT =====
