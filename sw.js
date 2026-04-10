@@ -43,6 +43,9 @@ self.addEventListener('activate', (event) => {
 // Fetch - Network first, fallback to cache
 // IndexedDB TIDAK terpengaruh oleh operasi cache ini
 self.addEventListener('fetch', (event) => {
+  // Skip blob and data URLs - biarkan browser handle langsung
+  if (event.request.url.startsWith('blob:') || event.request.url.startsWith('data:')) return;
+
   if (event.request.method !== 'GET') return;
   if (event.request.url.includes('/api/')) return;
 
