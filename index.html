@@ -914,6 +914,190 @@
     function lsGet(key) { try { return JSON.parse(localStorage.getItem(key)); } catch(e) { return null; } }
     function lsSet(key, data) { try { localStorage.setItem(key, JSON.stringify(data)); return true; } catch(e) { console.warn('localStorage write error:', e); return false; } }
 
+    // ===== IndexedDB HELPER =====
+    const DB_NAME = 'warkop_pos_db';
+    const DB_VERSION = 1;
+    let idbPromise = null;
+
+    function openIDB() {
+      if (!idbPromise) {
+        idbPromise = new Promise((resolve, reject) => {
+          const request = indexedDB.open(DB_NAME, DB_VERSION);
+          request.onupgradeneeded = function(e) {
+            const db = e.target.result;
+            // Transactions store - indexed by date for filtering
+            if (!db.objectStoreNames.contains('transactions')) {
+              const txStore = db.createObjectStore('transactions', { keyPath: 'localId' });
+              txStore.createIndex('date', 'date', { unique: false });
+              txStore.createIndex('shopId', 'shopId', { unique: false });
+            }
+            // Shop photos store
+            if (!db.objectStoreNames.contains('shopPhotos')) {
+              db.createObjectStore('shopPhotos', { keyPath: 'uid' });
+            }
+            // Data version store - for migration tracking
+            if (!db.objectStoreNames.contains('meta')) {
+              db.createObjectStore('meta', { keyPath: 'key' });
+            }
+          };
+          request.onsuccess = function(e) { resolve(e.target.result); };
+          request.onerror = function(e) { reject(e.target.error); };
+        });
+      }
+      return idbPromise;
+    }
+
+    // IndexedDB CRUD helpers
+    async function idbGetAllTransactions(shopId) {
+      const db = await openIDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction('transactions', 'readonly');
+        const store = tx.objectStore('transactions');
+        const index = store.index('shopId');
+        const request = index.getAll(shopId);
+        request.onsuccess = () => resolve(request.result || []);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    async function idbGetFilteredTransactions(shopId, startDate, endDate) {
+      const db = await openIDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction('transactions', 'readonly');
+        const store = tx.objectStore('transactions');
+        const index = store.index('shopId');
+        const request = index.getAll(shopId);
+        request.onsuccess = () => {
+          const all = request.result || [];
+          const filtered = all.filter(t => {
+            if (!t || !t.date) return false;
+            const txDate = typeof t.date === 'string' ? t.date.split('T')[0].split(' ')[0] : formatDateInput(new Date(t.date));
+            if (!txDate || txDate.length < 10) return false;
+            if (startDate && txDate < startDate) return false;
+            if (endDate && txDate > endDate) return false;
+            return true;
+          }).sort((a, b) => new Date(b.date) - new Date(a.date));
+          resolve(filtered);
+        };
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    async function idbAddTransaction(trx) {
+      const db = await openIDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction('transactions', 'readwrite');
+        const store = tx.objectStore('transactions');
+        const request = store.put(trx);
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    async function idbDeleteTransaction(localId) {
+      const db = await openIDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction('transactions', 'readwrite');
+        const store = tx.objectStore('transactions');
+        const request = store.delete(localId);
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    async function idbClearTransactions(shopId) {
+      const db = await openIDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction('transactions', 'readwrite');
+        const store = tx.objectStore('transactions');
+        const index = store.index('shopId');
+        const request = index.openCursor(shopId);
+        request.onsuccess = function(e) {
+          const cursor = e.target.result;
+          if (cursor) {
+            cursor.delete();
+            cursor.continue();
+          }
+        };
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+      });
+    }
+
+    async function idbGetShopPhoto(uid) {
+      const db = await openIDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction('shopPhotos', 'readonly');
+        const store = tx.objectStore('shopPhotos');
+        const request = store.get(uid);
+        request.onsuccess = () => resolve(request.result?.photo || null);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    async function idbSetShopPhoto(uid, photoBase64) {
+      const db = await openIDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction('shopPhotos', 'readwrite');
+        const store = tx.objectStore('shopPhotos');
+        const request = store.put({ uid, photo: photoBase64 });
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    async function idbGetMeta(key) {
+      const db = await openIDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction('meta', 'readonly');
+        const store = tx.objectStore('meta');
+        const request = store.get(key);
+        request.onsuccess = () => resolve(request.result?.value || null);
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    async function idbSetMeta(key, value) {
+      const db = await openIDB();
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction('meta', 'readwrite');
+        const store = tx.objectStore('meta');
+        const request = store.put({ key, value });
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(request.error);
+      });
+    }
+
+    // ===== DATA MIGRATION: localStorage → IndexedDB =====
+    async function migrateDataToIDB(uid) {
+      try {
+        const migrationDone = await idbGetMeta('migrated_v1_' + uid);
+        if (migrationDone) return; // Already migrated
+
+        // Migrate transactions
+        const lsTransactions = lsGet(LS_KEYS.transactions(uid)) || [];
+        if (lsTransactions.length > 0) {
+          console.log('Migrating', lsTransactions.length, 'transactions to IndexedDB...');
+          for (const trx of lsTransactions) {
+            if (!trx.localId) trx.localId = generateId();
+            trx.shopId = uid;
+            await idbAddTransaction(trx);
+          }
+          // Keep localStorage copy as backup (don't delete yet)
+          // Mark migration done AFTER successful migration
+          await idbSetMeta('migrated_v1_' + uid, {
+            date: new Date().toISOString(),
+            count: lsTransactions.length
+          });
+          console.log('Transaction migration completed successfully.');
+        } else {
+          await idbSetMeta('migrated_v1_' + uid, { date: new Date().toISOString(), count: 0 });
+        }
+      } catch (err) {
+        console.error('Migration error:', err);
+      }
+    }
+
     // Terjemahkan error Firebase ke pesan ramah pengguna (tanpa expose detail teknis)
     function friendlyError(code, fallback) {
       const map = {
@@ -1396,12 +1580,16 @@
       }
     });
 
-    // ===== LOAD POS (from localStorage) =====
-    function loadPOS() {
+    // ===== LOAD POS (from localStorage/IndexedDB) =====
+    async function loadPOS() {
       try {
+        // Migrate data from localStorage to IndexedDB (first time only, non-blocking)
+        if (currentShop && currentShop.id) {
+          migrateDataToIDB(currentShop.id); // fire-and-forget, runs in background
+        }
         loadMenuFromLS();
         loadActiveTablesFromLS();
-        loadSettingsFromLS();
+        await loadSettingsFromLS();
 
         // Update header
         document.getElementById('header-shop-name').textContent = currentShop.shopName || 'Warung Kopi';
@@ -1464,7 +1652,7 @@
       tableCustomerNames = lsGet(LS_KEYS.customerNames(uid)) || {};
     }
 
-    function loadSettingsFromLS() {
+    async function loadSettingsFromLS() {
       const uid = currentShop.id;
       const saved = lsGet(LS_KEYS.settings(uid));
       if (saved && Object.keys(saved).length > 0) {
@@ -1481,17 +1669,48 @@
         };
         lsSet(LS_KEYS.settings(uid), shopSettings);
       }
-      // Restore photo from localStorage
-      const localPhoto = localStorage.getItem('shopPhoto_' + uid);
-      if (localPhoto) shopSettings.shopPhoto = localPhoto;
+      // Restore photo from IndexedDB (migrated from localStorage)
+      try {
+        const localPhoto = await idbGetShopPhoto(uid);
+        if (localPhoto) {
+          shopSettings.shopPhoto = localPhoto;
+        } else {
+          // Try localStorage as fallback
+          const lsPhoto = localStorage.getItem('shopPhoto_' + uid);
+          if (lsPhoto) {
+            shopSettings.shopPhoto = lsPhoto;
+            // Migrate to IndexedDB and remove from localStorage
+            await idbSetShopPhoto(uid, lsPhoto);
+            localStorage.removeItem('shopPhoto_' + uid);
+          }
+        }
+      } catch(e) {
+        // Fallback to localStorage
+        const lsPhoto = localStorage.getItem('shopPhoto_' + uid);
+        if (lsPhoto) shopSettings.shopPhoto = lsPhoto;
+      }
     }
 
     // ===== LOCALSTORAGE: SAVE DATA =====
-    function saveTransactionToLS(trx) {
+    async function saveTransactionToLS(trx) {
       const uid = currentShop.id;
-      const transactions = lsGet(LS_KEYS.transactions(uid)) || [];
-      transactions.push(trx);
-      lsSet(LS_KEYS.transactions(uid), transactions);
+      if (!trx.localId) trx.localId = generateId();
+      trx.shopId = uid;
+      await idbAddTransaction(trx).catch(err => {
+        console.error('IndexedDB save failed, falling back to localStorage:', err);
+        // Fallback to localStorage
+        const transactions = lsGet(LS_KEYS.transactions(uid)) || [];
+        transactions.push(trx);
+        lsSet(LS_KEYS.transactions(uid), transactions);
+      });
+      // Also save to localStorage as backup
+      try {
+        const transactions = lsGet(LS_KEYS.transactions(uid)) || [];
+        if (!transactions.find(t => (t.localId || t.id) === trx.localId)) {
+          transactions.push(trx);
+          lsSet(LS_KEYS.transactions(uid), transactions);
+        }
+      } catch(e) { /* localStorage might be full, that's OK */ }
     }
 
     function saveActiveTablesToLS() {
@@ -1527,39 +1746,55 @@
       lsSet(LS_KEYS.menu(uid), filtered);
     }
 
-    // Get transactions filtered by date range from localStorage
-    function getTransactionsFiltered(startDate, endDate) {
+    // Get transactions filtered by date range from IndexedDB (with localStorage fallback)
+    async function getTransactionsFiltered(startDate, endDate) {
       if (!currentShop || !currentShop.id) {
         console.warn('getTransactionsFiltered: currentShop not ready');
         return [];
       }
       const uid = currentShop.id;
-      const allTx = lsGet(LS_KEYS.transactions(uid)) || [];
-      if (allTx.length === 0) return [];
-      console.log('getTransactionsFiltered: totalTx=', allTx.length, 'startDate=', startDate, 'endDate=', endDate);
-      return allTx
-        .filter(tx => {
+      try {
+        // Try IndexedDB first
+        const idbTx = await idbGetFilteredTransactions(uid, startDate, endDate);
+        if (idbTx.length > 0) return idbTx;
+        // Fallback to localStorage
+        const allTx = lsGet(LS_KEYS.transactions(uid)) || [];
+        if (allTx.length === 0) return [];
+        return allTx
+          .filter(tx => {
+            if (!tx || !tx.date) return false;
+            let txDate;
+            if (typeof tx.date === 'string') {
+              txDate = tx.date.split('T')[0].split(' ')[0];
+            } else if (tx.date instanceof Date) {
+              txDate = formatDateInput(tx.date);
+            } else {
+              txDate = formatDateInput(new Date(tx.date));
+            }
+            if (!txDate || txDate.length < 10) return false;
+            if (startDate && txDate < startDate) return false;
+            if (endDate && txDate > endDate) return false;
+            return true;
+          })
+          .sort((a, b) => new Date(b.date) - new Date(a.date));
+      } catch(e) {
+        console.error('getTransactionsFiltered error:', e);
+        // Fallback to localStorage
+        const allTx = lsGet(LS_KEYS.transactions(uid)) || [];
+        return allTx.filter(tx => {
           if (!tx || !tx.date) return false;
-          let txDate;
-          if (typeof tx.date === 'string') {
-            // Handle ISO format: 2026-04-10T12:30:00.000Z or 2026-04-10T12:30:00
-            txDate = tx.date.split('T')[0].split(' ')[0];
-          } else if (tx.date instanceof Date) {
-            txDate = formatDateInput(tx.date);
-          } else {
-            txDate = formatDateInput(new Date(tx.date));
-          }
+          const txDate = typeof tx.date === 'string' ? tx.date.split('T')[0].split(' ')[0] : formatDateInput(new Date(tx.date));
           if (!txDate || txDate.length < 10) return false;
           if (startDate && txDate < startDate) return false;
           if (endDate && txDate > endDate) return false;
           return true;
-        })
-        .sort((a, b) => new Date(b.date) - new Date(a.date));
+        }).sort((a, b) => new Date(b.date) - new Date(a.date));
+      }
     }
 
     // Paginated access (client-side slicing)
-    function getTransactionsPaginated(startDate, endDate, pageSize, offset) {
-      const allFiltered = getTransactionsFiltered(startDate, endDate);
+    async function getTransactionsPaginated(startDate, endDate, pageSize, offset) {
+      const allFiltered = await getTransactionsFiltered(startDate, endDate);
       const start = offset || 0;
       const page = allFiltered.slice(start, start + (pageSize || 20));
       return {
@@ -1568,11 +1803,21 @@
       };
     }
 
-    // ===== UPDATE HEADER (computes from localStorage) =====
-    function updateDailyStats() {
+    // ===== UPDATE HEADER (computes from IndexedDB/localStorage) =====
+    async function updateDailyStats() {
       try {
         if (!currentShop || !currentShop.id) return;
         const todayStr = today();
+        try {
+          const allTx = await idbGetFilteredTransactions(currentShop.id, todayStr, todayStr);
+          const totalRevenue = allTx.reduce((sum, tx) => sum + (tx.total || tx.totalHarga || 0), 0);
+          const totalEl = document.getElementById('header-daily-total');
+          const countEl = document.getElementById('header-daily-count');
+          if (totalEl) totalEl.textContent = formatIDR(totalRevenue);
+          if (countEl) countEl.textContent = allTx.length + ' transaksi';
+          return;
+        } catch(e) { /* fallback below */ }
+        // Fallback to localStorage
         const allTx = lsGet(LS_KEYS.transactions(currentShop.id)) || [];
         const todayTx = allTx.filter(tx => {
           if (!tx || !tx.date) return false;
@@ -2097,7 +2342,7 @@
       loadHistory(tab);
     }
 
-    function loadHistory(tab) {
+    async function loadHistory(tab) {
       if (!currentShop || !currentShop.id) {
         console.warn('loadHistory: currentShop not ready, retrying in 500ms');
         setTimeout(() => loadHistory(tab), 500);
@@ -2136,7 +2381,7 @@
 
       try {
         // Get all filtered transactions and store for pagination
-        const allFiltered = getTransactionsFiltered(startDate, endDate);
+        const allFiltered = await getTransactionsFiltered(startDate, endDate);
         historyPagination = { offset: 0, hasMore: allFiltered.length > 20, isLoading: false, _allFiltered: allFiltered };
         const pageTx = allFiltered.slice(0, 20);
         currentFilteredTransactions = pageTx;
@@ -2462,7 +2707,7 @@
       updateHeaderTagline();
     }
 
-    // Photo stored in localStorage only
+    // Photo stored in IndexedDB (with localStorage fallback)
     function handleShopPhoto(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -2474,17 +2719,13 @@
       reader.onload = function(e) {
         const base64 = e.target.result;
         shopSettings.shopPhoto = base64;
-        // Save to localStorage
-        try {
-          localStorage.setItem('shopPhoto_' + currentShop.id, base64);
-          // Also update settings object in localStorage
-          const uid = currentShop.id;
-          const saved = lsGet(LS_KEYS.settings(uid)) || {};
-          saved.shopPhoto = base64;
-          lsSet(LS_KEYS.settings(uid), saved);
-        } catch (e) {
-          console.warn('localStorage full, photo not saved locally');
-        }
+        // Save to IndexedDB
+        idbSetShopPhoto(currentShop.id, base64).catch(err => console.error('IDB photo save error:', err));
+        // Also update settings object in localStorage
+        const uid = currentShop.id;
+        const saved = lsGet(LS_KEYS.settings(uid)) || {};
+        saved.shopPhoto = base64;
+        lsSet(LS_KEYS.settings(uid), saved);
         document.getElementById('shop-photo-img').src = base64;
         document.getElementById('shop-photo-img').classList.remove('hidden');
         document.getElementById('shop-photo-placeholder').classList.add('hidden');
@@ -2566,13 +2807,20 @@
     }
 
     // ===== BACKUP & RESTORE =====
-    function getDataSummary() {
+    async function getDataSummary() {
       const uid = auth.currentUser?.uid;
       if (!uid) return {};
       const menu = lsGet(LS_KEYS.menu(uid)) || [];
-      const tx = lsGet(LS_KEYS.transactions(uid)) || [];
+      const lsTx = lsGet(LS_KEYS.transactions(uid)) || [];
       const settings = lsGet(LS_KEYS.settings(uid)) || {};
       const tables = lsGet(LS_KEYS.activeTables(uid)) || {};
+
+      // Get IndexedDB transaction count
+      let idbTxCount = 0;
+      try {
+        const idbTx = await idbGetAllTransactions(uid);
+        idbTxCount = idbTx.length;
+      } catch(e) {}
 
       let totalSize = 0;
       [LS_KEYS.menu(uid), LS_KEYS.transactions(uid), LS_KEYS.settings(uid), LS_KEYS.activeTables(uid)].forEach(k => {
@@ -2581,20 +2829,21 @@
 
       return {
         menuCount: menu.length,
-        transactionCount: tx.length,
+        transactionCount: Math.max(idbTxCount, lsTx.length),
+        storage: 'IndexedDB + localStorage',
         totalSize: (totalSize / 1024).toFixed(1) + ' KB',
-        maxLimit: '5-10 MB'
+        maxLimit: '500 MB+ (IndexedDB)'
       };
     }
 
-    function renderDataSummary() {
-      const summary = getDataSummary();
+    async function renderDataSummary() {
+      const summary = await getDataSummary();
       const el = document.getElementById('data-summary');
       if (!el) return;
       el.innerHTML = `
         <p><i class="fas fa-utensils mr-1"></i> Menu: <strong>${summary.menuCount || 0}</strong> item</p>
         <p><i class="fas fa-receipt mr-1"></i> Transaksi: <strong>${summary.transactionCount || 0}</strong> record</p>
-        <p><i class="fas fa-hdd mr-1"></i> Ukuran Data: <strong>${summary.totalSize || '0 KB'}</strong> / ${summary.maxLimit || '5-10 MB'}</p>
+        <p><i class="fas fa-hdd mr-1"></i> Ukuran Data: <strong>${summary.totalSize || '0 KB'}</strong> / ${summary.maxLimit || '500 MB+ (IndexedDB)'}</p>
       `;
 
       const lastBackup = lsGet('warkop_last_backup');
@@ -2606,18 +2855,30 @@
       }
     }
 
-    function exportBackup() {
+    async function exportBackup() {
       const uid = auth.currentUser?.uid;
       if (!uid) return;
 
+      // Get transactions from IndexedDB
+      let transactions = [];
+      try {
+        transactions = await idbGetAllTransactions(uid);
+      } catch(e) {
+        transactions = lsGet(LS_KEYS.transactions(uid)) || [];
+      }
+      // If IndexedDB empty, try localStorage
+      if (transactions.length === 0) {
+        transactions = lsGet(LS_KEYS.transactions(uid)) || [];
+      }
+
       const backup = {
-        version: '2.0',
+        version: '3.0',
         type: 'warkop-pos-backup',
         shopId: uid,
         exportDate: new Date().toISOString(),
         data: {
           menu: lsGet(LS_KEYS.menu(uid)) || [],
-          transactions: lsGet(LS_KEYS.transactions(uid)) || [],
+          transactions: transactions,
           settings: lsGet(LS_KEYS.settings(uid)) || {},
           activeTables: lsGet(LS_KEYS.activeTables(uid)) || {},
         }
@@ -2641,7 +2902,7 @@
       if (!file) return;
 
       const reader = new FileReader();
-      reader.onload = function(e) {
+      reader.onload = async function(e) {
         try {
           const backup = JSON.parse(e.target.result);
           if (backup.type !== 'warkop-pos-backup') {
@@ -2649,7 +2910,7 @@
             return;
           }
 
-          customConfirm('Restore data dari backup?\n\nData saat ini akan digabungkan (tidak ditimpa).\n\nMenu: ' + (backup.data.menu?.length || 0) + ' item\nTransaksi: ' + (backup.data.transactions?.length || 0) + ' record', function(ok) {
+          customConfirm('Restore data dari backup?\n\nData saat ini akan digabungkan (tidak ditimpa).\n\nMenu: ' + (backup.data.menu?.length || 0) + ' item\nTransaksi: ' + (backup.data.transactions?.length || 0) + ' record', async function(ok) {
             if (!ok) return;
             const uid = auth.currentUser?.uid;
 
@@ -2660,10 +2921,19 @@
             }
 
             if (backup.data.transactions?.length) {
-              const existing = lsGet(LS_KEYS.transactions(uid)) || [];
-              const existingIds = new Set(existing.map(t => t.localId || t.id));
-              const newTx = backup.data.transactions.filter(t => !existingIds.has(t.localId || t.id));
-              lsSet(LS_KEYS.transactions(uid), [...existing, ...newTx]);
+              // Restore to IndexedDB
+              for (const tx of backup.data.transactions) {
+                if (!tx.localId) tx.localId = tx.id || generateId();
+                tx.shopId = uid;
+                await idbAddTransaction(tx);
+              }
+              // Also save to localStorage as backup
+              try {
+                const existing = lsGet(LS_KEYS.transactions(uid)) || [];
+                const existingIds = new Set(existing.map(t => t.localId || t.id));
+                const newTx = backup.data.transactions.filter(t => !existingIds.has(t.localId || t.id));
+                lsSet(LS_KEYS.transactions(uid), [...existing, ...newTx]);
+              } catch(e) { /* localStorage might be full */ }
             }
 
             if (backup.data.settings && Object.keys(backup.data.settings).length) {
@@ -2682,10 +2952,13 @@
     }
 
     function confirmClearData() {
-      customConfirm('Semua data lokal (menu, transaksi, pengaturan) akan dihapus permanen. Pastikan Anda sudah backup terlebih dahulu!', function(ok) {
+      customConfirm('Semua data lokal (menu, transaksi, pengaturan) akan dihapus permanen. Pastikan Anda sudah backup terlebih dahulu!', async function(ok) {
         if (!ok) return;
         const uid = auth.currentUser?.uid;
         if (!uid) return;
+        // Clear IndexedDB
+        try { await idbClearTransactions(uid); } catch(e) {}
+        // Clear localStorage
         localStorage.removeItem(LS_KEYS.menu(uid));
         localStorage.removeItem(LS_KEYS.transactions(uid));
         localStorage.removeItem(LS_KEYS.settings(uid));
