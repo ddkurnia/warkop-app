@@ -8,7 +8,7 @@
 //   yang TIDAK AKAN terhapus saat cache diperbarui
 // ============================================
 
-const CACHE_NAME = 'warkop-pos-v10';
+const CACHE_NAME = 'warkop-pos-v11';
 const STATIC_ASSETS = [
   '/',
   '/manifest.json',
