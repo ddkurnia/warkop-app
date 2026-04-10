@@ -843,6 +843,47 @@
     <!-- TOAST -->
     <div id="toast-container" class="fixed bottom-24 left-1/2 -translate-x-1/2 z-[60] pointer-events-none"></div>
 
+    <!-- CUSTOM CONFIRM DIALOG -->
+    <div id="custom-confirm" class="hidden fixed inset-0 z-[70] flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="customConfirmCancel()"></div>
+      <div class="relative bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full animate-scale-in">
+        <div class="text-center mb-4">
+          <div class="w-12 h-12 rounded-full bg-amber-100 mx-auto mb-3 flex items-center justify-center">
+            <i class="fas fa-exclamation-triangle text-amber-600 text-xl"></i>
+          </div>
+          <p id="custom-confirm-msg" class="text-sm text-gray-700 leading-relaxed whitespace-pre-line"></p>
+        </div>
+        <div class="flex gap-3">
+          <button onclick="customConfirmCancel()" class="flex-1 py-2.5 rounded-xl text-sm font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition">Batal</button>
+          <button onclick="customConfirmOk()" class="flex-1 py-2.5 rounded-xl text-sm font-semibold bg-red-600 text-white hover:bg-red-700 transition">Ya, Lanjutkan</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CUSTOM PROMPT DIALOG (Customer Name) -->
+    <div id="customer-name-modal" class="hidden fixed inset-0 z-[70] flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeCustomerNameModal()"></div>
+      <div class="relative bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full animate-scale-in">
+        <div class="text-center mb-4">
+          <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-teal-400 to-teal-600 mx-auto mb-3 flex items-center justify-center shadow-md">
+            <i class="fas fa-user-edit text-white text-xl"></i>
+          </div>
+          <h3 id="cust-modal-title" class="font-display text-lg font-bold text-gray-900">Nama Pelanggan</h3>
+          <p id="cust-modal-desc" class="text-xs text-gray-400 mt-1">Tulis nama pelanggan meja ini</p>
+        </div>
+        <input type="text" id="cust-name-input" placeholder="Contoh: Budi, Pak Ahmad..." maxlength="30"
+          class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-teal-400 transition mb-1"
+          onkeydown="if(event.key==='Enter')saveCustomerName()">
+        <p class="text-[10px] text-gray-400 mb-4">Kosongkan untuk menghapus nama</p>
+        <div class="flex gap-3">
+          <button onclick="closeCustomerNameModal()" class="flex-1 py-2.5 rounded-xl text-sm font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition">Batal</button>
+          <button onclick="saveCustomerName()" class="flex-1 py-2.5 rounded-xl text-sm font-semibold bg-gradient-to-r from-teal-500 to-teal-700 text-white hover:from-teal-600 hover:to-teal-800 transition shadow-md">
+            <i class="fas fa-check mr-1"></i> Simpan
+          </button>
+        </div>
+      </div>
+    </div>
+
   </div><!-- end pos-app -->
 
   <!-- ============================================== -->
@@ -1660,18 +1701,52 @@
       grid.innerHTML = html;
     }
 
+    let _pendingCustomerTableId = null;
+    let _customConfirmCallback = null;
+
     function editCustomerName(tableId) {
+      _pendingCustomerTableId = tableId;
       const current = tableCustomerNames[tableId] || '';
-      const msg = current ? 'Ganti nama pelanggan meja ' + tableId + ' (kosongkan untuk hapus):' : 'Tulis nama pelanggan meja ' + tableId + ':';
-      const name = prompt(msg, current);
-      if (name === null) return; // User cancelled
-      if (name.trim() === '') {
-        delete tableCustomerNames[tableId];
+      document.getElementById('cust-modal-title').textContent = 'Nama Pelanggan';
+      document.getElementById('cust-modal-desc').textContent = 'Tulis nama pelanggan meja ' + tableId;
+      document.getElementById('cust-name-input').value = current;
+      document.getElementById('customer-name-modal').classList.remove('hidden');
+      setTimeout(() => document.getElementById('cust-name-input').focus(), 100);
+    }
+
+    function saveCustomerName() {
+      if (!_pendingCustomerTableId) return;
+      const name = (document.getElementById('cust-name-input').value || '').trim();
+      if (name === '') {
+        delete tableCustomerNames[_pendingCustomerTableId];
       } else {
-        tableCustomerNames[tableId] = name.trim();
+        tableCustomerNames[_pendingCustomerTableId] = name;
       }
       lsSet(LS_KEYS.customerNames(currentShop.id), tableCustomerNames);
+      closeCustomerNameModal();
       renderTables();
+    }
+
+    function closeCustomerNameModal() {
+      document.getElementById('customer-name-modal').classList.add('hidden');
+      document.getElementById('cust-name-input').value = '';
+      _pendingCustomerTableId = null;
+    }
+
+    function customConfirm(message, callback) {
+      _customConfirmCallback = callback;
+      document.getElementById('custom-confirm-msg').textContent = message;
+      document.getElementById('custom-confirm').classList.remove('hidden');
+    }
+
+    function customConfirmOk() {
+      document.getElementById('custom-confirm').classList.add('hidden');
+      if (_customConfirmCallback) { _customConfirmCallback(true); _customConfirmCallback = null; }
+    }
+
+    function customConfirmCancel() {
+      document.getElementById('custom-confirm').classList.add('hidden');
+      if (_customConfirmCallback) { _customConfirmCallback(false); _customConfirmCallback = null; }
     }
 
     function selectTable(tableId) {
@@ -1760,12 +1835,17 @@
 
     function resetOrder() {
       if (!currentTableId) return;
-      if (!confirm('Reset semua pesanan meja ini?')) return;
-      activeTables[currentTableId] = [];
-      saveActiveTablesToLS();
-      renderTables();
-      renderOrderPanel('panel-content-desktop');
-      renderOrderPanel('panel-content-mobile');
+      customConfirm('Reset semua pesanan meja ini?', function(ok) {
+        if (!ok) return;
+        activeTables[currentTableId] = [];
+        delete tableCustomerNames[currentTableId];
+        lsSet(LS_KEYS.customerNames(currentShop.id), tableCustomerNames);
+        saveActiveTablesToLS();
+        renderTables();
+        renderOrderPanel('panel-content-desktop');
+        renderOrderPanel('panel-content-mobile');
+        showToast('Pesanan direset');
+      });
     }
 
     function renderOrderPanel(panelId) {
@@ -2347,7 +2427,7 @@
     }
 
     function deleteMenuItemConfirm(docId, nama) {
-      if (confirm('Hapus menu "' + nama + '"?')) deleteMenuItemAction(docId);
+      customConfirm('Hapus menu "' + nama + '"?', function(ok) { if (ok) deleteMenuItemAction(docId); });
     }
 
     function deleteMenuItemAction(docId) {
@@ -2569,7 +2649,8 @@
             return;
           }
 
-          if (confirm('Restore data dari backup?\n\nData saat ini akan digabungkan (tidak ditimpa).\n\nMenu: ' + (backup.data.menu?.length || 0) + ' item\nTransaksi: ' + (backup.data.transactions?.length || 0) + ' record')) {
+          customConfirm('Restore data dari backup?\n\nData saat ini akan digabungkan (tidak ditimpa).\n\nMenu: ' + (backup.data.menu?.length || 0) + ' item\nTransaksi: ' + (backup.data.transactions?.length || 0) + ' record', function(ok) {
+            if (!ok) return;
             const uid = auth.currentUser?.uid;
 
             if (backup.data.menu?.length) {
@@ -2591,7 +2672,7 @@
 
             showToast('Data berhasil di-restore! Halaman akan di-refresh...', 'success');
             setTimeout(() => location.reload(), 2000);
-          }
+          });
         } catch (err) {
           showToast('File backup tidak valid atau rusak. Pastikan file benar.', 'error');
         }
@@ -2601,7 +2682,8 @@
     }
 
     function confirmClearData() {
-      if (confirm('⚠️ PERINGATAN!\n\nSemua data lokal (menu, transaksi, pengaturan) akan dihapus permanen.\n\nPastikan Anda sudah backup terlebih dahulu!\n\nYakin ingin melanjutkan?')) {
+      customConfirm('Semua data lokal (menu, transaksi, pengaturan) akan dihapus permanen. Pastikan Anda sudah backup terlebih dahulu!', function(ok) {
+        if (!ok) return;
         const uid = auth.currentUser?.uid;
         if (!uid) return;
         localStorage.removeItem(LS_KEYS.menu(uid));
@@ -2610,7 +2692,7 @@
         localStorage.removeItem(LS_KEYS.activeTables(uid));
         showToast('Semua data lokal telah dihapus. Halaman akan di-refresh...', 'success');
         setTimeout(() => location.reload(), 2000);
-      }
+      });
     }
 
     // ===== DEMO CODE FUNCTIONS =====
