@@ -46,9 +46,9 @@
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     @media print {
       body * { visibility: hidden; }
-      #receipt-modal-content, #receipt-modal-content * { visibility: visible; }
-      #receipt-modal-content { position: absolute; left: 0; top: 0; width: 100%; background: white; padding: 20px; }
       .no-print { display: none !important; }
+      #print-area, #print-area * { visibility: visible; }
+      #print-area { position: absolute; left: 0; top: 0; width: 100%; background: white; padding: 10px; }
     }
     /* ===== MODERN TABLE CARDS ===== */
     .table-card {
@@ -161,26 +161,53 @@
     .order-mode-tab.active-mode {
       transform: translateY(-1px);
     }
-    .takeaway-order-card {
-      background: white;
-      border: 2px solid transparent;
-      border-radius: 1rem;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    /* ===== TAKEAWAY / PEL CARDS ===== */
+    .pel-card {
       transition: all 0.3s cubic-bezier(.4,0,.2,1);
+      border: 2px solid transparent;
+      position: relative;
+      overflow: hidden;
+      border-radius: 1rem;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.03);
+      cursor: pointer;
     }
-    .takeaway-order-card.has-items {
-      border-color: #f59e0b;
+    .pel-card:hover {
+      transform: translateY(-4px) scale(1.03);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.04);
+    }
+    .pel-card.pel-active {
+      border-color: transparent;
       background: linear-gradient(145deg, #fffbeb, #fef3c7, #fde68a);
-      box-shadow: 0 6px 20px rgba(245,158,11,0.2), 0 0 0 1px #f59e0b;
+      box-shadow: 0 6px 20px rgba(245,158,11,0.25), 0 0 0 2px #f59e0b, inset 0 1px 0 rgba(255,255,255,0.6);
     }
-    .takeaway-name-input {
-      border: 2px solid #fde68a;
-      border-radius: 0.75rem;
-      transition: all 0.2s;
+    .pel-card.pel-active:hover {
+      box-shadow: 0 12px 30px rgba(245,158,11,0.35), 0 0 0 2px #d97706, inset 0 1px 0 rgba(255,255,255,0.6);
     }
-    .takeaway-name-input:focus {
-      border-color: #f59e0b;
-      box-shadow: 0 0 0 3px rgba(245,158,11,0.15);
+    .pel-card.pel-unpaid {
+      border-color: transparent;
+      background: linear-gradient(145deg, #fff1f2, #fecdd3, #fda4af);
+      box-shadow: 0 6px 20px rgba(239,68,68,0.2), 0 0 0 2px #ef4444, inset 0 1px 0 rgba(255,255,255,0.5);
+      animation: pel-unpaid-glow 2s ease-in-out infinite;
+    }
+    @keyframes pel-unpaid-glow {
+      0%, 100% { box-shadow: 0 6px 20px rgba(239,68,68,0.2), 0 0 0 2px #ef4444, inset 0 1px 0 rgba(255,255,255,0.5); }
+      50% { box-shadow: 0 6px 24px rgba(239,68,68,0.35), 0 0 0 3px #f87171, inset 0 1px 0 rgba(255,255,255,0.5); }
+    }
+    .pel-card.pel-selected {
+      box-shadow: 0 8px 24px rgba(245,158,11,0.35), 0 0 0 3px #d97706, inset 0 1px 0 rgba(255,255,255,0.6);
+      transform: translateY(-2px) scale(1.05);
+    }
+    .pel-card .pel-dot {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      box-shadow: 0 0 6px rgba(239,68,68,0.6);
+      background: #ef4444;
+      animation: pulse-dot 1.5s ease-in-out infinite;
     }
     .tab-btn { transition: all 0.25s cubic-bezier(.4,0,.2,1); }
     .tab-btn:hover { transform: translateY(-1px); }
@@ -664,22 +691,15 @@
 
               <!-- TAKE AWAY SECTION -->
               <div id="section-takeaway" class="hidden mb-4">
-                <div class="takeaway-order-card p-4 mb-3" id="takeaway-card">
-                  <div class="flex items-center gap-3 mb-3">
-                    <div class="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
-                      <i class="fas fa-shopping-bag text-xl text-amber-600"></i>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                      <h3 class="font-bold text-amber-800 text-sm">Pesanan Bungkus</h3>
-                      <p class="text-xs text-amber-600" id="takeaway-subtitle">Tambahkan nama pelanggan & pesanan</p>
-                    </div>
-                    <div id="takeaway-item-badge" class="hidden w-8 h-8 rounded-full bg-amber-500 text-white font-extrabold text-sm flex items-center justify-center shadow">0</div>
-                  </div>
-                  <div class="relative">
-                    <i class="fas fa-user absolute left-3 top-1/2 -translate-y-1/2 text-amber-400 text-sm"></i>
-                    <input type="text" id="takeaway-name-input" placeholder="Nama pelanggan (opsional)..." class="takeaway-name-input w-full pl-9 pr-4 py-2.5 bg-white text-sm focus:outline-none" oninput="updateTakeawayName()">
+                <div class="flex items-center justify-between mb-2">
+                  <h3 class="text-sm font-bold text-amber-700"><i class="fas fa-shopping-bag mr-1 text-amber-500"></i> Daftar Bungkus</h3>
+                  <div class="flex items-center gap-2">
+                    <button onclick="changeTakeawayCount(-1)" class="w-7 h-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition text-xs font-bold" title="Kurangi"><i class="fas fa-minus"></i></button>
+                    <span id="takeaway-count-display" class="text-sm font-bold text-amber-800 min-w-[24px] text-center">5</span>
+                    <button onclick="changeTakeawayCount(1)" class="w-7 h-7 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-600 flex items-center justify-center transition text-xs font-bold" title="Tambah"><i class="fas fa-plus"></i></button>
                   </div>
                 </div>
+                <div id="takeaway-grid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2.5"></div>
               </div>
 
               <!-- MENU SECTION (shared) -->
@@ -764,7 +784,7 @@
           </div>
           <div class="flex gap-2 mb-4">
             <button onclick="exportCSV()" class="flex-1 flex items-center justify-center gap-2 py-2.5 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition shadow-sm"><i class="fas fa-file-csv"></i> Export CSV</button>
-            <button onclick="window.print()" class="px-5 py-2.5 bg-coffee-700 text-white rounded-xl text-sm font-semibold hover:bg-coffee-800 transition shadow-sm"><i class="fas fa-print"></i></button>
+            <button onclick="printReport()" class="px-5 py-2.5 bg-coffee-700 text-white rounded-xl text-sm font-semibold hover:bg-coffee-800 transition shadow-sm"><i class="fas fa-print"></i></button>
           </div>
           <div id="history-summary" class="grid grid-cols-2 gap-3 mb-4"></div>
           <div id="top-items-section" class="hidden mb-4">
@@ -809,12 +829,14 @@
           <h2 class="text-lg font-bold text-coffee-800 mb-4 flex items-center gap-2"><i class="fas fa-store text-coffee-500"></i> Pengaturan Toko</h2>
           <div class="bg-white rounded-2xl p-5 shadow-sm border border-coffee-100 space-y-5">
             <div class="text-center">
-              <div id="shop-photo-preview" class="w-24 h-24 rounded-full bg-coffee-100 mx-auto mb-3 flex items-center justify-center overflow-hidden border-3 border-coffee-200 cursor-pointer" onclick="document.getElementById('shop-photo-input').click()">
-                <i class="fas fa-camera text-2xl text-coffee-400" id="shop-photo-placeholder"></i>
-                <img id="shop-photo-img" class="w-full h-full object-cover hidden" alt="Foto Toko">
-              </div>
+              <label for="shop-photo-input" class="inline-block cursor-pointer">
+                <div id="shop-photo-preview" class="w-24 h-24 rounded-full bg-coffee-100 mx-auto mb-3 flex items-center justify-center overflow-hidden border-3 border-coffee-200 hover:border-coffee-400 transition">
+                  <i class="fas fa-camera text-2xl text-coffee-400" id="shop-photo-placeholder"></i>
+                  <img id="shop-photo-img" class="w-full h-full object-cover hidden" alt="Foto Toko">
+                </div>
+              </label>
               <input type="file" id="shop-photo-input" accept="image/*" class="hidden" onchange="handleShopPhoto(event)">
-              <p class="text-xs text-coffee-400">Tap untuk ganti foto</p>
+              <p class="text-xs text-coffee-400">Tap foto untuk ganti (maks 500KB)</p>
             </div>
             <div>
               <label class="block text-sm font-semibold text-coffee-700 mb-1">Nama Toko</label>
@@ -1288,8 +1310,8 @@
     let shopSettings = {};
     let currentTableId = null;
     let currentOrderMode = 'dine-in'; // 'dine-in' or 'takeaway'
-    let takeawayCustomerName = '';
-    let takeawayOrderCounter = 0;
+    let TAKEAWAY_COUNT = 5;
+    try { const savedTC2 = JSON.parse(localStorage.getItem('warkop_takeawayCount')); if (savedTC2 && savedTC2 > 0 && savedTC2 <= 50) TAKEAWAY_COUNT = savedTC2; } catch(e) {}
     let currentPage = 'kasir';
     let currentMenuCategory = 'Semua';
     let currentMgmtCategory = 'Semua';
@@ -1749,9 +1771,10 @@
         loadActiveTablesFromLS();
         await loadSettingsFromLS();
 
-        // Update header
-        document.getElementById('header-shop-name').textContent = currentShop.shopName || 'Warung Kopi';
-        document.title = (currentShop.shopName || 'Warung Kopi') + ' - POS';
+        // Update header from shopSettings (localStorage), not from Firestore
+        const displayShopName = shopSettings.shopName || currentShop.shopName || 'Warung Kopi';
+        document.getElementById('header-shop-name').textContent = displayShopName;
+        document.title = displayShopName + ' - POS';
 
         updateHeaderPhoto();
         updateHeaderTagline();
@@ -2194,42 +2217,127 @@
         dineinBtn.className = 'order-mode-tab flex-1 py-3 rounded-xl font-bold text-sm bg-white text-gray-500 border-2 border-gray-200';
         takeawaySection.classList.remove('hidden');
         dineinSection.classList.add('hidden');
-        // Auto-select takeaway as "table"
-        currentTableId = 'takeaway';
-        if (!activeTables['takeaway']) activeTables['takeaway'] = [];
-        updateTakeawayCard();
+        currentTableId = null;
+        renderTakeawayGrid();
       }
-      // Re-render panels
       renderOrderPanel('panel-content-desktop');
       renderOrderPanel('panel-content-mobile');
       renderMenuGrid();
     }
 
-    function updateTakeawayName() {
-      const input = document.getElementById('takeaway-name-input');
-      takeawayCustomerName = (input.value || '').trim();
+    // ===== TAKEAWAY COUNT =====
+    function changeTakeawayCount(delta) {
+      const newCount = TAKEAWAY_COUNT + delta;
+      if (newCount < 1 || newCount > 50) return;
+      // Check if removing would lose active orders
+      if (delta < 0) {
+        const removeKey = 'TA_' + TAKEAWAY_COUNT;
+        if (activeTables[removeKey] && activeTables[removeKey].length > 0) {
+          showToast('Pel ' + TAKEAWAY_COUNT + ' masih ada pesanan!', 'error'); return;
+        }
+      }
+      TAKEAWAY_COUNT = newCount;
+      localStorage.setItem('warkop_takeawayCount', JSON.stringify(TAKEAWAY_COUNT));
+      document.getElementById('takeaway-count-display').textContent = TAKEAWAY_COUNT;
+      renderTakeawayGrid();
     }
 
-    function updateTakeawayCard() {
-      const items = activeTables['takeaway'] || [];
-      const card = document.getElementById('takeaway-card');
-      const badge = document.getElementById('takeaway-item-badge');
-      const subtitle = document.getElementById('takeaway-subtitle');
+    // ===== RENDER TAKEAWAY GRID (Pel Cards) =====
+    function renderTakeawayGrid() {
+      const grid = document.getElementById('takeaway-grid');
+      if (!grid) return;
+      document.getElementById('takeaway-count-display').textContent = TAKEAWAY_COUNT;
+      let html = '';
+      for (let i = 1; i <= TAKEAWAY_COUNT; i++) {
+        const taKey = 'TA_' + i;
+        const isActive = activeTables[taKey] && activeTables[taKey].length > 0;
+        const isSelected = currentTableId === taKey;
+        const isUnpaid = isActive && !isSelected;
+        const custName = tableCustomerNames[taKey] || '';
+        const itemCount = isActive ? activeTables[taKey].reduce((s, it) => s + it.qty, 0) : 0;
 
-      if (items.length > 0) {
-        card.classList.add('has-items');
-        badge.classList.remove('hidden');
-        badge.classList.add('flex');
-        const totalItems = items.reduce((s, i) => s + i.qty, 0);
-        badge.textContent = totalItems;
-        const total = items.reduce((s, i) => s + i.harga * i.qty, 0);
-        subtitle.textContent = totalItems + ' item — ' + formatIDR(total);
-      } else {
-        card.classList.remove('has-items');
-        badge.classList.add('hidden');
-        badge.classList.remove('flex');
-        subtitle.textContent = 'Tambahkan nama pelanggan & pesanan';
+        let classes = 'pel-card';
+        if (isUnpaid) classes += ' pel-unpaid';
+        else if (isActive && isSelected) classes += ' pel-active pel-selected';
+        else if (isActive) classes += ' pel-active';
+
+        let dotHtml = isUnpaid ? '<div class="pel-dot"></div>' : '';
+
+        let iconClass, iconColor, iconBg, statusText, statusColor, numberColor;
+        if (isUnpaid) {
+          iconClass = 'fas fa-shopping-bag'; iconColor = 'text-red-600'; iconBg = 'bg-red-100';
+          statusText = 'Belum Bayar'; statusColor = 'text-red-700';
+          numberColor = 'text-red-800';
+        } else if (isActive && isSelected) {
+          iconClass = 'fas fa-check-circle'; iconColor = 'text-amber-600'; iconBg = 'bg-amber-100';
+          statusText = itemCount + ' item'; statusColor = 'text-amber-700';
+          numberColor = 'text-amber-800';
+        } else if (isActive) {
+          iconClass = 'fas fa-shopping-bag'; iconColor = 'text-amber-600'; iconBg = 'bg-amber-100';
+          statusText = itemCount + ' item'; statusColor = 'text-amber-700';
+          numberColor = 'text-amber-800';
+        } else {
+          iconClass = 'fas fa-shopping-bag'; iconColor = 'text-gray-300'; iconBg = 'bg-gray-50';
+          statusText = 'Kosong'; statusColor = 'text-gray-400';
+          numberColor = 'text-gray-500';
+        }
+
+        // Customer name badge
+        let nameHtml = '';
+        if (custName) {
+          const nameShort = custName.length > 8 ? custName.substring(0, 8) + '..' : custName;
+          let nameBg, nameText;
+          if (isUnpaid) { nameBg = 'bg-red-500'; nameText = 'text-white'; }
+          else if (isActive) { nameBg = 'bg-amber-500'; nameText = 'text-white'; }
+          else { nameBg = 'bg-gray-600'; nameText = 'text-white'; }
+          nameHtml = '<div class="table-customer-badge inline-block mt-1.5 truncate max-w-full ' + nameBg + ' ' + nameText + ' text-[10px] font-bold px-2 py-0.5 rounded-full" title="' + custName.replace(/"/g, '&quot;') + '"><i class="fas fa-user mr-1 text-[8px]"></i>' + nameShort + '</div>';
+        }
+
+        // Item count pill
+        let itemPillHtml = '';
+        if (isActive && itemCount > 0) {
+          const pillBg = isUnpaid ? 'bg-red-600' : 'bg-amber-500';
+          itemPillHtml = '<div class="mt-1 inline-flex items-center justify-center w-6 h-6 rounded-full text-white text-[11px] font-extrabold shadow ' + pillBg + '">' + itemCount + '</div>';
+        }
+
+        html += '<div class="' + classes + '" onclick="selectTakeaway(' + i + ')">' +
+          dotHtml +
+          '<div class="flex flex-col items-center py-2 px-1">' +
+            '<div class="table-icon ' + iconBg + ' w-9 h-9 rounded-lg flex items-center justify-center mb-1"><i class="' + iconClass + ' ' + iconColor + '"></i></div>' +
+            '<div class="table-number ' + numberColor + '">Pel ' + i + '</div>' +
+            nameHtml +
+            (isActive && !isUnpaid ? '<div class="table-status mt-1 ' + statusColor + '">' + statusText + '</div>' : '') +
+            (isUnpaid ? '<div class="table-status mt-1 font-extrabold tracking-wide ' + statusColor + '"><i class="fas fa-exclamation-triangle mr-0.5"></i>' + statusText + '</div>' : '') +
+            itemPillHtml +
+            '<div class="edit-btn mt-1" onclick="event.stopPropagation();editTakeawayName(' + i + ')"><i class="fas fa-pen text-[9px] text-gray-400 hover:text-amber-500 cursor-pointer" title="Nama pelanggan"></i></div>' +
+          '</div>' +
+          '</div>';
       }
+      grid.innerHTML = html;
+    }
+
+    function selectTakeaway(pelNum) {
+      const taKey = 'TA_' + pelNum;
+      currentTableId = taKey;
+      if (!activeTables[taKey]) {
+        activeTables[taKey] = [];
+        saveActiveTablesToLS();
+      }
+      renderTakeawayGrid();
+      renderMenuGrid();
+      renderOrderPanel('panel-content-desktop');
+      renderOrderPanel('panel-content-mobile');
+      if (window.innerWidth < 1024) openMobilePanel();
+    }
+
+    function editTakeawayName(pelNum) {
+      _pendingCustomerTableId = 'TA_' + pelNum;
+      const current = tableCustomerNames['TA_' + pelNum] || '';
+      document.getElementById('cust-modal-title').textContent = 'Nama Pelanggan';
+      document.getElementById('cust-modal-desc').textContent = 'Tulis nama pelanggan Pel ' + pelNum;
+      document.getElementById('cust-name-input').value = current;
+      document.getElementById('customer-name-modal').classList.remove('hidden');
+      setTimeout(() => document.getElementById('cust-name-input').focus(), 100);
     }
 
     function selectTable(tableId) {
@@ -2281,9 +2389,15 @@
     }
 
     // ===== KASIR: CART =====
+    function refreshUI() {
+      if (currentOrderMode === 'takeaway') renderTakeawayGrid(); else renderTables();
+      renderOrderPanel('panel-content-desktop');
+      renderOrderPanel('panel-content-mobile');
+    }
     function addToCart(menuId) {
-      if (currentOrderMode === 'dine-in' && !currentTableId) { showToast('Pilih meja terlebih dahulu!', 'error'); return; }
-      if (currentOrderMode === 'takeaway') currentTableId = 'takeaway';
+      if (!currentTableId) {
+        showToast(currentOrderMode === 'takeaway' ? 'Pilih Pel terlebih dahulu!' : 'Pilih meja terlebih dahulu!', 'error'); return;
+      }
       const menuItem = menuData.find(m => m.id === menuId);
       if (!menuItem) return;
       if (!activeTables[currentTableId]) activeTables[currentTableId] = [];
@@ -2291,9 +2405,7 @@
       if (existing) { existing.qty++; }
       else { activeTables[currentTableId].push({ id: menuItem.id, nama_menu: menuItem.nama_menu, harga: menuItem.harga, kategori: menuItem.kategori, qty: 1 }); }
       saveActiveTablesToLS();
-      renderTables();
-      renderOrderPanel('panel-content-desktop');
-      renderOrderPanel('panel-content-mobile');
+      refreshUI();
     }
 
     function updateQty(menuId, delta) {
@@ -2303,18 +2415,14 @@
       item.qty += delta;
       if (item.qty <= 0) activeTables[currentTableId] = activeTables[currentTableId].filter(i => i.id !== menuId);
       saveActiveTablesToLS();
-      renderTables();
-      renderOrderPanel('panel-content-desktop');
-      renderOrderPanel('panel-content-mobile');
+      refreshUI();
     }
 
     function removeItem(menuId) {
       if (!currentTableId || !activeTables[currentTableId]) return;
       activeTables[currentTableId] = activeTables[currentTableId].filter(i => i.id !== menuId);
       saveActiveTablesToLS();
-      renderTables();
-      renderOrderPanel('panel-content-desktop');
-      renderOrderPanel('panel-content-mobile');
+      refreshUI();
     }
 
     function resetOrder() {
@@ -2326,9 +2434,7 @@
         delete tableCustomerNames[currentTableId];
         lsSet(LS_KEYS.customerNames(currentShop.id), tableCustomerNames);
         saveActiveTablesToLS();
-        renderTables();
-        renderOrderPanel('panel-content-desktop');
-        renderOrderPanel('panel-content-mobile');
+        refreshUI();
         showToast('Pesanan direset');
       });
     }
@@ -2336,21 +2442,28 @@
     function renderOrderPanel(panelId) {
       const panel = document.getElementById(panelId);
       if (!currentTableId) {
+        const hint = currentOrderMode === 'takeaway' ? 'Pilih Pel' : 'Pilih Meja';
+        const subhint = currentOrderMode === 'takeaway' ? 'Tap Pel untuk mulai pesanan' : 'Tap meja untuk mulai pesanan';
         panel.innerHTML = '<div class="flex-1 flex flex-col items-center justify-center py-10 text-coffee-400">' +
-          '<i class="fas fa-hand-pointer text-4xl mb-3"></i><p class="font-medium">Pilih Meja</p><p class="text-sm">Tap meja untuk mulai pesanan</p></div>';
+          '<i class="fas fa-hand-pointer text-4xl mb-3"></i><p class="font-medium">' + hint + '</p><p class="text-sm">' + subhint + '</p></div>';
         return;
       }
       const items = activeTables[currentTableId] || [];
       const total = items.reduce((s, i) => s + i.harga * i.qty, 0);
       const totalItems = items.reduce((s, i) => s + i.qty, 0);
+      const isTA = currentTableId.startsWith('TA_');
+      const pelNum = isTA ? currentTableId.replace('TA_', '') : '';
+      const headerLabel = isTA ? 'Pel ' + pelNum : 'Meja ' + currentTableId;
+      const headerIcon = isTA ? 'shopping-bag text-amber-500' : 'receipt text-coffee-500';
+      const custName = tableCustomerNames[currentTableId] || '';
       panel.innerHTML = '<div class="flex items-center justify-between mb-3">' +
-        '<h3 class="font-bold text-coffee-800"><i class="fas fa-' + (currentTableId === 'takeaway' ? 'shopping-bag text-amber-500' : 'receipt text-coffee-500') + ' mr-2"></i>' + (currentTableId === 'takeaway' ? 'Bungkus' : 'Meja ' + currentTableId) + '</h3>' +
+        '<h3 class="font-bold text-coffee-800"><i class="fas fa-' + headerIcon + ' mr-2"></i>' + headerLabel + '</h3>' +
         (totalItems > 0 ? '<button onclick="resetOrder()" class="text-xs text-red-500 hover:text-red-700"><i class="fas fa-trash mr-1"></i>Reset</button>' : '') +
         '</div>' +
         (items.length === 0 ?
           '<div class="flex-1 flex flex-col items-center justify-center py-8 text-coffee-400"><i class="fas fa-clipboard-list text-3xl mb-2"></i><p class="text-sm">Belum ada pesanan</p></div>' :
           '<div class="flex items-center gap-2 mb-2">' +
-            (takeawayCustomerName ? '<span class="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-lg font-semibold"><i class="fas fa-user mr-1"></i>' + takeawayCustomerName + '</span>' : '') +
+            (custName ? '<span class="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-lg font-semibold"><i class="fas fa-user mr-1"></i>' + custName + '</span>' : '') +
           '</div>' +
           '<div class="space-y-2 flex-1 overflow-y-auto mb-3">' + items.map(item =>
             '<div class="flex items-center gap-2 bg-coffee-50 rounded-xl p-2">' +
@@ -2369,7 +2482,6 @@
             '<button onclick="openPaymentModal()" class="w-full py-3 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition shadow-md"><i class="fas fa-wallet mr-2"></i>Bayar</button>' +
           '</div>'
         );
-      if (currentOrderMode === 'takeaway') updateTakeawayCard();
     }
 
     function openMobilePanel() { document.getElementById('mobile-panel').classList.remove('hidden'); }
@@ -2451,8 +2563,8 @@
       const trx = {
         id: generateTrxId(),
         date: nowLocal(),
-        table: currentTableId === 'takeaway' ? 'Bungkus' : currentTableId,
-        customerName: currentTableId === 'takeaway' ? takeawayCustomerName : (tableCustomerNames[currentTableId] || ''),
+        table: currentTableId.startsWith('TA_') ? 'Bungkus' : currentTableId,
+        customerName: tableCustomerNames[currentTableId] || '',
         items: [...items],
         subtotal: subtotal,
         discountPct: discountPct,
@@ -2470,21 +2582,13 @@
         activeTables[currentTableId] = [];
         delete tableCustomerNames[currentTableId];
         lsSet(LS_KEYS.customerNames(currentShop.id), tableCustomerNames);
-        if (currentOrderMode === 'takeaway') {
-          takeawayCustomerName = '';
-          const nameInput = document.getElementById('takeaway-name-input');
-          if (nameInput) nameInput.value = '';
-          updateTakeawayCard();
-        }
         const savedTableId = currentTableId;
 
         // 3. Save active tables to localStorage
         saveActiveTablesToLS();
 
         // 4. Re-render tables, order panels
-        renderTables();
-        renderOrderPanel('panel-content-desktop');
-        renderOrderPanel('panel-content-mobile');
+        refreshUI();
 
         // 5. Update daily stats in header
         updateDailyStats();
@@ -2560,7 +2664,45 @@
       document.getElementById('receipt-modal').classList.remove('hidden');
     }
 
-    function printReceipt() { window.print(); }
+    function printReceipt() {
+      const content = document.getElementById('receipt-modal-content');
+      if (!content) return;
+      // Create or reuse print area
+      let printArea = document.getElementById('print-area');
+      if (!printArea) {
+        printArea = document.createElement('div');
+        printArea.id = 'print-area';
+        document.body.appendChild(printArea);
+      }
+      printArea.innerHTML = content.innerHTML;
+      window.print();
+      setTimeout(() => { printArea.innerHTML = ''; }, 1000);
+    }
+
+    function printReport() {
+      const summary = document.getElementById('history-summary');
+      const report = document.getElementById('history-report');
+      if ((!summary || summary.innerHTML.trim() === '') && (!report || report.innerHTML.trim() === '')) {
+        showToast('Tidak ada data untuk dicetak', 'error');
+        return;
+      }
+      let printArea = document.getElementById('print-area');
+      if (!printArea) {
+        printArea = document.createElement('div');
+        printArea.id = 'print-area';
+        document.body.appendChild(printArea);
+      }
+      let html = '<div style="font-family:Inter,sans-serif;padding:10px;">';
+      html += '<h2 style="text-align:center;margin-bottom:5px;">' + (shopSettings.shopName || currentShop.shopName || 'Warung Kopi') + '</h2>';
+      if (shopSettings.shopAddress) html += '<p style="text-align:center;font-size:11px;color:#666;margin-bottom:10px;">' + shopSettings.shopAddress + '</p>';
+      html += '<hr style="border-top:1px dashed #ccc;margin-bottom:10px;">';
+      if (summary) html += summary.innerHTML;
+      if (report) html += report.innerHTML;
+      html += '</div>';
+      printArea.innerHTML = html;
+      window.print();
+      setTimeout(() => { printArea.innerHTML = ''; }, 1000);
+    }
     function closeReceiptModal() { document.getElementById('receipt-modal').classList.add('hidden'); }
 
     // ===== RIWAYAT =====
@@ -2803,14 +2945,24 @@
         const itemsStr = '"' + (trx.items || []).map(i => i.qty + 'x ' + i.nama_menu).join('; ') + '"';
         csv += [idx + 1, trx.date, trx.table, itemsStr, trx.subtotal, trx.discountPct, trx.discount, trx.total, trx.paymentMethod, trx.cashier || 'Admin'].join(',') + '\n';
       });
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'laporan_' + today() + '.csv';
-      a.click();
-      URL.revokeObjectURL(url);
-      showToast('CSV berhasil diunduh!');
+      try {
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'laporan_' + today() + '.csv';
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }, 200);
+        showToast('CSV berhasil diunduh!');
+      } catch (err) {
+        console.error('CSV export error:', err);
+        showToast('Gagal mengunduh CSV. Coba lagi.', 'error');
+      }
     }
 
     // ===== MENU MANAGEMENT =====
@@ -2940,19 +3092,28 @@
 
     // ===== SETTINGS / TOKO =====
     function loadSettingsForm() {
-      if (currentShop) {
-        document.getElementById('setting-shop-name').value = currentShop.shopName || '';
-        document.getElementById('setting-shop-phone').value = currentShop.phone || '';
-        document.getElementById('setting-shop-address').value = currentShop.address || '';
-      }
       if (shopSettings) {
+        document.getElementById('setting-shop-name').value = shopSettings.shopName || currentShop.shopName || '';
+        document.getElementById('setting-shop-phone').value = shopSettings.shopPhone || currentShop.phone || '';
+        document.getElementById('setting-shop-address').value = shopSettings.shopAddress || currentShop.address || '';
         document.getElementById('setting-shop-tagline').value = shopSettings.shopTagline || '';
         document.getElementById('setting-cashier-name').value = shopSettings.cashierName || 'Admin';
         if (shopSettings.shopPhoto) {
           document.getElementById('shop-photo-img').src = shopSettings.shopPhoto;
           document.getElementById('shop-photo-img').classList.remove('hidden');
           document.getElementById('shop-photo-placeholder').classList.add('hidden');
+        } else {
+          document.getElementById('shop-photo-img').classList.add('hidden');
+          document.getElementById('shop-photo-placeholder').classList.remove('hidden');
         }
+      } else if (currentShop) {
+        document.getElementById('setting-shop-name').value = currentShop.shopName || '';
+        document.getElementById('setting-shop-phone').value = currentShop.phone || '';
+        document.getElementById('setting-shop-address').value = currentShop.address || '';
+        document.getElementById('setting-shop-tagline').value = '';
+        document.getElementById('setting-cashier-name').value = 'Admin';
+        document.getElementById('shop-photo-img').classList.add('hidden');
+        document.getElementById('shop-photo-placeholder').classList.remove('hidden');
       }
       updateHeaderTagline();
     }
@@ -2962,7 +3123,7 @@
       const file = event.target.files[0];
       if (!file) return;
       if (file.size > 500000) {
-        showToast('Ukuran foto maksimal 500KB', 'error');
+        showToast('Ukuran foto maksimal 500KB. Pilih foto lebih kecil.', 'error');
         return;
       }
       const reader = new FileReader();
@@ -2970,17 +3131,28 @@
         const base64 = e.target.result;
         shopSettings.shopPhoto = base64;
         // Save to IndexedDB
-        idbSetShopPhoto(currentShop.id, base64).catch(err => console.error('IDB photo save error:', err));
+        idbSetShopPhoto(currentShop.id, base64).then(() => {
+          console.log('Photo saved to IndexedDB');
+        }).catch(err => console.error('IDB photo save error:', err));
         // Also update settings object in localStorage
         const uid = currentShop.id;
         const saved = lsGet(LS_KEYS.settings(uid)) || {};
         saved.shopPhoto = base64;
         lsSet(LS_KEYS.settings(uid), saved);
+        // Update UI
         document.getElementById('shop-photo-img').src = base64;
         document.getElementById('shop-photo-img').classList.remove('hidden');
         document.getElementById('shop-photo-placeholder').classList.add('hidden');
+        // Update header immediately
+        updateHeaderPhoto();
+        showToast('Foto berhasil dipilih! Klik Simpan untuk menyimpan.', 'success');
+      };
+      reader.onerror = function() {
+        showToast('Gagal membaca file foto', 'error');
       };
       reader.readAsDataURL(file);
+      // Reset input so same file can be selected again
+      event.target.value = '';
     }
 
     function saveShopSettings() {
@@ -3022,7 +3194,7 @@
         return;
       }
 
-      // 2. Update local state
+      // 2. Update local state (both currentShop and shopSettings already set above)
       currentShop.shopName = shopName;
       currentShop.phone = phone;
       currentShop.address = address;
@@ -3035,6 +3207,7 @@
         if (tagEl) tagEl.textContent = tagline;
         document.title = shopName + ' - POS';
         updateHeaderPhoto();
+        updateHeaderTagline();
       } catch (uiErr) {
         console.warn('UI update skipped:', uiErr.message);
       }
@@ -3042,6 +3215,13 @@
       showToast('Pengaturan berhasil disimpan!');
       saveBtn.disabled = false;
       saveBtn.innerHTML = '<i class="fas fa-save mr-2"></i> Simpan Pengaturan';
+
+      // 5. Save photo to IndexedDB if exists
+      if (shopSettings.shopPhoto && currentShop.id) {
+        idbSetShopPhoto(currentShop.id, shopSettings.shopPhoto).catch(function(idbErr) {
+          console.warn('IDB photo save error:', idbErr);
+        });
+      }
 
       // 4. Coba sync ke Firestore (async, jika gagal tidak mengganggu)
       if (typeof db !== 'undefined' && currentShop.id) {
