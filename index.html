@@ -783,7 +783,7 @@
             </div>
           </div>
           <div class="flex gap-2 mb-4">
-            <button onclick="exportCSV()" class="flex-1 flex items-center justify-center gap-2 py-2.5 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition shadow-sm"><i class="fas fa-file-csv"></i> Export / Bagikan CSV</button>
+            <button onclick="doExportCSV(event)" class="flex-1 flex items-center justify-center gap-2 py-2.5 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition shadow-sm"><i class="fas fa-file-csv"></i> Export / Bagikan CSV</button>
             <button onclick="printReport()" class="px-5 py-2.5 bg-coffee-700 text-white rounded-xl text-sm font-semibold hover:bg-coffee-800 transition shadow-sm"><i class="fas fa-print"></i></button>
           </div>
           <div id="history-summary" class="grid grid-cols-2 gap-3 mb-4"></div>
@@ -2946,7 +2946,7 @@
     function closeTrxDetailModal() { document.getElementById('trx-detail-modal').classList.add('hidden'); }
 
     // ===== EXPORT CSV =====
-    async function exportCSV() {
+    function doExportCSV(evt) {
       if (!currentFilteredTransactions || currentFilteredTransactions.length === 0) {
         showToast('Tidak ada data untuk diexport', 'error');
         return;
@@ -2963,50 +2963,68 @@
       });
 
       var BOM = '\uFEFF';
-      var blob = new Blob([BOM + csv], { type: 'text/csv;charset=utf-8;' });
+      var fileContent = BOM + csv;
 
-      // === CARA 1: Web Share API (bagikan file via menu sistem HP) ===
-      if (navigator.share && navigator.canShare) {
-        try {
-          var file = new File([blob], filename, { type: 'text/csv;charset=utf-8' });
-          if (navigator.canShare({ files: [file] })) {
-            await navigator.share({
-              files: [file],
-              title: 'Laporan ' + shopName,
-              text: 'Laporan penjualan ' + shopName + ' - ' + currentFilteredTransactions.length + ' transaksi'
-            });
-            showToast('CSV berhasil dibagikan', 'success');
-            return;
+      // Langsung coba Web Share API (pop up bawah: WhatsApp, Save to Files, dll)
+      if (navigator.share) {
+        var file = new File([fileContent], filename, { type: 'text/csv;charset=utf-8' });
+        navigator.share({
+          files: [file],
+          title: 'Laporan ' + shopName,
+          text: 'Laporan penjualan ' + shopName + ' - ' + currentFilteredTransactions.length + ' transaksi'
+        }).then(function() {
+          showToast('CSV berhasil dibagikan', 'success');
+        }).catch(function(err) {
+          // User batalkan atau share tidak support file — tampilkan overlay download
+          if (err.name !== 'AbortError') {
+            showCSVDownloadOverlay(fileContent, filename, shopName);
           }
-        } catch (err) {
-          if (err.name === 'AbortError') return;
-        }
-      }
-
-      // === CARA 2: Buka CSV di tab browser baru ===
-      // Di PWA, a.click() download TIDAK pernah berhasil.
-      // Solusi: buka file CSV di tab browser biasa, dari situ user bisa save/share.
-      var blobUrl = URL.createObjectURL(blob);
-      var newTab = window.open(blobUrl, '_blank');
-      if (newTab) {
-        // Berhasil buka tab baru
-        setTimeout(function() { URL.revokeObjectURL(blobUrl); }, 30000);
-        showToast('CSV dibuka di tab baru. Gunakan menu browser (⋮) untuk menyimpan atau membagikan.', 'success');
+        });
       } else {
-        // Tab baru diblokir — tampilkan di overlay fullscreen
-        URL.revokeObjectURL(blobUrl);
-        var escapedCSV = csv.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-        var html = '<div style="padding:20px;font-family:Inter,sans-serif;">' +
-          '<h2 style="font-size:16px;font-weight:bold;margin-bottom:5px;">' + shopName + ' - Laporan CSV</h2>' +
-          '<p style="color:#666;font-size:12px;margin-bottom:15px;">' + currentFilteredTransactions.length + ' transaksi</p>' +
-          '<button onclick="navigator.clipboard.writeText(document.getElementById(\'csv-text\').innerText).then(function(){document.getElementById(\'copy-btn\').textContent=\'Tersalin!\'})" id="copy-btn" style="padding:12px 24px;background:#16a34a;color:white;border:none;border-radius:10px;font-size:15px;font-weight:bold;cursor:pointer;margin-bottom:15px;">' +
-          '<i class="fas fa-copy" style="margin-right:6px;"></i>Salin Semua Data CSV</button>' +
-          '<p style="color:#888;font-size:11px;margin-bottom:10px;">Salin data di atas, lalu tempel di Excel atau Google Sheets.</p>' +
-          '<pre id="csv-text" style="background:#f5f5f5;padding:12px;border-radius:8px;font-size:11px;white-space:pre-wrap;word-break:break-all;max-height:60vh;overflow-y:auto;border:1px solid #ddd;">' + escapedCSV + '</pre>' +
-          '<button onclick="closePrintSheet()" style="margin-top:15px;padding:10px 30px;background:#f0fdfa;color:#0f766e;border:2px solid #0f766e;border-radius:10px;font-size:14px;font-weight:bold;cursor:pointer;">TUTUP</button>' +
-          '</div>';
-        showPrintSheet(html);
+        // Browser tidak support share — tampilkan overlay download
+        showCSVDownloadOverlay(fileContent, filename, shopName);
       }
+    }
+
+    function showCSVDownloadOverlay(fileContent, filename, shopName) {
+      var blob = new Blob([fileContent], { type: 'text/csv;charset=utf-8' });
+      var blobUrl = URL.createObjectURL(blob);
+
+      // Hapus overlay lama jika ada
+      var old = document.getElementById('csv-overlay');
+      if (old) old.remove();
+
+      // Buat overlay fullscreen
+      var overlay = document.createElement('div');
+      overlay.id = 'csv-overlay';
+      overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;';
+
+      var card = document.createElement('div');
+      card.style.cssText = 'background:white;border-radius:1.5rem 1.5rem 0 0;padding:28px 20px 20px;width:100%;max-width:400px;';
+      card.innerHTML =
+        '<div style="text-align:center;margin-bottom:20px;">' +
+          '<div style="width:48px;height:48px;background:linear-gradient(135deg,#16a34a,#15803d);border-radius:14px;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;">' +
+            '<i class="fas fa-file-csv" style="color:white;font-size:22px;"></i>' +
+          '</div>' +
+          '<h3 style="font-size:17px;font-weight:bold;color:#111;margin:0 0 4px;">Export Laporan</h3>' +
+          '<p style="font-size:12px;color:#888;margin:0;">' + currentFilteredTransactions.length + ' transaksi</p>' +
+        '</div>' +
+        '<a href="' + blobUrl + '" download="' + filename + '" id="csv-download-link" style="display:block;padding:16px;background:linear-gradient(135deg,#16a34a,#15803d);color:white;border-radius:14px;text-align:center;font-weight:bold;font-size:16px;text-decoration:none;margin-bottom:10px;box-shadow:0 4px 12px rgba(22,163,74,0.4);">' +
+          '<i class="fas fa-download" style="margin-right:8px;"></i>Download CSV' +
+        '</a>' +
+        '<p style="text-align:center;font-size:11px;color:#aaa;margin-bottom:16px;">Tap tombol di atas untuk menyimpan file</p>' +
+        '<button id="csv-close-btn" style="display:block;width:100%;padding:14px;background:#f5f5f5;color:#666;border:none;border-radius:12px;font-weight:600;font-size:14px;cursor:pointer;">TUTUP</button>';
+
+      overlay.appendChild(card);
+      document.body.appendChild(overlay);
+
+      // Tutup overlay
+      overlay.addEventListener('click', function(e) {
+        if (e.target === overlay || e.target.id === 'csv-close-btn') {
+          overlay.remove();
+          URL.revokeObjectURL(blobUrl);
+        }
+      });
     }
 
     // ===== MENU MANAGEMENT =====
