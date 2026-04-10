@@ -2955,101 +2955,120 @@
       var shopName = shopSettings.shopName || currentShop.shopName || 'POS';
       var filename = 'laporan_' + shopName.replace(/\s+/g, '_') + '_' + today() + '.csv';
 
-      // Build CSV string
       var csv = 'No,Tanggal,Meja,Item,Subtotal,Diskon%,Diskon,Total,Pembayaran,Kasir\n';
       currentFilteredTransactions.forEach(function(trx, idx) {
         var itemsStr = '"' + (trx.items || []).map(function(i) { return i.qty + 'x ' + i.nama_menu; }).join('; ') + '"';
         csv += [idx + 1, trx.date, trx.table || '-', itemsStr, trx.subtotal, trx.discountPct || 0, trx.discount || 0, trx.total, trx.paymentMethod, trx.cashier || 'Admin'].join(',') + '\n';
       });
 
-      var BOM = '\uFEFF';
-      var fileContent = BOM + csv;
+      window._csvData = csv;
+      window._csvShopName = shopName;
 
-      // Simpan ke global supaya bisa diakses dari overlay
-      window._csvFileContent = fileContent;
-      window._csvFilename = filename;
-
-      // Langsung coba Web Share API (pop up bawah: WhatsApp, Save to Files, dll)
+      // Coba Web Share — pop up bawaan HP (WhatsApp, Save to Files, dll)
       if (navigator.share) {
-        var file = new File([fileContent], filename, { type: 'text/csv;charset=utf-8' });
-        navigator.share({
-          files: [file],
-          title: 'Laporan ' + shopName,
-          text: 'Laporan penjualan ' + shopName + ' - ' + currentFilteredTransactions.length + ' transaksi'
-        }).then(function() {
-          showToast('CSV berhasil dibagikan', 'success');
-        }).catch(function(err) {
-          if (err.name !== 'AbortError') {
-            showExportOverlay(shopName);
-          }
-        });
+        var file = new File(['\uFEFF' + csv], filename, { type: 'text/csv;charset=utf-8' });
+        navigator.share({ files: [file], title: 'Laporan ' + shopName })
+          .then(function() { showToast('Berhasil dibagikan', 'success'); })
+          .catch(function(err) {
+            if (err.name === 'AbortError') return;
+            // File share gagal, coba share text
+            navigator.share({ title: 'Laporan ' + shopName, text: csv })
+              .catch(function() { showExportOverlay(); });
+          });
       } else {
-        showExportOverlay(shopName);
+        showExportOverlay();
       }
     }
 
-    function showExportOverlay(shopName) {
-      // Hapus overlay lama
+    function showExportOverlay() {
       var old = document.getElementById('csv-overlay');
       if (old) old.remove();
 
       var overlay = document.createElement('div');
       overlay.id = 'csv-overlay';
-      overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;';
+      overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:16px;';
+
+      var csv = window._csvData || '';
+      var shortCSV = csv.length > 800 ? csv.substring(0, 800) + '\n... (sisa data ada di bawah)' : csv;
 
       var card = document.createElement('div');
-      card.style.cssText = 'background:white;border-radius:1.5rem 1.5rem 0 0;padding:24px 20px 20px;width:100%;max-width:420px;';
+      card.style.cssText = 'background:white;border-radius:1.2rem;padding:20px;width:100%;max-width:420px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;';
+
       card.innerHTML =
-        '<div style="text-align:center;margin-bottom:20px;">' +
-          '<div style="width:50px;height:50px;background:linear-gradient(135deg,#16a34a,#15803d);border-radius:14px;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;">' +
-            '<i class="fas fa-file-csv" style="color:white;font-size:22px;"></i>' +
+        '<div style="text-align:center;margin-bottom:16px;">' +
+          '<div style="width:44px;height:44px;background:linear-gradient(135deg,#16a34a,#15803d);border-radius:12px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;">' +
+            '<i class="fas fa-file-csv" style="color:white;font-size:20px;"></i>' +
           '</div>' +
-          '<h3 style="font-size:17px;font-weight:bold;color:#111;margin:0 0 4px;">Export Laporan</h3>' +
-          '<p style="font-size:12px;color:#888;margin:0;">' + currentFilteredTransactions.length + ' transaksi</p>' +
+          '<h3 style="font-size:16px;font-weight:bold;color:#111;margin:0 0 2px;">Export Laporan</h3>' +
+          '<p style="font-size:11px;color:#888;margin:0;">' + (csv.split('\n').length - 1) + ' baris data</p>' +
         '</div>' +
-        // Tombol 1: Buka di browser (akan membuka Chrome/Safari di luar PWA)
-        '<button id="csv-open-browser" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:15px;background:linear-gradient(135deg,#16a34a,#15803d);color:white;border:none;border-radius:14px;font-weight:bold;font-size:15px;cursor:pointer;margin-bottom:8px;box-shadow:0 4px 12px rgba(22,163,74,0.35);">' +
-          '<i class="fas fa-external-link-alt"></i> Buka File CSV di Browser' +
-        '</button>' +
-        '<p style="text-align:center;font-size:10px;color:#999;margin:0 0 12px 0;">File akan terbuka di browser. Dari situ Anda bisa menyimpan atau membagikan.</p>' +
-        // Tombol 2: Salin ke clipboard
-        '<button id="csv-copy-btn" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px;background:#f0fdfa;color:#0f766e;border:2px solid #ccfbf1;border-radius:14px;font-weight:bold;font-size:14px;cursor:pointer;margin-bottom:12px;">' +
-          '<i class="fas fa-copy"></i> Salin Data CSV' +
-        '</button>' +
-        // Tombol tutup
-        '<button id="csv-close-btn" style="display:block;width:100%;padding:13px;background:#f5f5f5;color:#888;border:none;border-radius:12px;font-weight:600;font-size:14px;cursor:pointer;">TUTUP</button>';
+        '<div style="display:flex;gap:8px;margin-bottom:12px;">' +
+          '<button id="csv-copy-all" style="flex:1;padding:13px;background:linear-gradient(135deg,#16a34a,#15803d);color:white;border:none;border-radius:12px;font-weight:bold;font-size:13px;cursor:pointer;">' +
+            '<i class="fas fa-copy" style="margin-right:5px;"></i>Salin Semua' +
+          '</button>' +
+          '<button id="csv-share-btn" style="flex:1;padding:13px;background:#f0fdfa;color:#0f766e;border:2px solid #ccfbf1;border-radius:12px;font-weight:bold;font-size:13px;cursor:pointer;">' +
+            '<i class="fas fa-share-alt" style="margin-right:5px;"></i>Bagikan' +
+          '</button>' +
+        '</div>' +
+        '<div style="display:flex;gap:8px;margin-bottom:12px;">' +
+          '<button id="csv-wa-btn" style="flex:1;padding:11px;background:#dcfce7;color:#166534;border:none;border-radius:10px;font-weight:600;font-size:12px;cursor:pointer;">' +
+            '<i class="fab fa-whatsapp" style="margin-right:4px;"></i>Kirim WA' +
+          '</button>' +
+          '<button id="csv-email-btn" style="flex:1;padding:11px;background:#dbeafe;color:#1e40af;border:none;border-radius:10px;font-weight:600;font-size:12px;cursor:pointer;">' +
+            '<i class="fas fa-envelope" style="margin-right:4px;"></i>Kirim Email' +
+          '</button>' +
+        '</div>' +
+        '<p style="font-size:10px;color:#999;margin:0 0 8px;text-align:center;">Atau salin data di bawah ini lalu tempel di Excel / Google Sheets:</p>' +
+        '<textarea id="csv-textarea" readonly style="flex:1;min-height:120px;max-height:40vh;width:100%;padding:10px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;font-size:10px;font-family:monospace;color:#374151;resize:none;outline:none;line-height:1.5;">' + csv.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</textarea>' +
+        '<button id="csv-close-btn" style="width:100%;padding:12px;background:#f3f4f6;color:#6b7280;border:none;border-radius:10px;font-weight:600;font-size:13px;cursor:pointer;margin-top:10px;">TUTUP</button>';
 
       overlay.appendChild(card);
       document.body.appendChild(overlay);
 
-      // Tombol: Buka di browser
-      document.getElementById('csv-open-browser').addEventListener('click', function() {
-        var blob = new Blob([window._csvFileContent], { type: 'text/csv;charset=utf-8' });
-        var blobUrl = URL.createObjectURL(blob);
-        window.open(blobUrl, '_blank');
-        overlay.remove();
-      });
-
-      // Tombol: Salin ke clipboard
-      document.getElementById('csv-copy-btn').addEventListener('click', function() {
-        navigator.clipboard.writeText(window._csvFileContent).then(function() {
-          var btn = document.getElementById('csv-copy-btn');
-          btn.innerHTML = '<i class="fas fa-check"></i> Data Tersalin!';
+      // Salin Semua
+      document.getElementById('csv-copy-all').addEventListener('click', function() {
+        var ta = document.getElementById('csv-textarea');
+        ta.select();
+        ta.setSelectionRange(0, 999999);
+        navigator.clipboard.writeText(window._csvData).then(function() {
+          var btn = document.getElementById('csv-copy-all');
+          btn.innerHTML = '<i class="fas fa-check" style="margin-right:5px;"></i>Tersalin!';
           btn.style.background = '#dcfce7';
-          btn.style.borderColor = '#86efac';
           btn.style.color = '#166534';
-          showToast('Data CSV tersalin. Buka Excel/Google Sheets lalu tempel.', 'success');
+          showToast('Data tersalin! Buka Excel/Google Sheets lalu tempel.', 'success');
         }).catch(function() {
-          showToast('Gagal menyalin. Coba tombol Buka di Browser.', 'error');
+          // Fallback: execCommand
+          document.execCommand('copy');
+          showToast('Data tersalin!', 'success');
         });
       });
 
-      // Tutup
-      overlay.addEventListener('click', function(e) {
-        if (e.target === overlay || e.target.id === 'csv-close-btn') {
-          overlay.remove();
+      // Bagikan (coba Web Share lagi)
+      document.getElementById('csv-share-btn').addEventListener('click', function() {
+        if (navigator.share) {
+          navigator.share({ title: 'Laporan ' + (window._csvShopName || 'POS'), text: window._csvData })
+            .catch(function() {});
+        } else {
+          showToast('Browser tidak mendukung share', 'error');
         }
       });
+
+      // Kirim WhatsApp
+      document.getElementById('csv-wa-btn').addEventListener('click', function() {
+        var text = 'Laporan Penjualan:\n\n' + window._csvData;
+        window.location.href = 'https://wa.me/?text=' + encodeURIComponent(text.substring(0, 5000));
+      });
+
+      // Kirim Email
+      document.getElementById('csv-email-btn').addEventListener('click', function() {
+        var subject = 'Laporan Penjualan - ' + (window._csvShopName || 'POS');
+        var body = window._csvData;
+        window.location.href = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body.substring(0, 5000));
+      });
+
+      // Tutup
+      document.getElementById('csv-close-btn').addEventListener('click', function() { overlay.remove(); });
+      overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.remove(); });
     }
 
     // ===== MENU MANAGEMENT =====
