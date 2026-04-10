@@ -2965,6 +2965,10 @@
       var BOM = '\uFEFF';
       var fileContent = BOM + csv;
 
+      // Simpan ke global supaya bisa diakses dari overlay
+      window._csvFileContent = fileContent;
+      window._csvFilename = filename;
+
       // Langsung coba Web Share API (pop up bawah: WhatsApp, Save to Files, dll)
       if (navigator.share) {
         var file = new File([fileContent], filename, { type: 'text/csv;charset=utf-8' });
@@ -2975,54 +2979,75 @@
         }).then(function() {
           showToast('CSV berhasil dibagikan', 'success');
         }).catch(function(err) {
-          // User batalkan atau share tidak support file — tampilkan overlay download
           if (err.name !== 'AbortError') {
-            showCSVDownloadOverlay(fileContent, filename, shopName);
+            showExportOverlay(shopName);
           }
         });
       } else {
-        // Browser tidak support share — tampilkan overlay download
-        showCSVDownloadOverlay(fileContent, filename, shopName);
+        showExportOverlay(shopName);
       }
     }
 
-    function showCSVDownloadOverlay(fileContent, filename, shopName) {
-      var blob = new Blob([fileContent], { type: 'text/csv;charset=utf-8' });
-      var blobUrl = URL.createObjectURL(blob);
-
-      // Hapus overlay lama jika ada
+    function showExportOverlay(shopName) {
+      // Hapus overlay lama
       var old = document.getElementById('csv-overlay');
       if (old) old.remove();
 
-      // Buat overlay fullscreen
       var overlay = document.createElement('div');
       overlay.id = 'csv-overlay';
       overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;';
 
       var card = document.createElement('div');
-      card.style.cssText = 'background:white;border-radius:1.5rem 1.5rem 0 0;padding:28px 20px 20px;width:100%;max-width:400px;';
+      card.style.cssText = 'background:white;border-radius:1.5rem 1.5rem 0 0;padding:24px 20px 20px;width:100%;max-width:420px;';
       card.innerHTML =
         '<div style="text-align:center;margin-bottom:20px;">' +
-          '<div style="width:48px;height:48px;background:linear-gradient(135deg,#16a34a,#15803d);border-radius:14px;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;">' +
+          '<div style="width:50px;height:50px;background:linear-gradient(135deg,#16a34a,#15803d);border-radius:14px;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;">' +
             '<i class="fas fa-file-csv" style="color:white;font-size:22px;"></i>' +
           '</div>' +
           '<h3 style="font-size:17px;font-weight:bold;color:#111;margin:0 0 4px;">Export Laporan</h3>' +
           '<p style="font-size:12px;color:#888;margin:0;">' + currentFilteredTransactions.length + ' transaksi</p>' +
         '</div>' +
-        '<a href="' + blobUrl + '" download="' + filename + '" id="csv-download-link" style="display:block;padding:16px;background:linear-gradient(135deg,#16a34a,#15803d);color:white;border-radius:14px;text-align:center;font-weight:bold;font-size:16px;text-decoration:none;margin-bottom:10px;box-shadow:0 4px 12px rgba(22,163,74,0.4);">' +
-          '<i class="fas fa-download" style="margin-right:8px;"></i>Download CSV' +
-        '</a>' +
-        '<p style="text-align:center;font-size:11px;color:#aaa;margin-bottom:16px;">Tap tombol di atas untuk menyimpan file</p>' +
-        '<button id="csv-close-btn" style="display:block;width:100%;padding:14px;background:#f5f5f5;color:#666;border:none;border-radius:12px;font-weight:600;font-size:14px;cursor:pointer;">TUTUP</button>';
+        // Tombol 1: Buka di browser (akan membuka Chrome/Safari di luar PWA)
+        '<button id="csv-open-browser" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:15px;background:linear-gradient(135deg,#16a34a,#15803d);color:white;border:none;border-radius:14px;font-weight:bold;font-size:15px;cursor:pointer;margin-bottom:8px;box-shadow:0 4px 12px rgba(22,163,74,0.35);">' +
+          '<i class="fas fa-external-link-alt"></i> Buka File CSV di Browser' +
+        '</button>' +
+        '<p style="text-align:center;font-size:10px;color:#999;margin:0 0 12px 0;">File akan terbuka di browser. Dari situ Anda bisa menyimpan atau membagikan.</p>' +
+        // Tombol 2: Salin ke clipboard
+        '<button id="csv-copy-btn" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px;background:#f0fdfa;color:#0f766e;border:2px solid #ccfbf1;border-radius:14px;font-weight:bold;font-size:14px;cursor:pointer;margin-bottom:12px;">' +
+          '<i class="fas fa-copy"></i> Salin Data CSV' +
+        '</button>' +
+        // Tombol tutup
+        '<button id="csv-close-btn" style="display:block;width:100%;padding:13px;background:#f5f5f5;color:#888;border:none;border-radius:12px;font-weight:600;font-size:14px;cursor:pointer;">TUTUP</button>';
 
       overlay.appendChild(card);
       document.body.appendChild(overlay);
 
-      // Tutup overlay
+      // Tombol: Buka di browser
+      document.getElementById('csv-open-browser').addEventListener('click', function() {
+        var blob = new Blob([window._csvFileContent], { type: 'text/csv;charset=utf-8' });
+        var blobUrl = URL.createObjectURL(blob);
+        window.open(blobUrl, '_blank');
+        overlay.remove();
+      });
+
+      // Tombol: Salin ke clipboard
+      document.getElementById('csv-copy-btn').addEventListener('click', function() {
+        navigator.clipboard.writeText(window._csvFileContent).then(function() {
+          var btn = document.getElementById('csv-copy-btn');
+          btn.innerHTML = '<i class="fas fa-check"></i> Data Tersalin!';
+          btn.style.background = '#dcfce7';
+          btn.style.borderColor = '#86efac';
+          btn.style.color = '#166534';
+          showToast('Data CSV tersalin. Buka Excel/Google Sheets lalu tempel.', 'success');
+        }).catch(function() {
+          showToast('Gagal menyalin. Coba tombol Buka di Browser.', 'error');
+        });
+      });
+
+      // Tutup
       overlay.addEventListener('click', function(e) {
         if (e.target === overlay || e.target.id === 'csv-close-btn') {
           overlay.remove();
-          URL.revokeObjectURL(blobUrl);
         }
       });
     }
