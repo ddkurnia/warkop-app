@@ -2962,26 +2962,40 @@
         csv += [idx + 1, trx.date, trx.table || '-', itemsStr, trx.subtotal, trx.discountPct || 0, trx.discount || 0, trx.total, trx.paymentMethod, trx.cashier || 'Admin'].join(',') + '\n';
       });
 
-      // Bungkus data menjadi File .csv sungguhan, lalu lempar ke menu Share bawaan sistem HP
       var BOM = '\uFEFF';
-      var file = new File([BOM + csv], filename, { type: 'text/csv;charset=utf-8' });
+      var blob = new Blob([BOM + csv], { type: 'text/csv;charset=utf-8;' });
 
-      try {
-        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({
-            files: [file],
-            title: 'Laporan ' + shopName,
-            text: 'Laporan penjualan ' + shopName + ' - ' + currentFilteredTransactions.length + ' transaksi'
-          });
-          showToast('CSV berhasil dibagikan', 'success');
-        } else {
-          showToast('Fitur share tidak didukung browser ini. Gunakan Chrome atau Safari terbaru.', 'error');
-        }
-      } catch (err) {
-        if (err.name !== 'AbortError') {
-          showToast('Gagal membagikan: ' + err.message, 'error');
+      // === STRATEGI 1: Web Share API (bagikan file via menu sistem HP) ===
+      if (navigator.share && navigator.canShare) {
+        try {
+          var file = new File([blob], filename, { type: 'text/csv;charset=utf-8' });
+          if (navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              files: [file],
+              title: 'Laporan ' + shopName,
+              text: 'Laporan penjualan ' + shopName + ' - ' + currentFilteredTransactions.length + ' transaksi'
+            });
+            showToast('CSV berhasil dibagikan', 'success');
+            return;
+          }
+        } catch (err) {
+          if (err.name === 'AbortError') return;
         }
       }
+
+      // === STRATEGI 2: Download langsung via Blob URL ===
+      var blobUrl = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = filename;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function() {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(blobUrl);
+      }, 5000);
+      showToast('CSV berhasil diunduh', 'success');
     }
 
     // ===== MENU MANAGEMENT =====
