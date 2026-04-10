@@ -2962,50 +2962,44 @@
         csv += [idx + 1, trx.date, trx.table || '-', itemsStr, trx.subtotal, trx.discountPct || 0, trx.discount || 0, trx.total, trx.paymentMethod, trx.cashier || 'Admin'].join(',') + '\n';
       });
 
+      // Bungkus jadi File .csv sungguhan
       var BOM = '\uFEFF';
-      var blob = new Blob([BOM + csv], { type: 'text/csv;charset=utf-8;' });
+      var file = new File([BOM + csv], filename, { type: 'text/csv;charset=utf-8' });
 
-      // === CARA 1: Web Share API (bagikan file via menu sistem HP) ===
-      if (navigator.share && navigator.canShare) {
+      // Langsung panggil Web Share API — pop up bawah (WhatsApp, Save to Files, dll)
+      if (navigator.share) {
         try {
-          var file = new File([blob], filename, { type: 'text/csv;charset=utf-8' });
-          if (navigator.canShare({ files: [file] })) {
-            await navigator.share({
-              files: [file],
-              title: 'Laporan ' + shopName,
-              text: 'Laporan penjualan ' + shopName + ' - ' + currentFilteredTransactions.length + ' transaksi'
-            });
-            showToast('CSV berhasil dibagikan', 'success');
-            return;
-          }
+          await navigator.share({
+            files: [file],
+            title: 'Laporan ' + shopName,
+            text: 'Laporan penjualan ' + shopName + ' - ' + currentFilteredTransactions.length + ' transaksi'
+          });
+          showToast('CSV berhasil dibagikan', 'success');
+          return;
         } catch (err) {
           if (err.name === 'AbortError') return;
+          // Share file gagal, coba share sebagai text
+          try {
+            await navigator.share({
+              title: 'Laporan ' + shopName,
+              text: csv
+            });
+            return;
+          } catch (err2) {
+            if (err2.name === 'AbortError') return;
+          }
         }
       }
 
-      // === CARA 2: Buka CSV di tab browser baru ===
-      // Di PWA, a.click() download TIDAK pernah berhasil.
-      // Solusi: buka file CSV di tab browser biasa, dari situ user bisa save/share.
-      var blobUrl = URL.createObjectURL(blob);
+      // Fallback: buka CSV di tab browser baru
+      var blobUrl = URL.createObjectURL(file);
       var newTab = window.open(blobUrl, '_blank');
       if (newTab) {
-        // Berhasil buka tab baru
         setTimeout(function() { URL.revokeObjectURL(blobUrl); }, 30000);
-        showToast('CSV dibuka di tab baru. Gunakan menu browser (⋮) untuk menyimpan atau membagikan.', 'success');
+        showToast('CSV dibuka di tab baru. Gunakan menu browser (⋮) untuk menyimpan.', 'success');
       } else {
-        // Tab baru diblokir — tampilkan di overlay fullscreen
         URL.revokeObjectURL(blobUrl);
-        var escapedCSV = csv.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-        var html = '<div style="padding:20px;font-family:Inter,sans-serif;">' +
-          '<h2 style="font-size:16px;font-weight:bold;margin-bottom:5px;">' + shopName + ' - Laporan CSV</h2>' +
-          '<p style="color:#666;font-size:12px;margin-bottom:15px;">' + currentFilteredTransactions.length + ' transaksi</p>' +
-          '<button onclick="navigator.clipboard.writeText(document.getElementById(\'csv-text\').innerText).then(function(){document.getElementById(\'copy-btn\').textContent=\'Tersalin!\'})" id="copy-btn" style="padding:12px 24px;background:#16a34a;color:white;border:none;border-radius:10px;font-size:15px;font-weight:bold;cursor:pointer;margin-bottom:15px;">' +
-          '<i class="fas fa-copy" style="margin-right:6px;"></i>Salin Semua Data CSV</button>' +
-          '<p style="color:#888;font-size:11px;margin-bottom:10px;">Salin data di atas, lalu tempel di Excel atau Google Sheets.</p>' +
-          '<pre id="csv-text" style="background:#f5f5f5;padding:12px;border-radius:8px;font-size:11px;white-space:pre-wrap;word-break:break-all;max-height:60vh;overflow-y:auto;border:1px solid #ddd;">' + escapedCSV + '</pre>' +
-          '<button onclick="closePrintSheet()" style="margin-top:15px;padding:10px 30px;background:#f0fdfa;color:#0f766e;border:2px solid #0f766e;border-radius:10px;font-size:14px;font-weight:bold;cursor:pointer;">TUTUP</button>' +
-          '</div>';
-        showPrintSheet(html);
+        showToast('Gagal membuka file. Coba gunakan Chrome atau Safari.', 'error');
       }
     }
 
@@ -3329,7 +3323,7 @@
       }
     }
 
-        async function exportBackup() {
+    async function exportBackup() {
       const uid = auth.currentUser?.uid;
       if (!uid) return;
 
@@ -3358,109 +3352,18 @@
         }
       };
 
-      const filename = 'backup_warkop_' + new Date().toISOString().slice(0,10) + '.json';
-      const backupStr = JSON.stringify(backup, null, 2);
-
-      // === CARA 1: Web Share API (HP) ===
-      if (navigator.share && navigator.canShare) {
-        try {
-          const file = new File([backupStr], filename, { type: 'application/json' });
-          if (navigator.canShare({ files: [file] })) {
-            await navigator.share({
-              files: [file],
-              title: 'Backup Data POS',
-              text: 'Simpan file backup data toko ini dengan aman.'
-            });
-            lsSet('warkop_last_backup', { date: new Date().toLocaleString('id-ID') });
-            renderDataSummary();
-            showToast('Backup berhasil disiapkan!', 'success');
-            return; // Hentikan eksekusi agar tidak lanjut ke fallback
-          }
-        } catch(err) {
-          if (err.name === 'AbortError') return; // User membatalkan share
-          console.log('Share error:', err);
-        }
-      }
-      
-      // === CARA 2: Fallback Laptop/Desktop ===
-      const blob = new Blob([backupStr], { type: 'application/json' });
+      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = filename;
+      a.download = 'backup_warkop_' + new Date().toISOString().slice(0,10) + '.json';
       a.click();
       URL.revokeObjectURL(url);
+
       lsSet('warkop_last_backup', { date: new Date().toLocaleString('id-ID') });
       renderDataSummary();
       showToast('Backup berhasil diunduh!', 'success');
     }
-      };
-
-      async function exportBackup() {
-  const uid = auth.currentUser?.uid;
-  if (!uid) return;
-
-  // Get transactions from IndexedDB
-  let transactions = [];
-  try {
-    transactions = await idbGetAllTransactions(uid);
-  } catch(e) {
-    transactions = lsGet(LS_KEYS.transactions(uid)) || [];
-  }
-  // If IndexedDB empty, try localStorage
-  if (transactions.length === 0) {
-    transactions = lsGet(LS_KEYS.transactions(uid)) || [];
-  }
-
-  const backup = {
-    version: '3.0',
-    type: 'warkop-pos-backup',
-    shopId: uid,
-    exportDate: new Date().toISOString(),
-    data: {
-      menu: lsGet(LS_KEYS.menu(uid)) || [],
-      transactions: transactions,
-      settings: lsGet(LS_KEYS.settings(uid)) || {},
-      activeTables: lsGet(LS_KEYS.activeTables(uid)) || {},
-    }
-  };
-
-  const filename = 'backup_warkop_' + new Date().toISOString().slice(0,10) + '.json';
-  const backupStr = JSON.stringify(backup, null, 2);
-
-  // === CARA 1: Web Share API (HP) ===
-  if (navigator.share && navigator.canShare) {
-    try {
-      const file = new File([backupStr], filename, { type: 'application/json' });
-      if (navigator.canShare({ files: [file] })) {
-        await navigator.share({
-          files: [file],
-          title: 'Backup Data POS',
-          text: 'Simpan file backup data toko ini dengan aman.'
-        });
-        lsSet('warkop_last_backup', { date: new Date().toLocaleString('id-ID') });
-        renderDataSummary();
-        showToast('Backup berhasil disiapkan!', 'success');
-        return; // Hentikan eksekusi agar tidak lanjut ke fallback
-      }
-    } catch(err) {
-      if (err.name === 'AbortError') return; // User membatalkan share
-      console.log('Share error:', err);
-    }
-  }
-  
-  // === CARA 2: Fallback Laptop/Desktop ===
-  const blob = new Blob([backupStr], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.click();
-  URL.revokeObjectURL(url);
-  lsSet('warkop_last_backup', { date: new Date().toLocaleString('id-ID') });
-  renderDataSummary();
-  showToast('Backup berhasil diunduh!', 'success');
-}
 
     function importBackup(event) {
       const file = event.target.files[0];
