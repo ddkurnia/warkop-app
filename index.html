@@ -3329,7 +3329,7 @@
       }
     }
 
-    async function exportBackup() {
+        async function exportBackup() {
       const uid = auth.currentUser?.uid;
       if (!uid) return;
 
@@ -3356,6 +3356,44 @@
           settings: lsGet(LS_KEYS.settings(uid)) || {},
           activeTables: lsGet(LS_KEYS.activeTables(uid)) || {},
         }
+      };
+
+      const filename = 'backup_warkop_' + new Date().toISOString().slice(0,10) + '.json';
+      const backupStr = JSON.stringify(backup, null, 2);
+
+      // === CARA 1: Web Share API (HP) ===
+      if (navigator.share && navigator.canShare) {
+        try {
+          const file = new File([backupStr], filename, { type: 'application/json' });
+          if (navigator.canShare({ files: [file] })) {
+            await navigator.share({
+              files: [file],
+              title: 'Backup Data POS',
+              text: 'Simpan file backup data toko ini dengan aman.'
+            });
+            lsSet('warkop_last_backup', { date: new Date().toLocaleString('id-ID') });
+            renderDataSummary();
+            showToast('Backup berhasil disiapkan!', 'success');
+            return; // Hentikan eksekusi agar tidak lanjut ke fallback
+          }
+        } catch(err) {
+          if (err.name === 'AbortError') return; // User membatalkan share
+          console.log('Share error:', err);
+        }
+      }
+      
+      // === CARA 2: Fallback Laptop/Desktop ===
+      const blob = new Blob([backupStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(url);
+      lsSet('warkop_last_backup', { date: new Date().toLocaleString('id-ID') });
+      renderDataSummary();
+      showToast('Backup berhasil diunduh!', 'success');
+    }
       };
 
       async function exportBackup() {
