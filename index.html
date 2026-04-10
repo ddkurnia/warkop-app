@@ -11,6 +11,30 @@
   <meta name="mobile-web-app-capable" content="yes">
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="icon" href="/logo-wp.png" sizes="192x192" type="image/png">
+  <script>
+    // AUTO DOWNLOAD CSV: jika URL ada ?dl=1#BASE64_DATA, langsung download CSV
+    (function(){
+      if(window.location.search.indexOf('dl=1') !== -1 && window.location.hash.length > 1){
+        try{
+          var b64 = window.location.hash.substring(1);
+          var raw = atob(b64);
+          var csv = decodeURIComponent(raw.split('').map(function(c){
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+          }).join(''));
+          var blob = new Blob(['\ufeff' + csv], {type:'text/csv;charset=utf-8'});
+          var a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = 'laporan.csv';
+          document.head.appendChild(a);
+          a.click();
+          document.head.removeChild(a);
+          document.documentElement.innerHTML = '<body style="display:flex;align-items:center;justify-content:center;height:100vh;margin:0;font-family:sans-serif;background:#f0fdfa;"><div style="text-align:center;padding:30px;"><div style="width:60px;height:60px;background:#16a34a;border-radius:50%;margin:0 auto 16px;display:flex;align-items:center;justify-content:center;"><svg width="30" height="30" fill="none" stroke="white" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div><h2 style="color:#15803d;margin:0 0 8px;">File CSV Berhasil Diunduh!</h2><p style="color:#666;font-size:14px;">Cek folder Download di HP Anda.</p><p style="color:#999;font-size:12px;margin-top:20px;">Anda bisa menutup halaman ini.</p></div></body>';
+        }catch(e){
+          document.documentElement.innerHTML = '<body style="display:flex;align-items:center;justify-content:center;height:100vh;margin:0;font-family:sans-serif;background:#fef2f2;"><div style="text-align:center;padding:30px;"><p style="color:#991b1b;">Gagal membaca data. Pastikan link yang disalin lengkap.</p></div></body>';
+        }
+      }
+    })();
+  </script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
@@ -2980,90 +3004,158 @@
       }
     }
 
+    function utf8ToBase64(str) {
+      return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function(m, p1) {
+        return String.fromCharCode('0x' + p1);
+      }));
+    }
+
     function showExportOverlay() {
       var old = document.getElementById('csv-overlay');
       if (old) old.remove();
 
+      var csv = window._csvData || '';
+      var shopName = window._csvShopName || 'POS';
+      var rowInfo = (csv.split('\n').length - 1) + ' baris data';
+
+      // Buat download link: URL halaman ini + ?dl=1#BASE64_CSV
+      var b64 = utf8ToBase64(csv);
+      var dlLink = window.location.origin + window.location.pathname + '?dl=1#' + b64;
+
       var overlay = document.createElement('div');
       overlay.id = 'csv-overlay';
-      overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:16px;';
-
-      var csv = window._csvData || '';
-      var shortCSV = csv.length > 800 ? csv.substring(0, 800) + '\n... (sisa data ada di bawah)' : csv;
+      overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;justify-content:center;padding:0;';
 
       var card = document.createElement('div');
-      card.style.cssText = 'background:white;border-radius:1.2rem;padding:20px;width:100%;max-width:420px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;';
+      card.style.cssText = 'background:white;border-radius:1.5rem 1.5rem 0 0;padding:24px 20px 30px;width:100%;max-width:500px;max-height:92vh;display:flex;flex-direction:column;overflow:hidden;';
+
+      // Handle bar (drag indicator)
+      var handle = '<div style="width:36px;height:4px;background:#d1d5db;border-radius:99px;margin:0 auto 16px;"></div>';
 
       card.innerHTML =
-        '<div style="text-align:center;margin-bottom:16px;">' +
-          '<div style="width:44px;height:44px;background:linear-gradient(135deg,#16a34a,#15803d);border-radius:12px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;">' +
-            '<i class="fas fa-file-csv" style="color:white;font-size:20px;"></i>' +
+        handle +
+        '<div style="text-align:center;margin-bottom:20px;">' +
+          '<div style="width:52px;height:52px;background:linear-gradient(135deg,#16a34a,#15803d);border-radius:14px;margin:0 auto 10px;display:flex;align-items:center;justify-content:center;">' +
+            '<i class="fas fa-file-csv" style="color:white;font-size:22px;"></i>' +
           '</div>' +
-          '<h3 style="font-size:16px;font-weight:bold;color:#111;margin:0 0 2px;">Export Laporan</h3>' +
-          '<p style="font-size:11px;color:#888;margin:0;">' + (csv.split('\n').length - 1) + ' baris data</p>' +
+          '<h3 style="font-size:17px;font-weight:bold;color:#111;margin:0 0 3px;">Download File CSV</h3>' +
+          '<p style="font-size:12px;color:#888;margin:0;">' + rowInfo + '</p>' +
         '</div>' +
-        '<div style="display:flex;gap:8px;margin-bottom:12px;">' +
-          '<button id="csv-copy-all" style="flex:1;padding:13px;background:linear-gradient(135deg,#16a34a,#15803d);color:white;border:none;border-radius:12px;font-weight:bold;font-size:13px;cursor:pointer;">' +
-            '<i class="fas fa-copy" style="margin-right:5px;"></i>Salin Semua' +
+
+        // Langkah 1-3
+        '<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:14px;padding:16px;margin-bottom:16px;">' +
+          '<p style="font-size:13px;font-weight:700;color:#15803d;margin:0 0 10px;text-align:center;">Cara Download File CSV:</p>' +
+          '<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;">' +
+            '<div style="min-width:24px;height:24px;background:#16a34a;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;">1</div>' +
+            '<p style="font-size:12px;color:#374151;margin:0;line-height:1.5;">Tekan tombol <b style="color:#16a34a;">Salin Link Download</b> di bawah</p>' +
+          '</div>' +
+          '<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;">' +
+            '<div style="min-width:24px;height:24px;background:#16a34a;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;">2</div>' +
+            '<p style="font-size:12px;color:#374151;margin:0;line-height:1.5;">Buka aplikasi <b>Chrome</b> (browser luar, bukan di app ini)</p>' +
+          '</div>' +
+          '<div style="display:flex;align-items:flex-start;gap:10px;">' +
+            '<div style="min-width:24px;height:24px;background:#16a34a;color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;">3</div>' +
+            '<p style="font-size:12px;color:#374151;margin:0;line-height:1.5;">Tempel link di address bar Chrome lalu tekan <b>Enter</b>. File CSV otomatis terunduh!</p>' +
+          '</div>' +
+        '</div>' +
+
+        // Tombol Salin Link
+        '<button id="csv-copy-link" style="width:100%;padding:14px;background:linear-gradient(135deg,#16a34a,#15803d);color:white;border:none;border-radius:14px;font-weight:bold;font-size:14px;cursor:pointer;margin-bottom:12px;box-shadow:0 4px 12px rgba(22,163,74,0.3);">' +
+          '<i class="fas fa-link" style="margin-right:6px;"></i>Salin Link Download' +
+        '</button>' +
+
+        // Preview link (tersembunyi, untuk user yang ingin lihat)
+        '<details style="margin-bottom:14px;">' +
+          '<summary style="font-size:11px;color:#9ca3af;cursor:pointer;text-align:center;padding:4px 0;">Lihat / Salin Link Manual</summary>' +
+          '<div style="margin-top:8px;position:relative;">' +
+            '<input id="csv-link-input" readonly value="' + dlLink.replace(/"/g, '&quot;') + '" style="width:100%;padding:10px 44px 10px 12px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;font-size:9px;font-family:monospace;color:#374151;outline:none;word-break:break-all;" onclick="this.select();this.setSelectionRange(0,999999);">' +
+            '<button id="csv-copy-manual" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);padding:6px 10px;background:#e5e7eb;border:none;border-radius:6px;cursor:pointer;color:#374151;font-size:11px;"><i class="fas fa-copy"></i></button>' +
+          '</div>' +
+        '</details>' +
+
+        // Opsi alternatif
+        '<p style="font-size:10px;color:#aaa;margin:0 0 8px;text-align:center;">--- Opsi Lainnya ---</p>' +
+        '<div style="display:flex;gap:8px;margin-bottom:14px;">' +
+          '<button id="csv-copy-data" style="flex:1;padding:11px;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;border-radius:10px;font-weight:600;font-size:11px;cursor:pointer;">' +
+            '<i class="fas fa-table" style="margin-right:4px;"></i>Salin Data CSV' +
           '</button>' +
-          '<button id="csv-share-btn" style="flex:1;padding:13px;background:#f0fdfa;color:#0f766e;border:2px solid #ccfbf1;border-radius:12px;font-weight:bold;font-size:13px;cursor:pointer;">' +
-            '<i class="fas fa-share-alt" style="margin-right:5px;"></i>Bagikan' +
+          '<button id="csv-share-btn" style="flex:1;padding:11px;background:#fef3c7;color:#92400e;border:1px solid #fde68a;border-radius:10px;font-weight:600;font-size:11px;cursor:pointer;">' +
+            '<i class="fas fa-share-alt" style="margin-right:4px;"></i>Bagikan' +
           '</button>' +
         '</div>' +
-        '<div style="display:flex;gap:8px;margin-bottom:12px;">' +
-          '<button id="csv-wa-btn" style="flex:1;padding:11px;background:#dcfce7;color:#166534;border:none;border-radius:10px;font-weight:600;font-size:12px;cursor:pointer;">' +
-            '<i class="fab fa-whatsapp" style="margin-right:4px;"></i>Kirim WA' +
+        '<div style="display:flex;gap:8px;margin-bottom:14px;">' +
+          '<button id="csv-wa-btn" style="flex:1;padding:10px;background:#dcfce7;color:#166534;border:none;border-radius:10px;font-weight:600;font-size:11px;cursor:pointer;">' +
+            '<i class="fab fa-whatsapp" style="margin-right:4px;"></i>WA' +
           '</button>' +
-          '<button id="csv-email-btn" style="flex:1;padding:11px;background:#dbeafe;color:#1e40af;border:none;border-radius:10px;font-weight:600;font-size:12px;cursor:pointer;">' +
-            '<i class="fas fa-envelope" style="margin-right:4px;"></i>Kirim Email' +
+          '<button id="csv-email-btn" style="flex:1;padding:10px;background:#dbeafe;color:#1e40af;border:none;border-radius:10px;font-weight:600;font-size:11px;cursor:pointer;">' +
+            '<i class="fas fa-envelope" style="margin-right:4px;"></i>Email' +
           '</button>' +
         '</div>' +
-        '<p style="font-size:10px;color:#999;margin:0 0 8px;text-align:center;">Atau salin data di bawah ini lalu tempel di Excel / Google Sheets:</p>' +
-        '<textarea id="csv-textarea" readonly style="flex:1;min-height:120px;max-height:40vh;width:100%;padding:10px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;font-size:10px;font-family:monospace;color:#374151;resize:none;outline:none;line-height:1.5;">' + csv.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</textarea>' +
-        '<button id="csv-close-btn" style="width:100%;padding:12px;background:#f3f4f6;color:#6b7280;border:none;border-radius:10px;font-weight:600;font-size:13px;cursor:pointer;margin-top:10px;">TUTUP</button>';
+
+        '<button id="csv-close-btn" style="width:100%;padding:13px;background:#f3f4f6;color:#6b7280;border:none;border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;">TUTUP</button>';
 
       overlay.appendChild(card);
       document.body.appendChild(overlay);
 
-      // Salin Semua
-      document.getElementById('csv-copy-all').addEventListener('click', function() {
-        var ta = document.getElementById('csv-textarea');
-        ta.select();
-        ta.setSelectionRange(0, 999999);
-        navigator.clipboard.writeText(window._csvData).then(function() {
-          var btn = document.getElementById('csv-copy-all');
-          btn.innerHTML = '<i class="fas fa-check" style="margin-right:5px;"></i>Tersalin!';
-          btn.style.background = '#dcfce7';
-          btn.style.color = '#166534';
-          showToast('Data tersalin! Buka Excel/Google Sheets lalu tempel.', 'success');
+      // Salin Link Download (utama)
+      document.getElementById('csv-copy-link').addEventListener('click', function() {
+        var btn = document.getElementById('csv-copy-link');
+        navigator.clipboard.writeText(dlLink).then(function() {
+          btn.innerHTML = '<i class="fas fa-check-circle" style="margin-right:6px;"></i>Link Tersalin!';
+          btn.style.background = 'linear-gradient(135deg,#22c55e,#16a34a)';
+          showToast('Link berhasil disalin! Buka Chrome, tempel di address bar, lalu Enter.', 'success');
+          setTimeout(function() {
+            btn.innerHTML = '<i class="fas fa-link" style="margin-right:6px;"></i>Salin Link Download';
+            btn.style.background = 'linear-gradient(135deg,#16a34a,#15803d)';
+          }, 4000);
         }).catch(function() {
-          // Fallback: execCommand
+          // Fallback: pilih input manual
+          var inp = document.getElementById('csv-link-input');
+          inp.select();
+          inp.setSelectionRange(0, 999999);
           document.execCommand('copy');
-          showToast('Data tersalin!', 'success');
+          showToast('Link tersalin! Buka Chrome, tempel di address bar.', 'success');
         });
       });
 
-      // Bagikan (coba Web Share lagi)
+      // Salin manual dari input
+      document.getElementById('csv-copy-manual').addEventListener('click', function() {
+        var inp = document.getElementById('csv-link-input');
+        inp.select();
+        inp.setSelectionRange(0, 999999);
+        document.execCommand('copy');
+        showToast('Link tersalin!', 'success');
+      });
+
+      // Salin Data CSV mentah
+      document.getElementById('csv-copy-data').addEventListener('click', function() {
+        navigator.clipboard.writeText(window._csvData).then(function() {
+          showToast('Data CSV tersalin! Tempel di Excel atau Google Sheets.', 'success');
+        }).catch(function() {
+          showToast('Gagal menyalin data.', 'error');
+        });
+      });
+
+      // Bagikan
       document.getElementById('csv-share-btn').addEventListener('click', function() {
         if (navigator.share) {
-          navigator.share({ title: 'Laporan ' + (window._csvShopName || 'POS'), text: window._csvData })
+          navigator.share({ title: 'Laporan ' + shopName, text: csv })
             .catch(function() {});
         } else {
           showToast('Browser tidak mendukung share', 'error');
         }
       });
 
-      // Kirim WhatsApp
+      // WA
       document.getElementById('csv-wa-btn').addEventListener('click', function() {
-        var text = 'Laporan Penjualan:\n\n' + window._csvData;
+        var text = 'Laporan Penjualan:\n\n' + csv;
         window.location.href = 'https://wa.me/?text=' + encodeURIComponent(text.substring(0, 5000));
       });
 
-      // Kirim Email
+      // Email
       document.getElementById('csv-email-btn').addEventListener('click', function() {
-        var subject = 'Laporan Penjualan - ' + (window._csvShopName || 'POS');
-        var body = window._csvData;
-        window.location.href = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body.substring(0, 5000));
+        var subject = 'Laporan Penjualan - ' + shopName;
+        window.location.href = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(csv.substring(0, 5000));
       });
 
       // Tutup
