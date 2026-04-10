@@ -769,6 +769,111 @@
     return `<div class="skeleton" style="width:${width};height:${height}"></div>`;
   }
 
+  /**
+   * Format a Date object to YYYY-MM-DD string (for input[type=date])
+   */
+  function formatDateInput(d) {
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  // ===== IndexedDB HELPER =====
+  const DB_NAME = 'warkop_pos_db';
+  const DB_VERSION = 1;
+  let idbPromise = null;
+
+  function openIDB() {
+    if (!idbPromise) {
+      idbPromise = new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
+        request.onupgradeneeded = function(e) {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains('transactions')) {
+            const txStore = db.createObjectStore('transactions', { keyPath: 'localId' });
+            txStore.createIndex('date', 'date', { unique: false });
+            txStore.createIndex('shopId', 'shopId', { unique: false });
+          }
+          if (!db.objectStoreNames.contains('shopPhotos')) {
+            db.createObjectStore('shopPhotos', { keyPath: 'uid' });
+          }
+          if (!db.objectStoreNames.contains('meta')) {
+            db.createObjectStore('meta', { keyPath: 'key' });
+          }
+        };
+        request.onsuccess = function(e) { resolve(e.target.result); };
+        request.onerror = function(e) { reject(e.target.error); };
+      });
+    }
+    return idbPromise;
+  }
+
+  async function idbGetAllTransactions(shopId) {
+    const db = await openIDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction('transactions', 'readonly');
+      const store = tx.objectStore('transactions');
+      const index = store.index('shopId');
+      const request = index.getAll(shopId);
+      request.onsuccess = () => resolve(request.result || []);
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  async function idbGetFilteredTransactions(shopId, startDate, endDate) {
+    const db = await openIDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction('transactions', 'readonly');
+      const store = tx.objectStore('transactions');
+      const index = store.index('shopId');
+      const request = index.getAll(shopId);
+      request.onsuccess = () => {
+        const all = request.result || [];
+        const filtered = all.filter(t => {
+          if (!t || !t.date) return false;
+          const txDate = typeof t.date === 'string' ? t.date.split('T')[0].split(' ')[0] : formatDateInput(new Date(t.date));
+          if (!txDate || txDate.length < 10) return false;
+          if (startDate && txDate < startDate) return false;
+          if (endDate && txDate > endDate) return false;
+          return true;
+        }).sort((a, b) => new Date(b.date) - new Date(a.date));
+        resolve(filtered);
+      };
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  async function idbClearTransactions(shopId) {
+    const db = await openIDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction('transactions', 'readwrite');
+      const store = tx.objectStore('transactions');
+      const index = store.index('shopId');
+      const request = index.openCursor(shopId);
+      request.onsuccess = function(e) {
+        const cursor = e.target.result;
+        if (cursor) {
+          cursor.delete();
+          cursor.continue();
+        }
+      };
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+
+  async function idbGetMeta(key) {
+    const db = await openIDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction('meta', 'readonly');
+      const store = tx.objectStore('meta');
+      const request = store.get(key);
+      request.onsuccess = () => resolve(request.result?.value || null);
+      request.onerror = () => reject(request.error);
+    });
+  }
+
   /* ================================================================
      TOAST NOTIFICATIONS
      ================================================================ */
@@ -1984,23 +2089,88 @@
 
   /**
    * Load shop menu tab
-   * Menu data is stored locally on each user's device (localStorage).
-   * Admin cannot access user's localStorage, so we show an informational message.
+   * Tries to read menu data from IndexedDB (shared with user POS app).
+   * Falls back to informational message if no local data found.
    */
   async function loadShopMenu(shopId, container) {
+    // Try reading menu from IndexedDB (shared DB warkop_pos_db)
+    try {
+      const menuMeta = await idbGetMeta('menu_' + shopId);
+      if (menuMeta && Array.isArray(menuMeta) && menuMeta.length > 0) {
+        let totalItems = menuMeta.length;
+        let categories = [...new Set(menuMeta.map(m => m.category || 'Tanpa Kategori'))];
+
+        let menuHTML = menuMeta.map((item, i) => `
+          <div class="flex items-center justify-between py-2 px-3 rounded-lg ${i % 2 === 0 ? 'bg-coffee-50' : ''}">
+            <div class="flex items-center gap-3">
+              <span class="w-6 h-6 rounded-full bg-coffee-200 text-coffee-700 text-xs flex items-center justify-center font-medium">${i + 1}</span>
+              <div>
+                <p class="text-coffee-800 font-medium text-sm">${escapeHtml(item.name || '-')}</p>
+                ${item.category ? `<p class="text-xs text-coffee-400">${escapeHtml(item.category)}</p>` : ''}
+              </div>
+            </div>
+            <span class="text-coffee-700 font-semibold text-sm">${formatCurrency(item.price || 0)}</span>
+          </div>`).join('');
+
+        container.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <h4 class="font-semibold text-coffee-800"><i class="fas fa-utensils mr-2 text-coffee-500"></i>Menu Kedai</h4>
+              <span class="text-xs text-coffee-400">${totalItems} item &middot; ${categories.length} kategori</span>
+            </div>
+            <div class="bg-white border border-coffee-100 rounded-lg overflow-hidden">
+              ${menuHTML}
+            </div>
+            <p class="text-xs text-coffee-400 mt-3 text-center"><i class="fas fa-database mr-1"></i>Data dari IndexedDB lokal (shared dengan aplikasi POS)</p>
+          </div>`;
+        return;
+      }
+
+      // Try reading transactions to show activity stats even without menu
+      const transactions = await idbGetAllTransactions(shopId);
+      if (transactions && transactions.length > 0) {
+        const totalRevenue = transactions.reduce((sum, t) => sum + (t.total || 0), 0);
+        const txCount = transactions.length;
+        container.innerHTML = `
+          <div class="text-center py-8">
+            <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i class="fas fa-receipt text-green-600 text-3xl"></i>
+            </div>
+            <h4 class="font-semibold text-coffee-800 text-lg mb-2">Data Transaksi Tersedia</h4>
+            <div class="grid grid-cols-2 gap-3 max-w-sm mx-auto mb-4">
+              <div class="bg-coffee-50 rounded-lg p-3">
+                <p class="text-xs text-coffee-400">Total Transaksi</p>
+                <p class="text-xl font-bold text-coffee-800">${txCount}</p>
+              </div>
+              <div class="bg-coffee-50 rounded-lg p-3">
+                <p class="text-xs text-coffee-400">Total Pendapatan</p>
+                <p class="text-xl font-bold text-green-700">${formatCurrency(totalRevenue)}</p>
+              </div>
+            </div>
+            <p class="text-coffee-400 text-xs">Data menu belum tersedia di perangkat ini. Menu dikelola langsung oleh kedai melalui aplikasi POS.</p>
+            <p class="text-xs text-coffee-400 mt-1"><i class="fas fa-database mr-1"></i>Data dari IndexedDB lokal</p>
+          </div>`;
+        return;
+      }
+    } catch (e) {
+      console.warn('IndexedDB read failed, showing fallback info:', e);
+    }
+
+    // Fallback: no IndexedDB data found
     container.innerHTML = `
       <div class="text-center py-12">
         <div class="w-20 h-20 bg-coffee-100 rounded-full flex items-center justify-center mx-auto mb-4">
           <i class="fas fa-utensils text-coffee-500 text-3xl"></i>
         </div>
-        <h4 class="font-semibold text-coffee-800 text-lg mb-2">Data Menu Lokal</h4>
+        <h4 class="font-semibold text-coffee-800 text-lg mb-2">Data Lokal Tidak Ditemukan</h4>
         <p class="text-coffee-500 text-sm max-w-md mx-auto">
-          Menu dan data operasional kedai ini disimpan secara lokal di perangkat pengguna. Admin tidak dapat mengakses data tersebut.
+          Menu dan data operasional kedai ini disimpan secara lokal di perangkat pengguna melalui IndexedDB.
+          Data akan tersedia jika admin dan kedai berada di perangkat/browser yang sama.
         </p>
         <div class="mt-4 bg-amber-50 border border-amber-200 rounded-lg p-3 max-w-md mx-auto">
           <p class="text-xs text-amber-700">
             <i class="fas fa-info-circle mr-1"></i>
-            Data menu dikelola langsung oleh masing-masing kedai kopi melalui aplikasi POS mereka dan disimpan di <strong>localStorage</strong> perangkat masing-masing.
+            Data menu dikelola langsung oleh masing-masing kedai kopi melalui aplikasi POS mereka dan disimpan di <strong>IndexedDB</strong> perangkat masing-masing.
           </p>
         </div>
       </div>`;
