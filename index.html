@@ -782,7 +782,7 @@
           </div>
           <div class="flex gap-2 mb-4">
             <button onclick="exportCSV()" class="flex-1 flex items-center justify-center gap-2 py-2.5 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition shadow-sm"><i class="fas fa-file-csv"></i> Export CSV</button>
-            <button onclick="shareOrPrintReport()" class="px-5 py-2.5 bg-coffee-700 text-white rounded-xl text-sm font-semibold hover:bg-coffee-800 transition shadow-sm"><i class="fas fa-share-alt"></i></button>
+            <button onclick="printReport()" class="px-5 py-2.5 bg-coffee-700 text-white rounded-xl text-sm font-semibold hover:bg-coffee-800 transition shadow-sm"><i class="fas fa-print"></i></button>
           </div>
           <div id="history-summary" class="grid grid-cols-2 gap-3 mb-4"></div>
           <div id="top-items-section" class="hidden mb-4">
@@ -967,7 +967,7 @@
       <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto relative z-10">
         <div id="receipt-modal-content" class="p-6"></div>
         <div class="px-6 pb-6 flex gap-2 no-print">
-          <button onclick="shareOrPrintReceipt()" class="flex-1 py-2.5 bg-coffee-700 text-white rounded-xl font-semibold text-sm hover:bg-coffee-800 transition"><i class="fas fa-share-alt mr-1"></i> Bagikan/Cetak</button>
+          <button onclick="printReceipt()" class="flex-1 py-2.5 bg-coffee-700 text-white rounded-xl font-semibold text-sm hover:bg-coffee-800 transition"><i class="fas fa-print mr-1"></i> Cetak</button>
           <button onclick="closeReceiptModal()" class="flex-1 py-2.5 bg-coffee-200 text-coffee-800 rounded-xl font-semibold text-sm hover:bg-coffee-300 transition">Tutup</button>
         </div>
       </div>
@@ -1012,34 +1012,6 @@
           <button onclick="closeTrxDetailModal()" class="w-8 h-8 rounded-full bg-coffee-600 flex items-center justify-center hover:bg-coffee-500"><i class="fas fa-times"></i></button>
         </div>
         <div id="trx-detail-content" class="p-5"></div>
-      </div>
-    </div>
-
-    <!-- CSV EXPORT MODAL -->
-    <div id="csv-export-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div class="absolute inset-0 modal-overlay" onclick="closeCSVModal()"></div>
-      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto relative z-10">
-        <div class="bg-green-600 text-white p-4 rounded-t-2xl flex items-center justify-between">
-          <h3 class="font-bold"><i class="fas fa-file-csv mr-2"></i>Export Laporan CSV</h3>
-          <button onclick="closeCSVModal()" class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center hover:bg-green-400"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="p-5 space-y-4">
-          <p class="text-sm text-coffee-600 text-center">Pilih cara untuk mendapatkan file CSV:</p>
-          <div class="space-y-2">
-            <a id="csv-download-link" href="#" class="block w-full py-3 bg-green-600 text-white rounded-xl font-semibold text-center text-sm hover:bg-green-700 transition shadow-sm">
-              <i class="fas fa-download mr-2"></i>Tap untuk Download CSV
-            </a>
-            <button onclick="shareCSVFile()" id="csv-share-btn" class="hidden w-full py-3 bg-blue-600 text-white rounded-xl font-semibold text-sm hover:bg-blue-700 transition shadow-sm">
-              <i class="fas fa-share-alt mr-2"></i>Bagikan via Share Menu
-            </button>
-            <button onclick="copyCSVText()" class="w-full py-3 bg-coffee-700 text-white rounded-xl font-semibold text-sm hover:bg-coffee-800 transition shadow-sm">
-              <i class="fas fa-copy mr-2"></i>Salin ke Clipboard
-            </button>
-          </div>
-          <div class="bg-coffee-50 rounded-xl p-3">
-            <p id="csv-info" class="text-xs text-coffee-500 text-center"></p>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -2690,99 +2662,50 @@
       document.getElementById('receipt-modal').classList.remove('hidden');
     }
 
-    function getReceiptText() {
-      const content = document.getElementById('receipt-modal-content');
-      if (!content) return '';
-      return content.innerText || content.textContent || '';
+    function printReceipt() {
+      var content = document.getElementById('receipt-modal-content');
+      if (!content) return;
+      closeReceiptModal();
+      openPrintWindow(content.innerHTML);
     }
 
-    async function shareOrPrintReceipt() {
-      const text = getReceiptText();
-      if (!text) { showToast('Tidak ada struk untuk dibagikan', 'error'); return; }
-      const shopName = shopSettings.shopName || currentShop.shopName || 'Warung Kopi';
-
-      // Try Web Share API (works great on mobile)
-      if (navigator.share) {
-        try {
-          await navigator.share({
-            title: 'Struk - ' + shopName,
-            text: text
-          });
-          return;
-        } catch (err) {
-          if (err.name === 'AbortError') return; // User cancelled share
-        }
-      }
-      // Fallback: copy to clipboard
-      try {
-        await navigator.clipboard.writeText(text);
-        showToast('Struk disalin ke clipboard! Tempel ke aplikasi lain.', 'success');
-      } catch(e) {
-        showToast('Gagal membagikan struk', 'error');
-      }
-    }
-
-    async function shareOrPrintReport() {
-      const summary = document.getElementById('history-summary');
-      const report = document.getElementById('history-report');
+    function printReport() {
+      var summary = document.getElementById('history-summary');
+      var report = document.getElementById('history-report');
       if ((!summary || summary.innerHTML.trim() === '') && (!report || report.innerHTML.trim() === '')) {
-        showToast('Tidak ada data laporan', 'error');
+        showToast('Tidak ada data laporan untuk dicetak', 'error');
         return;
       }
-      const shopName = shopSettings.shopName || currentShop.shopName || 'Warung Kopi';
-      const addr = shopSettings.shopAddress || '';
+      var shopName = shopSettings.shopName || currentShop.shopName || 'Warung Kopi';
+      var addr = shopSettings.shopAddress || '';
+      var html = '<h2 style="text-align:center;margin-bottom:5px;font-family:Inter,sans-serif;">' + shopName + '</h2>';
+      if (addr) html += '<p style="text-align:center;font-size:11px;color:#666;margin-bottom:10px;font-family:Inter,sans-serif;">' + addr + '</p>';
+      html += '<hr style="border-top:1px dashed #ccc;margin-bottom:10px;">';
+      if (summary) html += summary.innerHTML;
+      if (report) html += report.innerHTML;
+      openPrintWindow(html);
+    }
 
-      // Build readable text from the report
-      let text = '=== LAPORAN ' + shopName.toUpperCase() + ' ===\n';
-      if (addr) text += addr + '\n';
-      text += 'Tanggal: ' + new Date().toLocaleDateString('id-ID') + '\n';
-      text += '================================\n\n';
-
-      // Add summary text
-      if (summary) {
-        const summaryCards = summary.querySelectorAll('.bg-white');
-        summaryCards.forEach(function(card) {
-          const label = card.querySelector('.text-coffee-500, .text-gray-500');
-          const value = card.querySelector('.text-coffee-900, .text-gray-900, .font-bold');
-          if (label && value) text += label.textContent.trim() + ': ' + value.textContent.trim() + '\n';
-        });
-        text += '\n';
-      }
-
-      // Add transaction list
-      if (report) {
-        const trxCards = report.querySelectorAll('[id^="trx-card-"]');
-        trxCards.forEach(function(card, i) {
-          text += '--- Transaksi ' + (i + 1) + ' ---\n';
-          const details = card.querySelectorAll('div');
-          details.forEach(function(d) {
-            const t = d.textContent.trim();
-            if (t && t.length > 1 && t.length < 200) text += t + '\n';
-          });
-          text += '\n';
-        });
-      }
-
-      // Try Web Share API
-      if (navigator.share) {
-        try {
-          await navigator.share({
-            title: 'Laporan - ' + shopName,
-            text: text
-          });
-          return;
-        } catch (err) {
-          if (err.name === 'AbortError') return;
-        }
-      }
-      // Fallback: copy to clipboard
+    function openPrintWindow(contentHTML) {
       try {
-        await navigator.clipboard.writeText(text);
-        showToast('Laporan disalin ke clipboard!', 'success');
+        var iframe = document.createElement('iframe');
+        iframe.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;border:none;z-index:99999;background:white;';
+        document.body.appendChild(iframe);
+        var doc = iframe.contentDocument || iframe.contentWindow.document;
+        doc.open();
+        doc.write('<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cetak</title>' +
+          '<style>body{font-family:Inter,sans-serif;padding:15px;margin:0;color:#333;max-width:400px;margin:0 auto;}@media print{body{padding:0;}}</style></head><body>' +
+          contentHTML +
+          '<div style="text-align:center;margin-top:20px;"><button onclick="window.print()" style="padding:12px 40px;background:#0f766e;color:white;border:none;border-radius:10px;font-size:16px;font-weight:bold;cursor:pointer;">CETAK / PRINT</button></div>' +
+          '<div style="text-align:center;margin-top:10px;"><button onclick="window.parent.document.body.removeChild(window.frameElement)" style="padding:8px 24px;background:#f0fdfa;color:#0f766e;border:2px solid #0f766e;border-radius:10px;font-size:14px;font-weight:bold;cursor:pointer;">TUTUP</button></div>' +
+          '</body></html>');
+        doc.close();
       } catch(e) {
-        showToast('Gagal membagikan laporan', 'error');
+        console.error('Print error:', e);
+        showToast('Gagal membuka cetak. Coba dari browser langsung.', 'error');
       }
     }
+
     function closeReceiptModal() { document.getElementById('receipt-modal').classList.add('hidden'); }
 
     // ===== RIWAYAT =====
@@ -3018,111 +2941,52 @@
     function closeTrxDetailModal() { document.getElementById('trx-detail-modal').classList.add('hidden'); }
 
     // ===== EXPORT CSV =====
-    let lastCSVData = '';
-    let lastCSVBlob = null;
-    let lastCSVFilename = '';
-
     function exportCSV() {
+      if (!currentFilteredTransactions || currentFilteredTransactions.length === 0) {
+        showToast('Tidak ada data untuk diexport', 'error');
+        return;
+      }
+      var shopName = shopSettings.shopName || currentShop.shopName || 'POS';
+      var filename = 'laporan_' + shopName.replace(/\s+/g, '_') + '_' + today() + '.csv';
+
+      // Build CSV string
+      var csv = 'No,Tanggal,Meja,Item,Subtotal,Diskon%,Diskon,Total,Pembayaran,Kasir\n';
+      currentFilteredTransactions.forEach(function(trx, idx) {
+        var itemsStr = '"' + (trx.items || []).map(function(i) { return i.qty + 'x ' + i.nama_menu; }).join('; ') + '"';
+        csv += [idx + 1, trx.date, trx.table || '-', itemsStr, trx.subtotal, trx.discountPct || 0, trx.discount || 0, trx.total, trx.paymentMethod, trx.cashier || 'Admin'].join(',') + '\n';
+      });
+
       try {
-        if (!currentFilteredTransactions || currentFilteredTransactions.length === 0) {
-          showToast('Tidak ada data untuk diexport', 'error');
-          return;
-        }
+        var blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+        var url = URL.createObjectURL(blob);
 
-        // Build CSV
-        let csv = 'No,Date,Table,Items,Subtotal,Discount%,Discount,Total,Payment,Cashier\n';
-        currentFilteredTransactions.forEach(function(trx, idx) {
-          const itemsStr = '"' + (trx.items || []).map(function(i) { return i.qty + 'x ' + i.nama_menu; }).join('; ') + '"';
-          csv += [idx + 1, trx.date, trx.table, itemsStr, trx.subtotal, trx.discountPct, trx.discount, trx.total, trx.paymentMethod, trx.cashier || 'Admin'].join(',') + '\n';
-        });
+        // Open CSV in new tab — browser will download or display it
+        var newTab = window.open(url, '_blank');
 
-        const shopName = shopSettings.shopName || currentShop.shopName || 'POS';
-        lastCSVFilename = 'laporan_' + shopName.replace(/\s+/g, '_') + '_' + today() + '.csv';
-        lastCSVData = csv;
-        lastCSVBlob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-
-        // Create data URI for the download link (user will tap manually)
-        const dataUri = 'data:text/csv;charset=utf-8,' + encodeURIComponent('\uFEFF' + csv);
-        const downloadLink = document.getElementById('csv-download-link');
-        downloadLink.href = dataUri;
-        downloadLink.download = lastCSVFilename;
-        downloadLink.onclick = function(e) {
-          // Let the default <a> behavior handle the download
-          showToast('File CSV sedang diunduh...');
-        };
-
-        // Show share button only if Web Share API is available
-        const shareBtn = document.getElementById('csv-share-btn');
-        if (navigator.share) {
-          shareBtn.classList.remove('hidden');
+        if (newTab) {
+          showToast('File CSV dibuka di tab baru. Simpan dari menu browser.', 'success');
         } else {
-          shareBtn.classList.add('hidden');
+          // window.open blocked — use iframe fallback
+          var iframe = document.createElement('iframe');
+          iframe.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;border:none;z-index:99999;background:white;';
+          document.body.appendChild(iframe);
+          var doc = iframe.contentDocument || iframe.contentWindow.document;
+          doc.open();
+          doc.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Export CSV</title></head><body style="font-family:sans-serif;padding:20px;text-align:center;">' +
+            '<h2>Laporan ' + shopName + '</h2>' +
+            '<p style="color:#666;">' + currentFilteredTransactions.length + ' transaksi</p>' +
+            '<p style="margin-top:30px;"><a href="' + url + '" download="' + filename + '" style="display:inline-block;padding:15px 40px;background:#16a34a;color:white;border-radius:10px;text-decoration:none;font-size:18px;font-weight:bold;">DOWNLOAD CSV</a></p>' +
+            '<p style="margin-top:15px;"><a href="data:text/csv;charset=utf-8,' + encodeURIComponent('\uFEFF' + csv) + '" download="' + filename + '" style="color:#0f766e;">Atau tap link ini untuk download</a></p>' +
+            '<p style="margin-top:20px;"><button onclick="window.parent.document.body.removeChild(window.frameElement)" style="padding:8px 24px;background:#f0fdfa;color:#0f766e;border:2px solid #0f766e;border-radius:10px;font-size:14px;font-weight:bold;cursor:pointer;">TUTUP</button></p>' +
+            '</body></html>');
+          doc.close();
         }
 
-        // Show info
-        document.getElementById('csv-info').textContent =
-          currentFilteredTransactions.length + ' transaksi | ' + lastCSVFilename;
-
-        // Show modal
-        document.getElementById('csv-export-modal').classList.remove('hidden');
-
-      } catch (err) {
-        console.error('exportCSV error:', err);
-        showToast('Gagal export CSV: ' + err.message, 'error');
+        setTimeout(function() { URL.revokeObjectURL(url); }, 60000);
+      } catch(e) {
+        console.error('CSV export error:', e);
+        showToast('Gagal export CSV: ' + e.message, 'error');
       }
-    }
-
-    async function shareCSVFile() {
-      if (!lastCSVBlob) return;
-      try {
-        const file = new File([lastCSVBlob], lastCSVFilename, { type: 'text/csv;charset=utf-8;' });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({
-            files: [file],
-            title: 'Laporan CSV',
-            text: 'Laporan penjualan'
-          });
-          closeCSVModal();
-        } else {
-          // Share as text fallback
-          await navigator.share({
-            title: 'Laporan CSV',
-            text: lastCSVData
-          });
-          closeCSVModal();
-        }
-      } catch (err) {
-        if (err.name !== 'AbortError') {
-          showToast('Share gagal. Coba tap Download.', 'error');
-        }
-      }
-    }
-
-    async function copyCSVText() {
-      if (!lastCSVData) return;
-      try {
-        await navigator.clipboard.writeText(lastCSVData);
-        showToast('Data CSV berhasil disalin! Buka Excel lalu Paste.', 'success');
-      } catch (err) {
-        // Fallback: create textarea and select
-        try {
-          const ta = document.createElement('textarea');
-          ta.value = lastCSVData;
-          ta.style.position = 'fixed';
-          ta.style.left = '-9999px';
-          document.body.appendChild(ta);
-          ta.select();
-          document.execCommand('copy');
-          document.body.removeChild(ta);
-          showToast('Data CSV berhasil disalin!', 'success');
-        } catch (e2) {
-          showToast('Gagal menyalin. Coba tap Download.', 'error');
-        }
-      }
-    }
-
-    function closeCSVModal() {
-      document.getElementById('csv-export-modal').classList.add('hidden');
     }
 
     // ===== MENU MANAGEMENT =====
