@@ -783,7 +783,7 @@
             </div>
           </div>
           <div class="flex gap-2 mb-4">
-            <button onclick="exportCSV()" class="flex-1 flex items-center justify-center gap-2 py-2.5 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition shadow-sm"><i class="fas fa-file-csv"></i> Export CSV</button>
+            <button onclick="exportCSV()" class="flex-1 flex items-center justify-center gap-2 py-2.5 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition shadow-sm"><i class="fas fa-file-csv"></i> Export / Bagikan CSV</button>
             <button onclick="printReport()" class="px-5 py-2.5 bg-coffee-700 text-white rounded-xl text-sm font-semibold hover:bg-coffee-800 transition shadow-sm"><i class="fas fa-print"></i></button>
           </div>
           <div id="history-summary" class="grid grid-cols-2 gap-3 mb-4"></div>
@@ -2951,6 +2951,7 @@
         showToast('Tidak ada data untuk diexport', 'error');
         return;
       }
+
       var shopName = shopSettings.shopName || currentShop.shopName || 'POS';
       var filename = 'laporan_' + shopName.replace(/\s+/g, '_') + '_' + today() + '.csv';
 
@@ -2961,53 +2962,24 @@
         csv += [idx + 1, trx.date, trx.table || '-', itemsStr, trx.subtotal, trx.discountPct || 0, trx.discount || 0, trx.total, trx.paymentMethod, trx.cashier || 'Admin'].join(',') + '\n';
       });
 
+      // Bungkus data menjadi File .csv sungguhan, lalu lempar ke menu Share bawaan sistem HP
       var BOM = '\uFEFF';
-      var blob = new Blob([BOM + csv], { type: 'text/csv;charset=utf-8;' });
-      var exported = false;
+      var file = new File([BOM + csv], filename, { type: 'text/csv;charset=utf-8' });
 
-      // === STRATEGY 1: Web Share API with File (works on iOS & Android PWA) ===
-      if (navigator.share && navigator.canShare) {
-        try {
-          var file = new File([blob], filename, { type: 'text/csv;charset=utf-8' });
-          if (navigator.canShare({ files: [file] })) {
-            await navigator.share({ files: [file], title: 'Laporan ' + shopName });
-            exported = true;
-            showToast('CSV berhasil disimpan/dibagikan', 'success');
-          }
-        } catch (shareErr) {
-          if (shareErr.name !== 'AbortError') {
-            console.warn('Web Share failed:', shareErr);
-          }
+      try {
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: 'Laporan ' + shopName,
+            text: 'Laporan penjualan ' + shopName + ' - ' + currentFilteredTransactions.length + ' transaksi'
+          });
+          showToast('CSV berhasil dibagikan', 'success');
+        } else {
+          showToast('Fitur share tidak didukung browser ini. Gunakan Chrome atau Safari terbaru.', 'error');
         }
-      }
-
-      // === STRATEGY 2: Open CSV in new browser tab ===
-      if (!exported) {
-        var blobUrl = URL.createObjectURL(blob);
-        try {
-          var newTab = window.open(blobUrl, '_blank');
-          if (newTab) {
-            exported = true;
-            showToast('CSV dibuka di tab baru. Gunakan menu browser untuk menyimpan.', 'success');
-          }
-        } catch (e) {
-          console.warn('window.open failed:', e);
-        }
-
-        // === STRATEGY 3: Direct a.click() download (desktop/lucky Android) ===
-        if (!exported) {
-          var a = document.createElement('a');
-          a.href = blobUrl;
-          a.download = filename;
-          a.style.display = 'none';
-          document.body.appendChild(a);
-          a.click();
-          setTimeout(function() { document.body.removeChild(a); }, 500);
-        }
-
-        setTimeout(function() { URL.revokeObjectURL(blobUrl); }, 10000);
-        if (!exported) {
-          showToast('Mengunduh ' + filename + '...', 'success');
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          showToast('Gagal membagikan: ' + err.message, 'error');
         }
       }
     }
