@@ -1,4 +1,4 @@
-const CACHE_NAME = 'warkop-pos-v5';
+const CACHE_NAME = 'warkop-pos-v7';
 const STATIC_ASSETS = [
   '/',
   '/manifest.json',
