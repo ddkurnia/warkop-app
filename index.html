@@ -50,9 +50,17 @@
       #receipt-modal-content { position: absolute; left: 0; top: 0; width: 100%; background: white; padding: 20px; }
       .no-print { display: none !important; }
     }
-    .table-card { transition: all 0.25s cubic-bezier(.4,0,.2,1); border: 2px solid transparent; }
-    .table-card:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 8px 25px rgba(45,212,191,0.18); }
-    .table-card.active-table { border-color: #14b8a6; background: linear-gradient(135deg, #f0fdfa, #ccfbf1); box-shadow: 0 4px 15px rgba(45,212,191,0.25); }
+    .table-card { transition: all 0.3s cubic-bezier(.4,0,.2,1); border: 2px solid transparent; position: relative; overflow: hidden; }
+    .table-card:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 8px 25px rgba(0,0,0,0.08); }
+    .table-card.active-table { border-color: #14b8a6; background: linear-gradient(135deg, #f0fdfa, #ccfbf1); box-shadow: 0 4px 15px rgba(20,184,166,0.2); }
+    .table-card.unpaid-table { border-color: #ef4444; background: linear-gradient(135deg, #fef2f2, #fee2e2); box-shadow: 0 4px 15px rgba(239,68,68,0.2); }
+    .table-card.unpaid-table:hover { box-shadow: 0 8px 25px rgba(239,68,68,0.25); }
+    .table-card .pulse-dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; border-radius: 50%; }
+    .table-card .pulse-dot.unpaid { background: #ef4444; animation: pulse-dot 1.5s ease-in-out infinite; }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.3); }
+    }
     .tab-btn { transition: all 0.25s cubic-bezier(.4,0,.2,1); }
     .tab-btn:hover { transform: translateY(-1px); }
     .toast-enter { animation: slideUp 0.4s cubic-bezier(.4,0,.2,1); }
@@ -464,24 +472,24 @@
   <div id="pos-app" class="hidden">
 
     <!-- HEADER -->
-    <header class="bg-coffee-800 text-white px-3 py-2 sticky top-0 z-40 shadow-lg no-print">
+    <header class="bg-white text-gray-800 px-3 py-2 sticky top-0 z-40 shadow-sm border-b border-gray-100 no-print">
       <div class="max-w-7xl mx-auto flex items-center justify-between">
         <div class="flex items-center gap-2 min-w-0 flex-1">
-          <div id="header-shop-photo" class="w-8 h-8 rounded-full bg-coffee-600 flex items-center justify-center overflow-hidden flex-shrink-0">
-            <i class="fas fa-mug-hot text-coffee-200 text-sm"></i>
+          <div id="header-shop-photo" class="w-9 h-9 rounded-xl bg-gradient-to-br from-teal-500 to-teal-700 flex items-center justify-center overflow-hidden flex-shrink-0 shadow-sm">
+            <i class="fas fa-mug-hot text-white text-sm"></i>
           </div>
           <div class="min-w-0">
-            <h1 id="header-shop-name" class="font-display text-sm font-bold leading-tight truncate">Warung Kopi</h1>
-            <p id="header-shop-tagline" class="text-coffee-300 text-[10px] truncate leading-tight"></p>
+            <h1 id="header-shop-name" class="font-display text-sm font-bold leading-tight truncate text-gray-900">Warung Kopi</h1>
+            <p id="header-shop-tagline" class="text-gray-400 text-[10px] truncate leading-tight"></p>
           </div>
         </div>
         <div class="flex items-center gap-2">
           <div class="text-right">
-            <div id="header-daily-total" class="font-bold text-coffee-100 text-xs">Rp 0</div>
-            <div id="header-daily-count" class="text-coffee-400 text-[10px]">0 transaksi</div>
+            <div id="header-daily-total" class="font-bold text-teal-700 text-xs">Rp 0</div>
+            <div id="header-daily-count" class="text-gray-400 text-[10px]">0 transaksi</div>
           </div>
-          <button onclick="doLogout()" class="w-8 h-8 rounded-full bg-coffee-700 flex items-center justify-center hover:bg-coffee-600 transition" title="Keluar">
-            <i class="fas fa-sign-out-alt text-xs text-coffee-200"></i>
+          <button onclick="doLogout()" class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center hover:bg-red-50 hover:text-red-500 text-gray-400 transition" title="Keluar">
+            <i class="fas fa-sign-out-alt text-xs"></i>
           </button>
         </div>
       </div>
@@ -717,19 +725,19 @@
     </div><!-- end pb-20 -->
 
     <!-- BOTTOM NAVIGATION -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-coffee-200 z-40 no-print shadow-lg">
+    <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200 z-40 no-print">
       <div class="max-w-lg mx-auto flex">
-        <button onclick="switchPage('kasir')" id="nav-kasir" class="nav-btn flex-1 py-3 flex flex-col items-center gap-0.5 text-coffee-700 bg-coffee-50 border-t-2 border-coffee-700">
+        <button onclick="switchPage('kasir')" id="nav-kasir" class="nav-btn flex-1 py-3 flex flex-col items-center gap-0.5 text-teal-600 bg-teal-50 border-t-2 border-teal-600">
           <i class="fas fa-cash-register text-lg"></i><span class="text-xs font-semibold">Kasir</span>
         </button>
-        <button onclick="switchPage('riwayat')" id="nav-riwayat" class="nav-btn flex-1 py-3 flex flex-col items-center gap-0.5 text-coffee-400">
-          <i class="fas fa-history text-lg"></i><span class="text-xs font-medium">Riwayat</span>
+        <button onclick="switchPage('riwayat')" id="nav-riwayat" class="nav-btn flex-1 py-3 flex flex-col items-center gap-0.5 text-gray-400">
+          <i class="fas fa-chart-line text-lg"></i><span class="text-xs font-medium">Riwayat</span>
         </button>
-        <button onclick="switchPage('menu')" id="nav-menu" class="nav-btn flex-1 py-3 flex flex-col items-center gap-0.5 text-coffee-400">
+        <button onclick="switchPage('menu')" id="nav-menu" class="nav-btn flex-1 py-3 flex flex-col items-center gap-0.5 text-gray-400">
           <i class="fas fa-utensils text-lg"></i><span class="text-xs font-medium">Menu</span>
         </button>
-        <button onclick="switchPage('toko')" id="nav-toko" class="nav-btn flex-1 py-3 flex flex-col items-center gap-0.5 text-coffee-400">
-          <i class="fas fa-store text-lg"></i><span class="text-xs font-medium">Toko</span>
+        <button onclick="switchPage('toko')" id="nav-toko" class="nav-btn flex-1 py-3 flex flex-col items-center gap-0.5 text-gray-400">
+          <i class="fas fa-cog text-lg"></i><span class="text-xs font-medium">Toko</span>
         </button>
       </div>
     </nav>
@@ -1559,14 +1567,14 @@
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       document.getElementById('page-' + page).classList.add('active');
       document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.classList.remove('text-coffee-700', 'bg-coffee-50', 'border-t-2', 'border-coffee-700');
-        btn.classList.add('text-coffee-400');
+        btn.classList.remove('text-teal-600', 'bg-teal-50', 'border-t-2', 'border-teal-600');
+        btn.classList.add('text-gray-400');
         const span = btn.querySelector('span');
         if (span) { span.classList.remove('font-semibold'); span.classList.add('font-medium'); }
       });
       const activeBtn = document.getElementById('nav-' + page);
-      activeBtn.classList.add('text-coffee-700', 'bg-coffee-50', 'border-t-2', 'border-coffee-700');
-      activeBtn.classList.remove('text-coffee-400');
+      activeBtn.classList.add('text-teal-600', 'bg-teal-50', 'border-t-2', 'border-teal-600');
+      activeBtn.classList.remove('text-gray-400');
       const span = activeBtn.querySelector('span');
       if (span) { span.classList.add('font-semibold'); span.classList.remove('font-medium'); }
 
@@ -1612,13 +1620,28 @@
         const isActive = activeTables[i] && activeTables[i].length > 0;
         const isSelected = currentTableId === i;
         const itemCount = isActive ? activeTables[i].reduce((s, it) => s + it.qty, 0) : 0;
+        const isUnpaid = isActive && !isSelected;
         let classes = 'table-card bg-white border-2 rounded-xl p-2 text-center cursor-pointer';
-        if (isActive) classes += ' active-table';
-        if (isSelected) classes += ' ring-2 ring-coffee-700 ring-offset-1';
+        if (isUnpaid) classes += ' unpaid-table';
+        else if (isActive) classes += ' active-table';
+        if (isSelected) classes += ' ring-2 ring-offset-1 ' + (isUnpaid ? 'ring-red-400' : 'ring-teal-400');
+        let dotHtml = isUnpaid ? '<div class="pulse-dot unpaid"></div>' : '';
+        let iconClass, iconColor, statusText, statusColor;
+        if (isUnpaid) {
+          iconClass = 'fas fa-utensils'; iconColor = 'text-red-500';
+          statusText = 'Belum Bayar'; statusColor = 'text-red-500 font-bold';
+        } else if (isActive) {
+          iconClass = 'fas fa-chair'; iconColor = 'text-teal-600';
+          statusText = itemCount + ' item'; statusColor = 'text-teal-600 font-semibold';
+        } else {
+          iconClass = 'fas fa-chair'; iconColor = 'text-gray-300';
+          statusText = 'Kosong'; statusColor = 'text-gray-400';
+        }
         html += '<div class="' + classes + '" onclick="selectTable(' + i + ')">' +
-          '<div class="text-lg mb-0.5"><i class="fas fa-chair ' + (isActive ? 'text-coffee-600' : 'text-coffee-300') + '"></i></div>' +
-          '<div class="text-xs font-bold text-coffee-800">' + i + '</div>' +
-          '<div class="text-[10px] ' + (isActive ? 'text-coffee-600 font-semibold' : 'text-coffee-400') + '">' + (isActive ? itemCount + ' item' : 'Kosong') + '</div></div>';
+          dotHtml +
+          '<div class="text-lg mb-0.5"><i class="' + iconClass + ' ' + iconColor + '"></i></div>' +
+          '<div class="text-xs font-bold text-gray-800">' + i + '</div>' +
+          '<div class="text-[10px] ' + statusColor + '">' + statusText + '</div></div>';
       }
       grid.innerHTML = html;
     }
@@ -1660,10 +1683,14 @@
       }
       grid.innerHTML = items.map(item => {
         const icon = getMenuIcon(item.kategori, item.nama_menu);
-        return '<div class="bg-white rounded-xl p-3 border border-coffee-100 hover:border-coffee-300 hover:shadow-md transition cursor-pointer active:scale-95" onclick="addToCart(\'' + item.id + '\')">' +
-          '<div class="text-2xl mb-1"><i class="fas ' + icon + ' text-coffee-500"></i></div>' +
-          '<div class="text-sm font-semibold text-coffee-800 leading-tight mb-1 truncate">' + item.nama_menu + '</div>' +
-          '<div class="text-xs font-bold text-coffee-600">' + formatIDR(item.harga) + '</div></div>';
+        const isMinuman = item.kategori === 'Minuman';
+        const cardBg = isMinuman ? 'bg-gradient-to-br from-teal-50 to-cyan-50 border-teal-100 hover:border-teal-300 hover:shadow-teal-100/50' : 'bg-gradient-to-br from-amber-50 to-orange-50 border-amber-100 hover:border-amber-300 hover:shadow-amber-100/50';
+        const iconColor = isMinuman ? 'text-teal-500' : 'text-amber-500';
+        const priceColor = isMinuman ? 'text-teal-700' : 'text-amber-700';
+        return '<div class="rounded-xl p-3 border transition cursor-pointer active:scale-95 hover:shadow-md ' + cardBg + '" onclick="addToCart(\'' + item.id + '\')">' +
+          '<div class="text-2xl mb-1"><i class="fas ' + icon + ' ' + iconColor + '"></i></div>' +
+          '<div class="text-sm font-semibold text-gray-800 leading-tight mb-1 truncate">' + item.nama_menu + '</div>' +
+          '<div class="text-xs font-bold ' + priceColor + '">' + formatIDR(item.harga) + '</div></div>';
       }).join('');
     }
 
