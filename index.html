@@ -46,6 +46,8 @@
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     @media print {
       body * { visibility: hidden; }
+      #print-sheet, #print-sheet * { visibility: visible; }
+      #print-sheet { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 999999; background: white; overflow-y: auto; }
       .no-print { display: none !important; }
     }
     /* ===== MODERN TABLE CARDS ===== */
@@ -1013,6 +1015,11 @@
         </div>
         <div id="trx-detail-content" class="p-5"></div>
       </div>
+    </div>
+
+    <!-- PRINT SHEET OVERLAY -->
+    <div id="print-sheet" class="hidden fixed inset-0 z-[100] bg-white overflow-y-auto">
+      <div id="print-sheet-content" class="max-w-md mx-auto p-4"></div>
     </div>
 
     <!-- TOAST -->
@@ -2666,7 +2673,7 @@
       var content = document.getElementById('receipt-modal-content');
       if (!content) return;
       closeReceiptModal();
-      openPrintWindow(content.innerHTML);
+      showPrintSheet(content.innerHTML);
     }
 
     function printReport() {
@@ -2678,32 +2685,27 @@
       }
       var shopName = shopSettings.shopName || currentShop.shopName || 'Warung Kopi';
       var addr = shopSettings.shopAddress || '';
-      var html = '<h2 style="text-align:center;margin-bottom:5px;font-family:Inter,sans-serif;">' + shopName + '</h2>';
-      if (addr) html += '<p style="text-align:center;font-size:11px;color:#666;margin-bottom:10px;font-family:Inter,sans-serif;">' + addr + '</p>';
+      var html = '<div style="text-align:center;margin-bottom:10px;"><h2 style="font-size:16px;font-weight:bold;">' + shopName + '</h2>';
+      if (addr) html += '<p style="font-size:11px;color:#666;">' + addr + '</p></div>';
       html += '<hr style="border-top:1px dashed #ccc;margin-bottom:10px;">';
       if (summary) html += summary.innerHTML;
       if (report) html += report.innerHTML;
-      openPrintWindow(html);
+      showPrintSheet(html);
     }
 
-    function openPrintWindow(contentHTML) {
-      try {
-        var iframe = document.createElement('iframe');
-        iframe.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;border:none;z-index:99999;background:white;';
-        document.body.appendChild(iframe);
-        var doc = iframe.contentDocument || iframe.contentWindow.document;
-        doc.open();
-        doc.write('<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Cetak</title>' +
-          '<style>body{font-family:Inter,sans-serif;padding:15px;margin:0;color:#333;max-width:400px;margin:0 auto;}@media print{body{padding:0;}}</style></head><body>' +
-          contentHTML +
-          '<div style="text-align:center;margin-top:20px;"><button onclick="window.print()" style="padding:12px 40px;background:#0f766e;color:white;border:none;border-radius:10px;font-size:16px;font-weight:bold;cursor:pointer;">CETAK / PRINT</button></div>' +
-          '<div style="text-align:center;margin-top:10px;"><button onclick="window.parent.document.body.removeChild(window.frameElement)" style="padding:8px 24px;background:#f0fdfa;color:#0f766e;border:2px solid #0f766e;border-radius:10px;font-size:14px;font-weight:bold;cursor:pointer;">TUTUP</button></div>' +
-          '</body></html>');
-        doc.close();
-      } catch(e) {
-        console.error('Print error:', e);
-        showToast('Gagal membuka cetak. Coba dari browser langsung.', 'error');
-      }
+    function showPrintSheet(contentHTML) {
+      var sheet = document.getElementById('print-sheet');
+      var container = document.getElementById('print-sheet-content');
+      container.innerHTML = contentHTML +
+        '<div style="text-align:center;margin-top:25px;display:flex;gap:10px;justify-content:center;" class="no-print">' +
+          '<button onclick="window.print()" style="padding:12px 36px;background:#0f766e;color:white;border:none;border-radius:10px;font-size:16px;font-weight:bold;cursor:pointer;">CETAK / PRINT</button>' +
+          '<button onclick="closePrintSheet()" style="padding:12px 36px;background:#f0fdfa;color:#0f766e;border:2px solid #0f766e;border-radius:10px;font-size:16px;font-weight:bold;cursor:pointer;">TUTUP</button>' +
+        '</div>';
+      sheet.classList.remove('hidden');
+    }
+
+    function closePrintSheet() {
+      document.getElementById('print-sheet').classList.add('hidden');
     }
 
     function closeReceiptModal() { document.getElementById('receipt-modal').classList.add('hidden'); }
@@ -2956,37 +2958,23 @@
         csv += [idx + 1, trx.date, trx.table || '-', itemsStr, trx.subtotal, trx.discountPct || 0, trx.discount || 0, trx.total, trx.paymentMethod, trx.cashier || 'Admin'].join(',') + '\n';
       });
 
-      try {
-        var blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-        var url = URL.createObjectURL(blob);
+      // Data URI — tidak melewati network/jaringan, tidak di-intercept service worker
+      var dataUri = 'data:text/csv;charset=utf-8,' + encodeURIComponent('\uFEFF' + csv);
 
-        // Open CSV in new tab — browser will download or display it
-        var newTab = window.open(url, '_blank');
+      // Tampilkan di print sheet (overlay fullscreen) dengan tombol download
+      var html = '<div style="text-align:center;margin-bottom:15px;">' +
+        '<h2 style="font-size:18px;font-weight:bold;">' + shopName + '</h2>' +
+        '<p style="color:#666;font-size:13px;">' + currentFilteredTransactions.length + ' transaksi</p>' +
+        '</div>' +
+        '<div style="text-align:center;margin:30px 0;">' +
+        '<a href="' + dataUri + '" download="' + filename + '" style="display:inline-block;padding:16px 48px;background:#16a34a;color:white;border-radius:12px;text-decoration:none;font-size:18px;font-weight:bold;">' +
+        '<i class="fas fa-download" style="margin-right:8px;"></i>DOWNLOAD CSV</a>' +
+        '</div>' +
+        '<div style="text-align:center;margin:15px 0;">' +
+        '<p style="color:#888;font-size:12px;">File: ' + filename + '</p>' +
+        '</div>';
 
-        if (newTab) {
-          showToast('File CSV dibuka di tab baru. Simpan dari menu browser.', 'success');
-        } else {
-          // window.open blocked — use iframe fallback
-          var iframe = document.createElement('iframe');
-          iframe.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;border:none;z-index:99999;background:white;';
-          document.body.appendChild(iframe);
-          var doc = iframe.contentDocument || iframe.contentWindow.document;
-          doc.open();
-          doc.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Export CSV</title></head><body style="font-family:sans-serif;padding:20px;text-align:center;">' +
-            '<h2>Laporan ' + shopName + '</h2>' +
-            '<p style="color:#666;">' + currentFilteredTransactions.length + ' transaksi</p>' +
-            '<p style="margin-top:30px;"><a href="' + url + '" download="' + filename + '" style="display:inline-block;padding:15px 40px;background:#16a34a;color:white;border-radius:10px;text-decoration:none;font-size:18px;font-weight:bold;">DOWNLOAD CSV</a></p>' +
-            '<p style="margin-top:15px;"><a href="data:text/csv;charset=utf-8,' + encodeURIComponent('\uFEFF' + csv) + '" download="' + filename + '" style="color:#0f766e;">Atau tap link ini untuk download</a></p>' +
-            '<p style="margin-top:20px;"><button onclick="window.parent.document.body.removeChild(window.frameElement)" style="padding:8px 24px;background:#f0fdfa;color:#0f766e;border:2px solid #0f766e;border-radius:10px;font-size:14px;font-weight:bold;cursor:pointer;">TUTUP</button></p>' +
-            '</body></html>');
-          doc.close();
-        }
-
-        setTimeout(function() { URL.revokeObjectURL(url); }, 60000);
-      } catch(e) {
-        console.error('CSV export error:', e);
-        showToast('Gagal export CSV: ' + e.message, 'error');
-      }
+      showPrintSheet(html);
     }
 
     // ===== MENU MANAGEMENT =====
