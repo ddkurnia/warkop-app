@@ -2456,8 +2456,9 @@
       const items = activeTables[currentTableId] || [];
       const total = items.reduce((s, i) => s + i.harga * i.qty, 0);
       const totalItems = items.reduce((s, i) => s + i.qty, 0);
-      const isTA = currentTableId.startsWith('TA_');
-      const pelNum = isTA ? currentTableId.replace('TA_', '') : '';
+      const tableIdStr = String(currentTableId);
+      const isTA = tableIdStr.startsWith('TA_');
+      const pelNum = isTA ? tableIdStr.replace('TA_', '') : '';
       const headerLabel = isTA ? 'Pel ' + pelNum : 'Meja ' + currentTableId;
       const headerIcon = isTA ? 'shopping-bag text-amber-500' : 'receipt text-coffee-500';
       const custName = tableCustomerNames[currentTableId] || '';
@@ -2568,7 +2569,7 @@
       const trx = {
         id: generateTrxId(),
         date: nowLocal(),
-        table: currentTableId.startsWith('TA_') ? 'Bungkus' : currentTableId,
+        table: String(currentTableId).startsWith('TA_') ? 'Bungkus' : currentTableId,
         customerName: tableCustomerNames[currentTableId] || '',
         items: [...items],
         subtotal: subtotal,
