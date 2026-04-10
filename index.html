@@ -2672,8 +2672,10 @@
     function printReceipt() {
       var content = document.getElementById('receipt-modal-content');
       if (!content) return;
+      var html = content.innerHTML;
       closeReceiptModal();
-      showPrintSheet(content.innerHTML);
+      showPrintSheet(html);
+      setTimeout(function() { window.print(); }, 400);
     }
 
     function printReport() {
@@ -2691,6 +2693,7 @@
       if (summary) html += summary.innerHTML;
       if (report) html += report.innerHTML;
       showPrintSheet(html);
+      setTimeout(function() { window.print(); }, 400);
     }
 
     function showPrintSheet(contentHTML) {
@@ -2958,23 +2961,21 @@
         csv += [idx + 1, trx.date, trx.table || '-', itemsStr, trx.subtotal, trx.discountPct || 0, trx.discount || 0, trx.total, trx.paymentMethod, trx.cashier || 'Admin'].join(',') + '\n';
       });
 
-      // Data URI — tidak melewati network/jaringan, tidak di-intercept service worker
-      var dataUri = 'data:text/csv;charset=utf-8,' + encodeURIComponent('\uFEFF' + csv);
-
-      // Tampilkan di print sheet (overlay fullscreen) dengan tombol download
-      var html = '<div style="text-align:center;margin-bottom:15px;">' +
-        '<h2 style="font-size:18px;font-weight:bold;">' + shopName + '</h2>' +
-        '<p style="color:#666;font-size:13px;">' + currentFilteredTransactions.length + ' transaksi</p>' +
-        '</div>' +
-        '<div style="text-align:center;margin:30px 0;">' +
-        '<a href="' + dataUri + '" download="' + filename + '" style="display:inline-block;padding:16px 48px;background:#16a34a;color:white;border-radius:12px;text-decoration:none;font-size:18px;font-weight:bold;">' +
-        '<i class="fas fa-download" style="margin-right:8px;"></i>DOWNLOAD CSV</a>' +
-        '</div>' +
-        '<div style="text-align:center;margin:15px 0;">' +
-        '<p style="color:#888;font-size:12px;">File: ' + filename + '</p>' +
-        '</div>';
-
-      showPrintSheet(html);
+      // Create Blob URL and trigger download directly (works in PWA/mobile)
+      var BOM = '\uFEFF';
+      var blob = new Blob([BOM + csv], { type: 'text/csv;charset=utf-8;' });
+      var blobUrl = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = filename;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function() {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(blobUrl);
+      }, 250);
+      showToast('CSV berhasil diunduh: ' + filename, 'success');
     }
 
     // ===== MENU MANAGEMENT =====
