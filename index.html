@@ -867,7 +867,8 @@
       menu: (uid) => 'warkop_menu_' + uid,
       transactions: (uid) => 'warkop_transactions_' + uid,
       settings: (uid) => 'warkop_settings_' + uid,
-      activeTables: (uid) => 'warkop_activeTables_' + uid
+      activeTables: (uid) => 'warkop_activeTables_' + uid,
+      customerNames: (uid) => 'warkop_customerNames_' + uid
     };
     function lsGet(key) { try { return JSON.parse(localStorage.getItem(key)); } catch(e) { return null; } }
     function lsSet(key, data) { try { localStorage.setItem(key, JSON.stringify(data)); return true; } catch(e) { console.warn('localStorage write error:', e); return false; } }
@@ -903,6 +904,7 @@
     let currentShop = null;
     let menuData = [];
     let activeTables = {};
+    let tableCustomerNames = {};
     let shopSettings = {};
     let currentTableId = null;
     let currentPage = 'kasir';
@@ -1418,6 +1420,7 @@
     function loadActiveTablesFromLS() {
       const uid = currentShop.id;
       activeTables = lsGet(LS_KEYS.activeTables(uid)) || {};
+      tableCustomerNames = lsGet(LS_KEYS.customerNames(uid)) || {};
     }
 
     function loadSettingsFromLS() {
@@ -1621,6 +1624,7 @@
         const isSelected = currentTableId === i;
         const itemCount = isActive ? activeTables[i].reduce((s, it) => s + it.qty, 0) : 0;
         const isUnpaid = isActive && !isSelected;
+        const custName = tableCustomerNames[i] || '';
         let classes = 'table-card bg-white border-2 rounded-xl p-2 text-center cursor-pointer';
         if (isUnpaid) classes += ' unpaid-table';
         else if (isActive) classes += ' active-table';
@@ -1637,13 +1641,37 @@
           iconClass = 'fas fa-chair'; iconColor = 'text-gray-300';
           statusText = 'Kosong'; statusColor = 'text-gray-400';
         }
+        // Customer name badge
+        let nameHtml = '';
+        if (custName) {
+          const nameShort = custName.length > 7 ? custName.substring(0, 7) + '..' : custName;
+          const nameBg = isUnpaid ? 'bg-red-100 text-red-700' : isActive ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-600';
+          nameHtml = '<div class="mt-0.5 text-[9px] px-1.5 py-0 rounded-full font-semibold truncate ' + nameBg + '" title="' + custName.replace(/"/g, '&quot;') + '">' + nameShort + '</div>';
+        }
         html += '<div class="' + classes + '" onclick="selectTable(' + i + ')">' +
           dotHtml +
           '<div class="text-lg mb-0.5"><i class="' + iconClass + ' ' + iconColor + '"></i></div>' +
           '<div class="text-xs font-bold text-gray-800">' + i + '</div>' +
-          '<div class="text-[10px] ' + statusColor + '">' + statusText + '</div></div>';
+          nameHtml +
+          '<div class="text-[10px] ' + statusColor + '">' + statusText + '</div>' +
+          '<div class="mt-0.5" onclick="event.stopPropagation();editCustomerName(' + i + ')"><i class="fas fa-pen text-[8px] text-gray-300 hover:text-teal-500 transition cursor-pointer" title="Nama pelanggan"></i></div>' +
+          '</div>';
       }
       grid.innerHTML = html;
+    }
+
+    function editCustomerName(tableId) {
+      const current = tableCustomerNames[tableId] || '';
+      const msg = current ? 'Ganti nama pelanggan meja ' + tableId + ' (kosongkan untuk hapus):' : 'Tulis nama pelanggan meja ' + tableId + ':';
+      const name = prompt(msg, current);
+      if (name === null) return; // User cancelled
+      if (name.trim() === '') {
+        delete tableCustomerNames[tableId];
+      } else {
+        tableCustomerNames[tableId] = name.trim();
+      }
+      lsSet(LS_KEYS.customerNames(currentShop.id), tableCustomerNames);
+      renderTables();
     }
 
     function selectTable(tableId) {
@@ -1855,6 +1883,7 @@
         id: generateTrxId(),
         date: nowLocal(),
         table: currentTableId,
+        customerName: tableCustomerNames[currentTableId] || '',
         items: [...items],
         subtotal: subtotal,
         discountPct: discountPct,
@@ -1870,6 +1899,8 @@
 
         // 2. Clear active tables for that table
         activeTables[currentTableId] = [];
+        delete tableCustomerNames[currentTableId];
+        lsSet(LS_KEYS.customerNames(currentShop.id), tableCustomerNames);
         const savedTableId = currentTableId;
 
         // 3. Save active tables to localStorage
@@ -1926,6 +1957,7 @@
         '<div class="flex justify-between"><span class="text-coffee-500">No</span><span class="font-medium">' + trx.id + '</span></div>' +
         '<div class="flex justify-between"><span class="text-coffee-500">Tanggal</span><span class="font-medium">' + formatDateTime(trx.date) + '</span></div>' +
         '<div class="flex justify-between"><span class="text-coffee-500">Meja</span><span class="font-medium">' + trx.table + '</span></div>' +
+        (trx.customerName ? '<div class="flex justify-between"><span class="text-coffee-500">Pelanggan</span><span class="font-medium">' + trx.customerName + '</span></div>' : '') +
         '<div class="flex justify-between"><span class="text-coffee-500">Kasir</span><span class="font-medium">' + cashier + '</span></div>' +
         '</div>' +
         '<div class="border-t border-dashed border-coffee-300 my-3"></div>' +
@@ -2066,9 +2098,11 @@
     }
 
     function renderSingleTrxCard(trx) {
+      const nameBadge = trx.customerName ? '<span class="bg-teal-50 text-teal-700 text-xs font-semibold px-2 py-0.5 rounded-lg"><i class="fas fa-user text-[9px] mr-1"></i>' + trx.customerName + '</span>' : '';
       return '<div class="bg-white rounded-2xl p-4 shadow-sm border border-coffee-100 cursor-pointer hover:shadow-md transition" onclick="showTrxDetail(\'' + trx.id + '\')">' +
         '<div class="flex items-center justify-between mb-2">' +
           '<div class="flex items-center gap-2"><span class="bg-coffee-100 text-coffee-700 text-xs font-bold px-2 py-0.5 rounded-lg">Meja ' + trx.table + '</span>' +
+          nameBadge +
           '<span class="text-xs text-coffee-400">' + formatDateTime(trx.date) + '</span></div>' +
           '<span class="text-sm font-bold text-coffee-800">' + formatIDR(trx.total) + '</span>' +
         '</div>' +
