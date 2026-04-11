@@ -512,11 +512,14 @@
           <span class="w-6 h-6 bg-green-600 text-white rounded-full flex items-center justify-center text-xs font-bold">2</span>
           <p class="text-sm font-bold text-green-800">Hubungi Admin via WhatsApp</p>
         </div>
-        <p class="text-xs text-green-700 mb-3">Kirim kode aktivasi di atas ke admin untuk pembayaran dan aktivasi akun Anda.</p>
-        <button onclick="openWhatsApp()" id="wa-admin-btn"
-          class="flex items-center justify-center gap-2 w-full py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl text-sm font-bold transition shadow-md">
-          <i class="fab fa-whatsapp text-lg"></i> Hubungi Admin via WhatsApp
-        </button>
+        <p class="text-xs text-green-700 mb-2">Kirim kode aktivasi di atas ke admin untuk pembayaran dan aktivasi akun Anda.</p>
+        <div class="bg-white border border-green-300 rounded-xl p-3 flex items-center gap-3">
+          <i class="fab fa-whatsapp text-green-600 text-xl"></i>
+          <div>
+            <p class="text-[10px] text-green-600 font-semibold uppercase tracking-wider">Nomor WhatsApp Admin</p>
+            <p class="text-base font-bold text-green-800 select-all">0896-8515-7213</p>
+          </div>
+        </div>
       </div>
 
       <!-- Step 3: Tunggu Aktivasi -->
@@ -592,10 +595,13 @@
         <p class="text-xs font-bold text-green-800 mb-2">Kode Aktivasi Anda</p>
         <div id="demo-expired-code" class="font-mono text-xl font-bold text-green-800 tracking-wider select-all">WK-XXXXXX</div>
       </div>
-      <button onclick="openWhatsAppDemoExpired()" id="demo-expired-wa-btn"
-        class="flex items-center justify-center gap-2 w-full py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl text-sm font-bold transition shadow-md mb-3">
-        <i class="fab fa-whatsapp text-lg"></i> Hubungi Admin via WhatsApp
-      </button>
+      <div class="bg-green-50 border border-green-200 rounded-xl p-3 mb-3 flex items-center gap-3">
+        <i class="fab fa-whatsapp text-green-600 text-xl"></i>
+        <div>
+          <p class="text-[10px] text-green-600 font-semibold uppercase tracking-wider">Nomor WhatsApp Admin</p>
+          <p class="text-base font-bold text-green-800 select-all">0896-8515-7213</p>
+        </div>
+      </div>
       <button onclick="doLogout()" class="w-full px-6 py-2.5 bg-coffee-200 text-coffee-800 rounded-xl font-semibold hover:bg-coffee-300 transition">
         <i class="fas fa-sign-out-alt mr-2"></i> Keluar
       </button>
