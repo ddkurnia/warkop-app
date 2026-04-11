@@ -1,5 +1,5 @@
 // ============================================
-// Service Worker v13 - Warung Kopi POS
+// Service Worker v14 - Warung Kopi POS
 // ============================================
 // CATATAN PENTING:
 // - Service Worker ini TIDAK PERNAH menyentuh IndexedDB atau localStorage
@@ -8,7 +8,7 @@
 //   yang TIDAK AKAN terhapus saat cache diperbarui
 // ============================================
 
-const CACHE_NAME = 'warkop-pos-v17';
+const CACHE_NAME = 'warkop-pos-v18';
 const STATIC_ASSETS = [
   '/',
   '/manifest.json',
