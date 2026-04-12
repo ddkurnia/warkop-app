@@ -62,15 +62,15 @@
     }
     .table-card:hover {
       transform: translateY(-4px) scale(1.03);
-      box-shadow: 0 12px 28px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.04);
+      box-shadow: 0 12px 28px rgba(3,105,161,0.12), 0 0 0 1px rgba(0,0,0,0.04);
     }
     .table-card.active-table {
       border-color: transparent;
-      background: linear-gradient(145deg, #e6fffa, #b2f5ea, #81e6d9);
-      box-shadow: 0 6px 20px rgba(20,184,166,0.25), 0 0 0 2px #14b8a6, inset 0 1px 0 rgba(255,255,255,0.6);
+      background: linear-gradient(145deg, #e0f2fe, #bae6fd, #7dd3fc);
+      box-shadow: 0 6px 20px rgba(14,165,233,0.25), 0 0 0 2px #0EA5E9, inset 0 1px 0 rgba(255,255,255,0.6);
     }
     .table-card.active-table:hover {
-      box-shadow: 0 12px 30px rgba(20,184,166,0.35), 0 0 0 2px #0d9488, inset 0 1px 0 rgba(255,255,255,0.6);
+      box-shadow: 0 12px 30px rgba(14,165,233,0.35), 0 0 0 2px #0284C7, inset 0 1px 0 rgba(255,255,255,0.6);
     }
     .table-card.unpaid-table {
       border-color: transparent;
@@ -134,7 +134,7 @@
       opacity: 1;
     }
     .table-card.selected-table {
-      box-shadow: 0 8px 24px rgba(13,148,136,0.35), 0 0 0 3px #0d9488, inset 0 1px 0 rgba(255,255,255,0.6);
+      box-shadow: 0 8px 24px rgba(14,165,233,0.35), 0 0 0 3px #0284C7, inset 0 1px 0 rgba(255,255,255,0.6);
       transform: translateY(-2px) scale(1.05);
     }
     /* ===== ORDER MODE TABS ===== */
@@ -174,15 +174,15 @@
     }
     .pel-card:hover {
       transform: translateY(-4px) scale(1.03);
-      box-shadow: 0 12px 28px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.04);
+      box-shadow: 0 12px 28px rgba(3,105,161,0.12), 0 0 0 1px rgba(0,0,0,0.04);
     }
     .pel-card.pel-active {
       border-color: transparent;
-      background: linear-gradient(145deg, #fffbeb, #fef3c7, #fde68a);
-      box-shadow: 0 6px 20px rgba(245,158,11,0.25), 0 0 0 2px #f59e0b, inset 0 1px 0 rgba(255,255,255,0.6);
+      background: linear-gradient(145deg, #fef9c3, #fef08a, #fde047);
+      box-shadow: 0 6px 20px rgba(234,179,8,0.25), 0 0 0 2px #EAB308, inset 0 1px 0 rgba(255,255,255,0.6);
     }
     .pel-card.pel-active:hover {
-      box-shadow: 0 12px 30px rgba(245,158,11,0.35), 0 0 0 2px #d97706, inset 0 1px 0 rgba(255,255,255,0.6);
+      box-shadow: 0 12px 30px rgba(234,179,8,0.35), 0 0 0 2px #CA8A04, inset 0 1px 0 rgba(255,255,255,0.6);
     }
     .pel-card.pel-unpaid {
       border-color: transparent;
@@ -195,7 +195,7 @@
       50% { box-shadow: 0 6px 24px rgba(239,68,68,0.35), 0 0 0 3px #f87171, inset 0 1px 0 rgba(255,255,255,0.5); }
     }
     .pel-card.pel-selected {
-      box-shadow: 0 8px 24px rgba(245,158,11,0.35), 0 0 0 3px #d97706, inset 0 1px 0 rgba(255,255,255,0.6);
+      box-shadow: 0 8px 24px rgba(234,179,8,0.35), 0 0 0 3px #CA8A04, inset 0 1px 0 rgba(255,255,255,0.6);
       transform: translateY(-2px) scale(1.05);
     }
     .pel-card .pel-dot {
@@ -243,13 +243,13 @@
     .page { display: none; }
     .page.active { display: block; }
     .report-tab.active-tab {
-      background-color: #0f766e !important;
+      background-color: #0369A1 !important;
       color: white !important;
-      border-color: #0f766e !important;
-      box-shadow: 0 4px 12px rgba(15,118,110,0.3);
+      border-color: #0369A1 !important;
+      box-shadow: 0 4px 12px rgba(3,105,161,0.3);
     }
     .modal-overlay {
-      background: rgba(19, 78, 74, 0.5);
+      background: rgba(12, 74, 110, 0.5);
       backdrop-filter: blur(8px);
     }
     /* ===== OCEAN BLUE AUTH THEME ===== */
@@ -426,8 +426,8 @@
       cursor: pointer;
     }
     ::selection {
-      background: #99f6e4;
-      color: #134e4a;
+      background: #bae6fd;
+      color: #0c4a6e;
     }
     /* Modern glassmorphism for POS cards */
     .glass-card {
@@ -437,13 +437,13 @@
       border: 1px solid rgba(255,255,255,0.5);
     }
     /* Smooth scrollbar for modern feel */
-    * { scrollbar-width: thin; scrollbar-color: #99f6e4 transparent; }
+    * { scrollbar-width: thin; scrollbar-color: #bae6fd transparent; }
     *::-webkit-scrollbar { width: 4px; }
     *::-webkit-scrollbar-track { background: transparent; }
-    *::-webkit-scrollbar-thumb { background: #99f6e4; border-radius: 99px; }
+    *::-webkit-scrollbar-thumb { background: #bae6fd; border-radius: 99px; }
   </style>
 </head>
-<body class="bg-coffee-50 min-h-screen">
+<body class="bg-slate-50 min-h-screen">
 
   <!-- ============================================== -->
   <!-- ============ AUTH: LOGIN SCREEN ============== -->
@@ -790,10 +790,10 @@
   <div id="pos-app" class="hidden">
 
     <!-- HEADER -->
-    <header class="bg-white text-gray-800 px-3 py-2 sticky top-0 z-40 shadow-sm border-b border-gray-100 no-print">
+    <header class="bg-white text-gray-800 px-3 py-2 sticky top-0 z-40 shadow-sm border-b border-sky-100 no-print">
       <div class="max-w-7xl mx-auto flex items-center justify-between">
         <div class="flex items-center gap-2 min-w-0 flex-1">
-          <div id="header-shop-photo" class="w-9 h-9 rounded-xl bg-gradient-to-br from-teal-500 to-teal-700 flex items-center justify-center overflow-hidden flex-shrink-0 shadow-sm">
+          <div id="header-shop-photo" class="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-500 to-sky-700 flex items-center justify-center overflow-hidden flex-shrink-0 shadow-sm">
             <i class="fas fa-mug-hot text-white text-sm"></i>
           </div>
           <div class="min-w-0">
@@ -803,7 +803,7 @@
         </div>
         <div class="flex items-center gap-2">
           <div class="text-right">
-            <div id="header-daily-total" class="font-bold text-teal-700 text-xs">Rp 0</div>
+            <div id="header-daily-total" class="font-bold text-sky-700 text-xs">Rp 0</div>
             <div id="header-daily-count" class="text-gray-400 text-[10px]">0 transaksi</div>
           </div>
           <button onclick="doLogout()" class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center hover:bg-red-50 hover:text-red-500 text-gray-400 transition" title="Keluar">
@@ -821,7 +821,7 @@
 
     <!-- DEMO WATERMARK -->
     <div id="demo-watermark" class="hidden fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-30 opacity-[0.04] rotate-[-30deg] no-print">
-      <span class="text-coffee-900 font-bold text-6xl sm:text-8xl whitespace-nowrap tracking-wider">DEMO</span>
+      <span class="text-sky-900 font-bold text-6xl sm:text-8xl whitespace-nowrap tracking-wider">DEMO</span>
     </div>
 
     <!-- POS CONTENT -->
@@ -833,7 +833,7 @@
 
           <!-- ORDER MODE TABS -->
           <div class="flex gap-2 mb-4">
-            <button onclick="switchOrderMode('dine-in')" id="mode-dinein" class="order-mode-tab flex-1 py-3 rounded-xl font-bold text-sm bg-teal-600 text-white shadow-md active-mode">
+            <button onclick="switchOrderMode('dine-in')" id="mode-dinein" class="order-mode-tab flex-1 py-3 rounded-xl font-bold text-sm bg-sky-600 text-white shadow-md active-mode">
               <i class="fas fa-chair mr-2"></i> Di Tempat
             </button>
             <button onclick="switchOrderMode('takeaway')" id="mode-takeaway" class="order-mode-tab flex-1 py-3 rounded-xl font-bold text-sm bg-white text-gray-500 border-2 border-gray-200">
@@ -848,11 +848,11 @@
               <div id="section-dinein">
                 <div class="mb-4">
                   <div class="flex items-center justify-between mb-2">
-                    <h3 class="text-sm font-bold text-coffee-700"><i class="fas fa-chair mr-1 text-coffee-500"></i> Daftar Meja</h3>
+                    <h3 class="text-sm font-bold text-sky-700"><i class="fas fa-chair mr-1 text-sky-500"></i> Daftar Meja</h3>
                     <div class="flex items-center gap-2">
                       <button onclick="changeTableCount(-1)" class="w-7 h-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition text-xs font-bold" title="Kurangi meja"><i class="fas fa-minus"></i></button>
-                      <span id="table-count-display" class="text-sm font-bold text-coffee-800 min-w-[24px] text-center">30</span>
-                      <button onclick="changeTableCount(1)" class="w-7 h-7 rounded-lg bg-green-50 hover:bg-green-100 text-green-600 flex items-center justify-center transition text-xs font-bold" title="Tambah meja"><i class="fas fa-plus"></i></button>
+                      <span id="table-count-display" class="text-sm font-bold text-sky-800 min-w-[24px] text-center">30</span>
+                      <button onclick="changeTableCount(1)" class="w-7 h-7 rounded-lg bg-sky-50 hover:bg-sky-100 text-sky-600 flex items-center justify-center transition text-xs font-bold" title="Tambah meja"><i class="fas fa-plus"></i></button>
                     </div>
                   </div>
                   <div id="tables-grid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2.5"></div>
@@ -862,11 +862,11 @@
               <!-- TAKE AWAY SECTION -->
               <div id="section-takeaway" class="hidden mb-4">
                 <div class="flex items-center justify-between mb-2">
-                  <h3 class="text-sm font-bold text-amber-700"><i class="fas fa-shopping-bag mr-1 text-amber-500"></i> Daftar Bungkus</h3>
+                  <h3 class="text-sm font-bold text-yellow-700"><i class="fas fa-shopping-bag mr-1 text-yellow-500"></i> Daftar Bungkus</h3>
                   <div class="flex items-center gap-2">
                     <button onclick="changeTakeawayCount(-1)" class="w-7 h-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition text-xs font-bold" title="Kurangi"><i class="fas fa-minus"></i></button>
-                    <span id="takeaway-count-display" class="text-sm font-bold text-amber-800 min-w-[24px] text-center">5</span>
-                    <button onclick="changeTakeawayCount(1)" class="w-7 h-7 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-600 flex items-center justify-center transition text-xs font-bold" title="Tambah"><i class="fas fa-plus"></i></button>
+                    <span id="takeaway-count-display" class="text-sm font-bold text-yellow-800 min-w-[24px] text-center">5</span>
+                    <button onclick="changeTakeawayCount(1)" class="w-7 h-7 rounded-lg bg-yellow-50 hover:bg-yellow-100 text-yellow-600 flex items-center justify-center transition text-xs font-bold" title="Tambah"><i class="fas fa-plus"></i></button>
                   </div>
                 </div>
                 <div id="takeaway-grid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2.5"></div>
@@ -875,19 +875,19 @@
               <!-- MENU SECTION (shared) -->
               <div class="mb-4">
                 <div class="relative mb-3">
-                  <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-coffee-400"></i>
-                  <input type="text" id="menu-search" placeholder="Cari menu..." class="w-full pl-10 pr-4 py-2.5 bg-white border border-coffee-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coffee-400 focus:border-coffee-400" oninput="renderMenuGrid()">
+                  <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-sky-400"></i>
+                  <input type="text" id="menu-search" placeholder="Cari menu..." class="w-full pl-10 pr-4 py-2.5 bg-white border border-sky-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400" oninput="renderMenuGrid()">
                 </div>
                 <div class="flex gap-2">
-                  <button onclick="setMenuCategory('Semua')" id="cat-all" class="cat-btn tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-coffee-700 text-white">Semua</button>
-                  <button onclick="setMenuCategory('Minuman')" id="cat-Minuman" class="cat-btn tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-white text-coffee-600 border border-coffee-200">☕ Minuman</button>
-                  <button onclick="setMenuCategory('Makanan')" id="cat-Makanan" class="cat-btn tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-white text-coffee-600 border border-coffee-200">🍽 Makanan</button>
+                  <button onclick="setMenuCategory('Semua')" id="cat-all" class="cat-btn tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-sky-700 text-white">Semua</button>
+                  <button onclick="setMenuCategory('Minuman')" id="cat-Minuman" class="cat-btn tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-white text-sky-600 border border-sky-200">☕ Minuman</button>
+                  <button onclick="setMenuCategory('Makanan')" id="cat-Makanan" class="cat-btn tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-white text-sky-600 border border-sky-200">🍽 Makanan</button>
                 </div>
               </div>
               <div id="menu-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 mb-4"></div>
             </div>
             <div class="hidden lg:block w-96 flex-shrink-0">
-              <div class="bg-white rounded-2xl shadow-sm border border-coffee-100 p-4 sticky top-20 max-h-[calc(100vh-100px)] flex flex-col">
+              <div class="bg-white rounded-2xl shadow-sm border border-sky-100 p-4 sticky top-20 max-h-[calc(100vh-100px)] flex flex-col">
                 <div id="panel-content-desktop"></div>
               </div>
             </div>
@@ -896,9 +896,9 @@
         <div id="mobile-panel" class="hidden fixed inset-0 z-50 lg:hidden">
           <div class="absolute inset-0 modal-overlay" onclick="closeMobilePanel()"></div>
           <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-2xl max-h-[85vh] flex flex-col">
-            <div class="flex items-center justify-between p-4 border-b border-coffee-100">
-              <h3 class="font-bold text-coffee-800"><i class="fas fa-receipt mr-2 text-coffee-500"></i>Pesanan</h3>
-              <button onclick="closeMobilePanel()" class="w-8 h-8 rounded-full bg-coffee-100 flex items-center justify-center text-coffee-600">
+            <div class="flex items-center justify-between p-4 border-b border-sky-100">
+              <h3 class="font-bold text-sky-800"><i class="fas fa-receipt mr-2 text-sky-500"></i>Pesanan</h3>
+              <button onclick="closeMobilePanel()" class="w-8 h-8 rounded-full bg-sky-100 flex items-center justify-center text-sky-600">
                 <i class="fas fa-times"></i>
               </button>
             </div>
@@ -910,67 +910,67 @@
       <!-- PAGE: RIWAYAT -->
       <div id="page-riwayat" class="page">
         <div class="max-w-4xl mx-auto p-4">
-          <h2 class="text-lg font-bold text-coffee-800 mb-4 flex items-center gap-2">
-            <i class="fas fa-history text-coffee-500"></i> Riwayat Penjualan
+          <h2 class="text-lg font-bold text-sky-800 mb-4 flex items-center gap-2">
+            <i class="fas fa-history text-sky-500"></i> Riwayat Penjualan
           </h2>
           <div class="flex gap-2 mb-4">
-            <button onclick="switchReportTab('daily')" id="tab-daily" class="report-tab flex-1 py-2.5 rounded-xl text-sm font-semibold bg-coffee-700 text-white shadow-sm active-tab">
+            <button onclick="switchReportTab('daily')" id="tab-daily" class="report-tab flex-1 py-2.5 rounded-xl text-sm font-semibold bg-sky-700 text-white shadow-sm active-tab">
               <i class="fas fa-calendar-day mr-1"></i> Harian
             </button>
-            <button onclick="switchReportTab('monthly')" id="tab-monthly" class="report-tab flex-1 py-2.5 rounded-xl text-sm font-semibold bg-white text-coffee-600 border-2 border-coffee-200">
+            <button onclick="switchReportTab('monthly')" id="tab-monthly" class="report-tab flex-1 py-2.5 rounded-xl text-sm font-semibold bg-white text-sky-600 border-2 border-sky-200">
               <i class="fas fa-calendar-alt mr-1"></i> Bulanan
             </button>
-            <button onclick="switchReportTab('custom')" id="tab-custom" class="report-tab flex-1 py-2.5 rounded-xl text-sm font-semibold bg-white text-coffee-600 border-2 border-coffee-200">
+            <button onclick="switchReportTab('custom')" id="tab-custom" class="report-tab flex-1 py-2.5 rounded-xl text-sm font-semibold bg-white text-sky-600 border-2 border-sky-200">
               <i class="fas fa-sliders-h mr-1"></i> Kustom
             </button>
           </div>
           <div id="panel-daily" class="report-panel">
-            <div class="bg-white rounded-2xl p-4 shadow-sm border border-coffee-100 mb-4">
-              <h2 class="text-base font-bold text-coffee-800 mb-3"><i class="fas fa-chart-line mr-2 text-coffee-400"></i>Laporan Penjualan Hari Ini</h2>
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-sky-100 mb-4">
+              <h2 class="text-base font-bold text-sky-800 mb-3"><i class="fas fa-chart-line mr-2 text-sky-400"></i>Laporan Penjualan Hari Ini</h2>
               <div class="flex items-center gap-3">
-                <input type="date" id="daily-date" class="flex-1 px-3 py-2 border border-coffee-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coffee-400" onchange="loadHistory('daily')">
-                <button onclick="loadHistory('daily')" class="px-4 py-2 bg-coffee-700 text-white rounded-xl text-sm font-semibold hover:bg-coffee-800 transition"><i class="fas fa-search mr-1"></i> Cari</button>
+                <input type="date" id="daily-date" class="flex-1 px-3 py-2 border border-sky-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-400" onchange="loadHistory('daily')">
+                <button onclick="loadHistory('daily')" class="px-4 py-2 bg-sky-700 text-white rounded-xl text-sm font-semibold hover:bg-sky-800 transition"><i class="fas fa-search mr-1"></i> Cari</button>
               </div>
             </div>
           </div>
           <div id="panel-monthly" class="report-panel hidden">
-            <div class="bg-white rounded-2xl p-4 shadow-sm border border-coffee-100 mb-4">
-              <h2 class="text-base font-bold text-coffee-800 mb-3"><i class="fas fa-chart-bar mr-2 text-coffee-400"></i>Laporan Penjualan Bulan Ini</h2>
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-sky-100 mb-4">
+              <h2 class="text-base font-bold text-sky-800 mb-3"><i class="fas fa-chart-bar mr-2 text-sky-400"></i>Laporan Penjualan Bulan Ini</h2>
               <div class="flex items-center gap-3">
-                <input type="month" id="monthly-picker" class="flex-1 px-3 py-2 border border-coffee-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coffee-400" onchange="loadHistory('monthly')">
-                <button onclick="loadHistory('monthly')" class="px-4 py-2 bg-coffee-700 text-white rounded-xl text-sm font-semibold hover:bg-coffee-800 transition"><i class="fas fa-search mr-1"></i> Cari</button>
+                <input type="month" id="monthly-picker" class="flex-1 px-3 py-2 border border-sky-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-400" onchange="loadHistory('monthly')">
+                <button onclick="loadHistory('monthly')" class="px-4 py-2 bg-sky-700 text-white rounded-xl text-sm font-semibold hover:bg-sky-800 transition"><i class="fas fa-search mr-1"></i> Cari</button>
               </div>
             </div>
           </div>
           <div id="panel-custom" class="report-panel hidden">
-            <div class="bg-white rounded-2xl p-4 shadow-sm border border-coffee-100 mb-4">
-              <h2 class="text-base font-bold text-coffee-800 mb-3"><i class="fas fa-filter mr-2 text-coffee-400"></i>Riwayat Penjualan (Kustom)</h2>
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-sky-100 mb-4">
+              <h2 class="text-base font-bold text-sky-800 mb-3"><i class="fas fa-filter mr-2 text-sky-400"></i>Riwayat Penjualan (Kustom)</h2>
               <div class="flex flex-col sm:flex-row gap-3">
-                <input type="date" id="history-start" class="flex-1 px-3 py-2 border border-coffee-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coffee-400">
-                <input type="date" id="history-end" class="flex-1 px-3 py-2 border border-coffee-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coffee-400">
-                <button onclick="loadHistory('custom')" class="px-4 py-2 bg-coffee-700 text-white rounded-xl text-sm font-semibold hover:bg-coffee-800 transition whitespace-nowrap"><i class="fas fa-search mr-1"></i> Cari</button>
+                <input type="date" id="history-start" class="flex-1 px-3 py-2 border border-sky-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-400">
+                <input type="date" id="history-end" class="flex-1 px-3 py-2 border border-sky-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-400">
+                <button onclick="loadHistory('custom')" class="px-4 py-2 bg-sky-700 text-white rounded-xl text-sm font-semibold hover:bg-sky-800 transition whitespace-nowrap"><i class="fas fa-search mr-1"></i> Cari</button>
               </div>
             </div>
           </div>
           <div class="flex gap-2 mb-4">
             <button onclick="doExportCSV(event)" class="flex-1 flex items-center justify-center gap-2 py-2.5 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition shadow-sm"><i class="fas fa-file-csv"></i> Export / Bagikan CSV</button>
-            <button onclick="printReport()" class="px-5 py-2.5 bg-coffee-700 text-white rounded-xl text-sm font-semibold hover:bg-coffee-800 transition shadow-sm"><i class="fas fa-print"></i></button>
+            <button onclick="printReport()" class="px-5 py-2.5 bg-sky-700 text-white rounded-xl text-sm font-semibold hover:bg-sky-800 transition shadow-sm"><i class="fas fa-print"></i></button>
           </div>
           <div id="history-summary" class="grid grid-cols-2 gap-3 mb-4"></div>
           <div id="top-items-section" class="hidden mb-4">
-            <div class="bg-white rounded-2xl p-4 shadow-sm border border-coffee-100">
-              <h3 class="text-sm font-bold text-coffee-800 mb-3"><i class="fas fa-trophy mr-2 text-yellow-500"></i>Menu Terlaris</h3>
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-sky-100">
+              <h3 class="text-sm font-bold text-sky-800 mb-3"><i class="fas fa-trophy mr-2 text-yellow-500"></i>Menu Terlaris</h3>
               <div id="top-items-list" class="space-y-2"></div>
             </div>
           </div>
           <div id="history-report" class="space-y-3"></div>
           <div id="history-empty" class="hidden text-center py-12">
-            <i class="fas fa-receipt text-5xl text-coffee-200 mb-4"></i>
-            <p class="text-coffee-400 font-medium">Tidak ada transaksi pada periode ini</p>
-            <p class="text-coffee-300 text-sm mt-1">Coba pilih tanggal lain</p>
+            <i class="fas fa-receipt text-5xl text-sky-200 mb-4"></i>
+            <p class="text-sky-400 font-medium">Tidak ada transaksi pada periode ini</p>
+            <p class="text-sky-300 text-sm mt-1">Coba pilih tanggal lain</p>
           </div>
           <div id="history-load-more-container" class="hidden text-center py-4">
-            <button onclick="loadMoreTransactions()" id="load-more-btn" class="px-6 py-2.5 bg-coffee-100 text-coffee-700 rounded-xl text-sm font-semibold hover:bg-coffee-200 transition shadow-sm">
+            <button onclick="loadMoreTransactions()" id="load-more-btn" class="px-6 py-2.5 bg-sky-100 text-sky-700 rounded-xl text-sm font-semibold hover:bg-sky-200 transition shadow-sm">
               <i class="fas fa-chevron-down mr-1"></i> Muat Lebih Banyak
             </button>
           </div>
@@ -981,13 +981,13 @@
       <div id="page-menu" class="page">
         <div class="max-w-4xl mx-auto p-4">
           <div class="flex items-center justify-between mb-4">
-            <h2 class="text-lg font-bold text-coffee-800 flex items-center gap-2"><i class="fas fa-utensils text-coffee-500"></i> Kelola Menu</h2>
-            <button onclick="openMenuModal()" class="px-4 py-2 bg-coffee-700 text-white rounded-xl text-sm font-semibold hover:bg-coffee-800 transition shadow-sm"><i class="fas fa-plus mr-1"></i> Tambah</button>
+            <h2 class="text-lg font-bold text-sky-800 flex items-center gap-2"><i class="fas fa-utensils text-sky-500"></i> Kelola Menu</h2>
+            <button onclick="openMenuModal()" class="px-4 py-2 bg-sky-700 text-white rounded-xl text-sm font-semibold hover:bg-sky-800 transition shadow-sm"><i class="fas fa-plus mr-1"></i> Tambah</button>
           </div>
           <div class="flex gap-2 mb-4">
-            <button onclick="setMenuMgmtCategory('Semua')" id="mgmt-cat-all" class="cat-btn-mgmt tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-coffee-700 text-white">Semua</button>
-            <button onclick="setMenuMgmtCategory('Minuman')" id="mgmt-cat-Minuman" class="cat-btn-mgmt tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-white text-coffee-600 border border-coffee-200">☕ Minuman</button>
-            <button onclick="setMenuMgmtCategory('Makanan')" id="mgmt-cat-Makanan" class="cat-btn-mgmt tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-white text-coffee-600 border border-coffee-200">🍽 Makanan</button>
+            <button onclick="setMenuMgmtCategory('Semua')" id="mgmt-cat-all" class="cat-btn-mgmt tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-sky-700 text-white">Semua</button>
+            <button onclick="setMenuMgmtCategory('Minuman')" id="mgmt-cat-Minuman" class="cat-btn-mgmt tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-white text-sky-600 border border-sky-200">☕ Minuman</button>
+            <button onclick="setMenuMgmtCategory('Makanan')" id="mgmt-cat-Makanan" class="cat-btn-mgmt tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-white text-sky-600 border border-sky-200">🍽 Makanan</button>
           </div>
           <div id="menu-mgmt-list" class="space-y-2"></div>
         </div>
@@ -996,54 +996,54 @@
       <!-- PAGE: TOKO -->
       <div id="page-toko" class="page">
         <div class="max-w-lg mx-auto p-4">
-          <h2 class="text-lg font-bold text-coffee-800 mb-4 flex items-center gap-2"><i class="fas fa-store text-coffee-500"></i> Pengaturan Toko</h2>
-          <div class="bg-white rounded-2xl p-5 shadow-sm border border-coffee-100 space-y-5">
+          <h2 class="text-lg font-bold text-sky-800 mb-4 flex items-center gap-2"><i class="fas fa-store text-sky-500"></i> Pengaturan Toko</h2>
+          <div class="bg-white rounded-2xl p-5 shadow-sm border border-sky-100 space-y-5">
             <div class="text-center">
               <label for="shop-photo-input" class="inline-block cursor-pointer">
-                <div id="shop-photo-preview" class="w-24 h-24 rounded-full bg-coffee-100 mx-auto mb-3 flex items-center justify-center overflow-hidden border-3 border-coffee-200 hover:border-coffee-400 transition">
-                  <i class="fas fa-camera text-2xl text-coffee-400" id="shop-photo-placeholder"></i>
+                <div id="shop-photo-preview" class="w-24 h-24 rounded-full bg-sky-100 mx-auto mb-3 flex items-center justify-center overflow-hidden border-3 border-sky-200 hover:border-sky-400 transition">
+                  <i class="fas fa-camera text-2xl text-sky-400" id="shop-photo-placeholder"></i>
                   <img id="shop-photo-img" class="w-full h-full object-cover hidden" alt="Foto Toko">
                 </div>
               </label>
               <input type="file" id="shop-photo-input" accept="image/*" class="hidden" onchange="handleShopPhoto(event)">
-              <p class="text-xs text-coffee-400">Tap foto untuk ganti (maks 500KB)</p>
+              <p class="text-xs text-sky-400">Tap foto untuk ganti (maks 500KB)</p>
             </div>
             <div>
-              <label class="block text-sm font-semibold text-coffee-700 mb-1">Nama Toko</label>
-              <input type="text" id="setting-shop-name" placeholder="Warung Kopi" class="w-full px-4 py-2.5 border border-coffee-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coffee-400">
+              <label class="block text-sm font-semibold text-sky-700 mb-1">Nama Toko</label>
+              <input type="text" id="setting-shop-name" placeholder="Warung Kopi" class="w-full px-4 py-2.5 border border-sky-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-400">
             </div>
             <div>
-              <label class="block text-sm font-semibold text-coffee-700 mb-1">Tagline</label>
-              <input type="text" id="setting-shop-tagline" placeholder="Kopi Nusantara Asli" class="w-full px-4 py-2.5 border border-coffee-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coffee-400">
+              <label class="block text-sm font-semibold text-sky-700 mb-1">Tagline</label>
+              <input type="text" id="setting-shop-tagline" placeholder="Kopi Nusantara Asli" class="w-full px-4 py-2.5 border border-sky-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-400">
             </div>
             <div>
-              <label class="block text-sm font-semibold text-coffee-700 mb-1">Telepon</label>
-              <input type="text" id="setting-shop-phone" placeholder="08xx-xxxx-xxxx" class="w-full px-4 py-2.5 border border-coffee-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coffee-400">
+              <label class="block text-sm font-semibold text-sky-700 mb-1">Telepon</label>
+              <input type="text" id="setting-shop-phone" placeholder="08xx-xxxx-xxxx" class="w-full px-4 py-2.5 border border-sky-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-400">
             </div>
             <div>
-              <label class="block text-sm font-semibold text-coffee-700 mb-1">Alamat</label>
-              <textarea id="setting-shop-address" rows="2" placeholder="Jl. Kopi Nusantara No. 1" class="w-full px-4 py-2.5 border border-coffee-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coffee-400 resize-none"></textarea>
+              <label class="block text-sm font-semibold text-sky-700 mb-1">Alamat</label>
+              <textarea id="setting-shop-address" rows="2" placeholder="Jl. Kopi Nusantara No. 1" class="w-full px-4 py-2.5 border border-sky-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 resize-none"></textarea>
             </div>
             <div>
-              <label class="block text-sm font-semibold text-coffee-700 mb-1">Nama Kasir</label>
-              <input type="text" id="setting-cashier-name" placeholder="Admin" class="w-full px-4 py-2.5 border border-coffee-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coffee-400">
+              <label class="block text-sm font-semibold text-sky-700 mb-1">Nama Kasir</label>
+              <input type="text" id="setting-cashier-name" placeholder="Admin" class="w-full px-4 py-2.5 border border-sky-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-400">
             </div>
-            <button onclick="saveShopSettings()" id="save-settings-btn" class="w-full py-3 bg-coffee-700 text-white rounded-xl font-semibold hover:bg-coffee-800 transition shadow-sm">
+            <button onclick="saveShopSettings()" id="save-settings-btn" class="w-full py-3 bg-sky-700 text-white rounded-xl font-semibold hover:bg-sky-800 transition shadow-sm">
               <i class="fas fa-save mr-2"></i> Simpan Pengaturan
             </button>
           </div>
 
           <!-- Backup & Restore Card -->
-          <div class="bg-white rounded-2xl p-5 shadow-sm border border-coffee-100 mt-4">
-            <h3 class="text-sm font-bold text-coffee-800 mb-3"><i class="fas fa-database mr-2 text-blue-500"></i>Backup & Restore Data</h3>
+          <div class="bg-white rounded-2xl p-5 shadow-sm border border-sky-100 mt-4">
+            <h3 class="text-sm font-bold text-sky-800 mb-3"><i class="fas fa-database mr-2 text-blue-500"></i>Backup & Restore Data</h3>
 
             <!-- Data Summary -->
-            <div id="data-summary" class="mb-4 text-xs text-coffee-500 space-y-1">
+            <div id="data-summary" class="mb-4 text-xs text-sky-500 space-y-1">
               <!-- Filled dynamically -->
             </div>
 
             <!-- Last Backup Info -->
-            <div id="last-backup-info" class="mb-4 text-xs text-coffee-500"></div>
+            <div id="last-backup-info" class="mb-4 text-xs text-sky-500"></div>
 
             <!-- Buttons -->
             <div class="grid grid-cols-2 gap-3">
@@ -1074,7 +1074,7 @@
     <!-- BOTTOM NAVIGATION -->
     <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200 z-40 no-print">
       <div class="max-w-lg mx-auto flex">
-        <button onclick="switchPage('kasir')" id="nav-kasir" class="nav-btn flex-1 py-3 flex flex-col items-center gap-0.5 text-teal-600 bg-teal-50 border-t-2 border-teal-600">
+        <button onclick="switchPage('kasir')" id="nav-kasir" class="nav-btn flex-1 py-3 flex flex-col items-center gap-0.5 text-sky-600 bg-sky-50 border-t-2 border-sky-600">
           <i class="fas fa-cash-register text-lg"></i><span class="text-xs font-semibold">Kasir</span>
         </button>
         <button onclick="switchPage('riwayat')" id="nav-riwayat" class="nav-btn flex-1 py-3 flex flex-col items-center gap-0.5 text-gray-400">
@@ -1093,34 +1093,34 @@
     <div id="payment-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
       <div class="absolute inset-0 modal-overlay" onclick="closePaymentModal()"></div>
       <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto relative z-10">
-        <div class="bg-coffee-700 text-white p-4 rounded-t-2xl flex items-center justify-between">
+        <div class="bg-sky-700 text-white p-4 rounded-t-2xl flex items-center justify-between">
           <h3 class="font-bold text-lg"><i class="fas fa-wallet mr-2"></i>Pembayaran</h3>
-          <button onclick="closePaymentModal()" class="w-8 h-8 rounded-full bg-coffee-600 flex items-center justify-center hover:bg-coffee-500"><i class="fas fa-times"></i></button>
+          <button onclick="closePaymentModal()" class="w-8 h-8 rounded-full bg-sky-600 flex items-center justify-center hover:bg-sky-500"><i class="fas fa-times"></i></button>
         </div>
         <div class="p-5 space-y-4">
-          <div class="bg-coffee-50 rounded-xl p-3">
-            <h4 class="font-semibold text-coffee-800 text-sm mb-2">Ringkasan Pesanan</h4>
+          <div class="bg-sky-50 rounded-xl p-3">
+            <h4 class="font-semibold text-sky-800 text-sm mb-2">Ringkasan Pesanan</h4>
             <div id="payment-items" class="space-y-1 text-sm max-h-40 overflow-y-auto"></div>
-            <div class="border-t border-coffee-200 mt-2 pt-2 space-y-1">
-              <div class="flex justify-between text-sm"><span class="text-coffee-600">Subtotal</span><span id="pay-subtotal" class="font-semibold"></span></div>
+            <div class="border-t border-sky-200 mt-2 pt-2 space-y-1">
+              <div class="flex justify-between text-sm"><span class="text-sky-600">Subtotal</span><span id="pay-subtotal" class="font-semibold"></span></div>
               <div class="flex items-center justify-between text-sm">
-                <span class="text-coffee-600">Diskon (%)</span>
-                <input type="number" id="pay-discount" min="0" max="100" value="0" class="w-16 text-center py-0.5 border border-coffee-200 rounded-lg text-sm" oninput="updatePaymentTotal()">
+                <span class="text-sky-600">Diskon (%)</span>
+                <input type="number" id="pay-discount" min="0" max="100" value="0" class="w-16 text-center py-0.5 border border-sky-200 rounded-lg text-sm" oninput="updatePaymentTotal()">
               </div>
-              <div class="flex justify-between text-base font-bold text-coffee-800 pt-1 border-t border-coffee-200"><span>Total</span><span id="pay-total"></span></div>
+              <div class="flex justify-between text-base font-bold text-sky-800 pt-1 border-t border-sky-200"><span>Total</span><span id="pay-total"></span></div>
             </div>
           </div>
           <div>
-            <label class="block text-sm font-semibold text-coffee-700 mb-2">Metode Pembayaran</label>
+            <label class="block text-sm font-semibold text-sky-700 mb-2">Metode Pembayaran</label>
             <div class="grid grid-cols-3 gap-2">
-              <button onclick="selectPayMethod('Tunai')" id="pm-Tunai" class="pay-method-btn py-2.5 rounded-xl text-sm font-semibold bg-coffee-700 text-white border-2 border-coffee-700 transition"><i class="fas fa-money-bill-wave mr-1"></i> Tunai</button>
-              <button onclick="selectPayMethod('QRIS')" id="pm-QRIS" class="pay-method-btn py-2.5 rounded-xl text-sm font-semibold bg-white text-coffee-600 border-2 border-coffee-200 transition hover:border-coffee-400"><i class="fas fa-qrcode mr-1"></i> QRIS</button>
-              <button onclick="selectPayMethod('Transfer')" id="pm-Transfer" class="pay-method-btn py-2.5 rounded-xl text-sm font-semibold bg-white text-coffee-600 border-2 border-coffee-200 transition hover:border-coffee-400"><i class="fas fa-mobile-alt mr-1"></i> Transfer</button>
+              <button onclick="selectPayMethod('Tunai')" id="pm-Tunai" class="pay-method-btn py-2.5 rounded-xl text-sm font-semibold bg-sky-700 text-white border-2 border-sky-700 transition"><i class="fas fa-money-bill-wave mr-1"></i> Tunai</button>
+              <button onclick="selectPayMethod('QRIS')" id="pm-QRIS" class="pay-method-btn py-2.5 rounded-xl text-sm font-semibold bg-white text-sky-600 border-2 border-sky-200 transition hover:border-sky-400"><i class="fas fa-qrcode mr-1"></i> QRIS</button>
+              <button onclick="selectPayMethod('Transfer')" id="pm-Transfer" class="pay-method-btn py-2.5 rounded-xl text-sm font-semibold bg-white text-sky-600 border-2 border-sky-200 transition hover:border-sky-400"><i class="fas fa-mobile-alt mr-1"></i> Transfer</button>
             </div>
           </div>
           <div id="cash-input-section">
-            <label class="block text-sm font-semibold text-coffee-700 mb-2">Jumlah Uang</label>
-            <input type="number" id="pay-cash" min="0" placeholder="Masukkan jumlah uang..." class="w-full px-4 py-2.5 border border-coffee-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coffee-400" oninput="updatePaymentTotal()">
+            <label class="block text-sm font-semibold text-sky-700 mb-2">Jumlah Uang</label>
+            <input type="number" id="pay-cash" min="0" placeholder="Masukkan jumlah uang..." class="w-full px-4 py-2.5 border border-sky-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-400" oninput="updatePaymentTotal()">
             <div id="pay-change-section" class="hidden mt-2 bg-green-50 border border-green-200 rounded-xl p-3 text-center">
               <span class="text-sm text-green-600">Kembalian</span>
               <div id="pay-change" class="text-xl font-bold text-green-700"></div>
@@ -1139,8 +1139,8 @@
       <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm max-h-[90vh] overflow-y-auto relative z-10">
         <div id="receipt-modal-content" class="p-6"></div>
         <div class="px-6 pb-6 flex gap-2 no-print">
-          <button onclick="printReceipt()" class="flex-1 py-2.5 bg-coffee-700 text-white rounded-xl font-semibold text-sm hover:bg-coffee-800 transition"><i class="fas fa-print mr-1"></i> Cetak</button>
-          <button onclick="closeReceiptModal()" class="flex-1 py-2.5 bg-coffee-200 text-coffee-800 rounded-xl font-semibold text-sm hover:bg-coffee-300 transition">Tutup</button>
+          <button onclick="printReceipt()" class="flex-1 py-2.5 bg-sky-700 text-white rounded-xl font-semibold text-sm hover:bg-sky-800 transition"><i class="fas fa-print mr-1"></i> Cetak</button>
+          <button onclick="closeReceiptModal()" class="flex-1 py-2.5 bg-sky-200 text-sky-800 rounded-xl font-semibold text-sm hover:bg-sky-300 transition">Tutup</button>
         </div>
       </div>
     </div>
@@ -1149,28 +1149,28 @@
     <div id="menu-edit-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
       <div class="absolute inset-0 modal-overlay" onclick="closeMenuModal()"></div>
       <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md relative z-10">
-        <div class="bg-coffee-700 text-white p-4 rounded-t-2xl flex items-center justify-between">
+        <div class="bg-sky-700 text-white p-4 rounded-t-2xl flex items-center justify-between">
           <h3 id="menu-modal-title" class="font-bold text-lg"><i class="fas fa-utensils mr-2"></i>Tambah Menu</h3>
-          <button onclick="closeMenuModal()" class="w-8 h-8 rounded-full bg-coffee-600 flex items-center justify-center hover:bg-coffee-500"><i class="fas fa-times"></i></button>
+          <button onclick="closeMenuModal()" class="w-8 h-8 rounded-full bg-sky-600 flex items-center justify-center hover:bg-sky-500"><i class="fas fa-times"></i></button>
         </div>
         <div class="p-5 space-y-4">
           <input type="hidden" id="menu-edit-id">
           <div>
-            <label class="block text-sm font-semibold text-coffee-700 mb-1">Nama Menu</label>
-            <input type="text" id="menu-edit-name" placeholder="Nama menu..." class="w-full px-4 py-2.5 border border-coffee-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coffee-400">
+            <label class="block text-sm font-semibold text-sky-700 mb-1">Nama Menu</label>
+            <input type="text" id="menu-edit-name" placeholder="Nama menu..." class="w-full px-4 py-2.5 border border-sky-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-400">
           </div>
           <div>
-            <label class="block text-sm font-semibold text-coffee-700 mb-1">Harga (Rp)</label>
-            <input type="number" id="menu-edit-price" placeholder="0" min="0" class="w-full px-4 py-2.5 border border-coffee-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coffee-400">
+            <label class="block text-sm font-semibold text-sky-700 mb-1">Harga (Rp)</label>
+            <input type="number" id="menu-edit-price" placeholder="0" min="0" class="w-full px-4 py-2.5 border border-sky-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-400">
           </div>
           <div>
-            <label class="block text-sm font-semibold text-coffee-700 mb-2">Kategori</label>
+            <label class="block text-sm font-semibold text-sky-700 mb-2">Kategori</label>
             <div class="flex gap-2">
-              <button onclick="selectMenuKategori('Minuman')" id="mk-Minuman" class="flex-1 py-2 rounded-xl text-sm font-semibold bg-coffee-700 text-white border-2 border-coffee-700 transition">☕ Minuman</button>
-              <button onclick="selectMenuKategori('Makanan')" id="mk-Makanan" class="flex-1 py-2 rounded-xl text-sm font-semibold bg-white text-coffee-600 border-2 border-coffee-200 transition">🍽 Makanan</button>
+              <button onclick="selectMenuKategori('Minuman')" id="mk-Minuman" class="flex-1 py-2 rounded-xl text-sm font-semibold bg-sky-700 text-white border-2 border-sky-700 transition">☕ Minuman</button>
+              <button onclick="selectMenuKategori('Makanan')" id="mk-Makanan" class="flex-1 py-2 rounded-xl text-sm font-semibold bg-white text-sky-600 border-2 border-sky-200 transition">🍽 Makanan</button>
             </div>
           </div>
-          <button onclick="saveMenuFormItem()" id="save-menu-btn" class="w-full py-3 bg-coffee-700 text-white rounded-xl font-bold hover:bg-coffee-800 transition"><i class="fas fa-save mr-2"></i> Simpan</button>
+          <button onclick="saveMenuFormItem()" id="save-menu-btn" class="w-full py-3 bg-sky-700 text-white rounded-xl font-bold hover:bg-sky-800 transition"><i class="fas fa-save mr-2"></i> Simpan</button>
         </div>
       </div>
     </div>
@@ -1179,9 +1179,9 @@
     <div id="trx-detail-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
       <div class="absolute inset-0 modal-overlay" onclick="closeTrxDetailModal()"></div>
       <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto relative z-10">
-        <div class="bg-coffee-700 text-white p-4 rounded-t-2xl flex items-center justify-between">
+        <div class="bg-sky-700 text-white p-4 rounded-t-2xl flex items-center justify-between">
           <h3 class="font-bold"><i class="fas fa-receipt mr-2"></i>Detail Transaksi</h3>
-          <button onclick="closeTrxDetailModal()" class="w-8 h-8 rounded-full bg-coffee-600 flex items-center justify-center hover:bg-coffee-500"><i class="fas fa-times"></i></button>
+          <button onclick="closeTrxDetailModal()" class="w-8 h-8 rounded-full bg-sky-600 flex items-center justify-center hover:bg-sky-500"><i class="fas fa-times"></i></button>
         </div>
         <div id="trx-detail-content" class="p-5"></div>
       </div>
@@ -1217,19 +1217,19 @@
       <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeCustomerNameModal()"></div>
       <div class="relative bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full animate-scale-in">
         <div class="text-center mb-4">
-          <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-teal-400 to-teal-600 mx-auto mb-3 flex items-center justify-center shadow-md">
+          <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-sky-400 to-sky-600 mx-auto mb-3 flex items-center justify-center shadow-md">
             <i class="fas fa-user-edit text-white text-xl"></i>
           </div>
           <h3 id="cust-modal-title" class="font-display text-lg font-bold text-gray-900">Nama Pelanggan</h3>
           <p id="cust-modal-desc" class="text-xs text-gray-400 mt-1">Tulis nama pelanggan meja ini</p>
         </div>
         <input type="text" id="cust-name-input" placeholder="Contoh: Budi, Pak Ahmad..." maxlength="30"
-          class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-400 focus:border-teal-400 transition mb-1"
+          class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400 transition mb-1"
           onkeydown="if(event.key==='Enter')saveCustomerName()">
         <p class="text-[10px] text-gray-400 mb-4">Kosongkan untuk menghapus nama</p>
         <div class="flex gap-3">
           <button onclick="closeCustomerNameModal()" class="flex-1 py-2.5 rounded-xl text-sm font-semibold bg-gray-100 text-gray-600 hover:bg-gray-200 transition">Batal</button>
-          <button onclick="saveCustomerName()" class="flex-1 py-2.5 rounded-xl text-sm font-semibold bg-gradient-to-r from-teal-500 to-teal-700 text-white hover:from-teal-600 hover:to-teal-800 transition shadow-md">
+          <button onclick="saveCustomerName()" class="flex-1 py-2.5 rounded-xl text-sm font-semibold bg-gradient-to-r from-sky-500 to-sky-700 text-white hover:from-sky-600 hover:to-sky-800 transition shadow-md">
             <i class="fas fa-check mr-1"></i> Simpan
           </button>
         </div>
@@ -1593,7 +1593,7 @@
     // ===== TOAST =====
     function showToast(message, type = 'success') {
       const container = document.getElementById('toast-container');
-      const bgColor = type === 'success' ? 'bg-green-600' : type === 'error' ? 'bg-red-600' : 'bg-coffee-700';
+      const bgColor = type === 'success' ? 'bg-green-600' : type === 'error' ? 'bg-red-600' : 'bg-sky-700';
       const toast = document.createElement('div');
       toast.className = bgColor + ' text-white px-5 py-3 rounded-xl shadow-lg text-sm font-medium toast-enter pointer-events-auto mb-2';
       toast.textContent = message;
@@ -2195,7 +2195,7 @@
       if (shopSettings && shopSettings.shopPhoto) {
         photoEl.innerHTML = '<img src="' + shopSettings.shopPhoto + '" class="w-full h-full object-cover" alt="Logo">';
       } else {
-        photoEl.innerHTML = '<i class="fas fa-mug-hot text-coffee-200 text-lg"></i>';
+        photoEl.innerHTML = '<i class="fas fa-mug-hot text-sky-200 text-lg"></i>';
       }
     }
 
@@ -2212,13 +2212,13 @@
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       document.getElementById('page-' + page).classList.add('active');
       document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.classList.remove('text-teal-600', 'bg-teal-50', 'border-t-2', 'border-teal-600');
+        btn.classList.remove('text-sky-600', 'bg-sky-50', 'border-t-2', 'border-sky-600');
         btn.classList.add('text-gray-400');
         const span = btn.querySelector('span');
         if (span) { span.classList.remove('font-semibold'); span.classList.add('font-medium'); }
       });
       const activeBtn = document.getElementById('nav-' + page);
-      activeBtn.classList.add('text-teal-600', 'bg-teal-50', 'border-t-2', 'border-teal-600');
+      activeBtn.classList.add('text-sky-600', 'bg-sky-50', 'border-t-2', 'border-sky-600');
       activeBtn.classList.remove('text-gray-400');
       const span = activeBtn.querySelector('span');
       if (span) { span.classList.add('font-semibold'); span.classList.remove('font-medium'); }
@@ -2284,9 +2284,9 @@
           statusText = itemCount + ' item'; statusColor = 'text-emerald-700';
           numberColor = 'text-emerald-800';
         } else if (isActive) {
-          iconClass = 'fas fa-coffee'; iconColor = 'text-teal-700'; iconBg = 'bg-teal-100';
-          statusText = itemCount + ' item'; statusColor = 'text-teal-700';
-          numberColor = 'text-teal-800';
+          iconClass = 'fas fa-coffee'; iconColor = 'text-sky-700'; iconBg = 'bg-sky-100';
+          statusText = itemCount + ' item'; statusColor = 'text-sky-700';
+          numberColor = 'text-sky-800';
         } else {
           iconClass = 'fas fa-chair'; iconColor = 'text-gray-300'; iconBg = 'bg-gray-50';
           statusText = 'Kosong'; statusColor = 'text-gray-400';
@@ -2298,14 +2298,14 @@
           const nameShort = custName.length > 8 ? custName.substring(0, 8) + '..' : custName;
           let nameBg, nameText;
           if (isUnpaid) { nameBg = 'bg-red-500'; nameText = 'text-white'; }
-          else if (isActive) { nameBg = 'bg-teal-600'; nameText = 'text-white'; }
+          else if (isActive) { nameBg = 'bg-sky-600'; nameText = 'text-white'; }
           else { nameBg = 'bg-gray-600'; nameText = 'text-white'; }
           nameHtml = '<div class="customer-badge inline-block mt-1.5 truncate max-w-full ' + nameBg + ' ' + nameText + '" title="' + custName.replace(/"/g, '&quot;') + '"><i class="fas fa-user mr-1 text-[9px]"></i>' + nameShort + '</div>';
         }
         // Item count pill
         let itemPillHtml = '';
         if (isActive && itemCount > 0) {
-          const pillBg = isUnpaid ? 'bg-red-600' : 'bg-teal-600';
+          const pillBg = isUnpaid ? 'bg-red-600' : 'bg-sky-600';
           itemPillHtml = '<div class="mt-1 inline-flex items-center justify-center w-6 h-6 rounded-full text-white text-[11px] font-extrabold shadow ' + pillBg + '">' + itemCount + '</div>';
         }
         html += '<div class="' + classes + '" onclick="selectTable(' + i + ')">' +
@@ -2317,7 +2317,7 @@
             (isActive && !isUnpaid ? '<div class="table-status mt-1 ' + statusColor + '">' + statusText + '</div>' : '') +
             (isUnpaid ? '<div class="table-status mt-1 font-extrabold tracking-wide ' + statusColor + '"><i class="fas fa-exclamation-triangle mr-0.5"></i>' + statusText + '</div>' : '') +
             itemPillHtml +
-            '<div class="edit-btn mt-1" onclick="event.stopPropagation();editCustomerName(' + i + ')"><i class="fas fa-pen text-[9px] text-gray-400 hover:text-teal-500 cursor-pointer" title="Nama pelanggan"></i></div>' +
+            '<div class="edit-btn mt-1" onclick="event.stopPropagation();editCustomerName(' + i + ')"><i class="fas fa-pen text-[9px] text-gray-400 hover:text-sky-500 cursor-pointer" title="Nama pelanggan"></i></div>' +
           '</div>' +
           '</div>';
       }
@@ -2381,14 +2381,14 @@
       const takeawaySection = document.getElementById('section-takeaway');
 
       if (mode === 'dine-in') {
-        dineinBtn.className = 'order-mode-tab flex-1 py-3 rounded-xl font-bold text-sm bg-teal-600 text-white shadow-md active-mode';
+        dineinBtn.className = 'order-mode-tab flex-1 py-3 rounded-xl font-bold text-sm bg-sky-600 text-white shadow-md active-mode';
         takeawayBtn.className = 'order-mode-tab flex-1 py-3 rounded-xl font-bold text-sm bg-white text-gray-500 border-2 border-gray-200';
         dineinSection.classList.remove('hidden');
         takeawaySection.classList.add('hidden');
         currentTableId = null;
         renderTables();
       } else {
-        takeawayBtn.className = 'order-mode-tab flex-1 py-3 rounded-xl font-bold text-sm bg-amber-500 text-white shadow-md active-mode';
+        takeawayBtn.className = 'order-mode-tab flex-1 py-3 rounded-xl font-bold text-sm bg-yellow-500 text-white shadow-md active-mode';
         dineinBtn.className = 'order-mode-tab flex-1 py-3 rounded-xl font-bold text-sm bg-white text-gray-500 border-2 border-gray-200';
         takeawaySection.classList.remove('hidden');
         dineinSection.classList.add('hidden');
@@ -2444,12 +2444,12 @@
           statusText = 'Belum Bayar'; statusColor = 'text-red-700';
           numberColor = 'text-red-800';
         } else if (isActive && isSelected) {
-          iconClass = 'fas fa-check-circle'; iconColor = 'text-amber-600'; iconBg = 'bg-amber-100';
-          statusText = itemCount + ' item'; statusColor = 'text-amber-700';
+          iconClass = 'fas fa-check-circle'; iconColor = 'text-amber-600'; iconBg = 'bg-yellow-100';
+          statusText = itemCount + ' item'; statusColor = 'text-yellow-700';
           numberColor = 'text-amber-800';
         } else if (isActive) {
-          iconClass = 'fas fa-shopping-bag'; iconColor = 'text-amber-600'; iconBg = 'bg-amber-100';
-          statusText = itemCount + ' item'; statusColor = 'text-amber-700';
+          iconClass = 'fas fa-shopping-bag'; iconColor = 'text-amber-600'; iconBg = 'bg-yellow-100';
+          statusText = itemCount + ' item'; statusColor = 'text-yellow-700';
           numberColor = 'text-amber-800';
         } else {
           iconClass = 'fas fa-shopping-bag'; iconColor = 'text-gray-300'; iconBg = 'bg-gray-50';
@@ -2463,7 +2463,7 @@
           const nameShort = custName.length > 8 ? custName.substring(0, 8) + '..' : custName;
           let nameBg, nameText;
           if (isUnpaid) { nameBg = 'bg-red-500'; nameText = 'text-white'; }
-          else if (isActive) { nameBg = 'bg-amber-500'; nameText = 'text-white'; }
+          else if (isActive) { nameBg = 'bg-yellow-500'; nameText = 'text-white'; }
           else { nameBg = 'bg-gray-600'; nameText = 'text-white'; }
           nameHtml = '<div class="table-customer-badge inline-block mt-1.5 truncate max-w-full ' + nameBg + ' ' + nameText + ' text-[10px] font-bold px-2 py-0.5 rounded-full" title="' + custName.replace(/"/g, '&quot;') + '"><i class="fas fa-user mr-1 text-[8px]"></i>' + nameShort + '</div>';
         }
@@ -2471,7 +2471,7 @@
         // Item count pill
         let itemPillHtml = '';
         if (isActive && itemCount > 0) {
-          const pillBg = isUnpaid ? 'bg-red-600' : 'bg-amber-500';
+          const pillBg = isUnpaid ? 'bg-red-600' : 'bg-yellow-500';
           itemPillHtml = '<div class="mt-1 inline-flex items-center justify-center w-6 h-6 rounded-full text-white text-[11px] font-extrabold shadow ' + pillBg + '">' + itemCount + '</div>';
         }
 
@@ -2532,10 +2532,10 @@
     function setMenuCategory(cat) {
       currentMenuCategory = cat;
       document.querySelectorAll('.cat-btn').forEach(btn => {
-        btn.className = 'cat-btn tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-white text-coffee-600 border border-coffee-200';
+        btn.className = 'cat-btn tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-white text-sky-600 border border-sky-200';
       });
       const activeBtn = document.getElementById('cat-' + (cat === 'Semua' ? 'all' : cat));
-      if (activeBtn) activeBtn.className = 'cat-btn tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-coffee-700 text-white';
+      if (activeBtn) activeBtn.className = 'cat-btn tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-sky-700 text-white';
       renderMenuGrid();
     }
 
@@ -2547,15 +2547,15 @@
       if (search) items = items.filter(m => m.nama_menu.toLowerCase().includes(search));
 
       if (items.length === 0) {
-        grid.innerHTML = '<div class="col-span-full text-center py-8 text-coffee-400"><i class="fas fa-search text-3xl mb-2"></i><p class="text-sm">Menu tidak ditemukan</p></div>';
+        grid.innerHTML = '<div class="col-span-full text-center py-8 text-slate-400"><i class="fas fa-search text-3xl mb-2"></i><p class="text-sm">Menu tidak ditemukan</p></div>';
         return;
       }
       grid.innerHTML = items.map(item => {
         const icon = getMenuIcon(item.kategori, item.nama_menu);
         const isMinuman = item.kategori === 'Minuman';
-        const cardBg = isMinuman ? 'bg-gradient-to-br from-teal-50 to-cyan-50 border-teal-100 hover:border-teal-300 hover:shadow-teal-100/50' : 'bg-gradient-to-br from-amber-50 to-orange-50 border-amber-100 hover:border-amber-300 hover:shadow-amber-100/50';
-        const iconColor = isMinuman ? 'text-teal-500' : 'text-amber-500';
-        const priceColor = isMinuman ? 'text-teal-700' : 'text-amber-700';
+        const cardBg = isMinuman ? 'bg-gradient-to-br from-sky-50 to-sky-100 border-sky-100 hover:border-sky-300 hover:shadow-sky-100/50' : 'bg-gradient-to-br from-amber-50 to-orange-50 border-amber-100 hover:border-amber-300 hover:shadow-amber-100/50';
+        const iconColor = isMinuman ? 'text-sky-500' : 'text-yellow-500';
+        const priceColor = isMinuman ? 'text-sky-700' : 'text-yellow-700';
         return '<div class="rounded-xl p-3 border transition cursor-pointer active:scale-95 hover:shadow-md ' + cardBg + '" onclick="addToCart(\'' + item.id + '\')">' +
           '<div class="text-2xl mb-1"><i class="fas ' + icon + ' ' + iconColor + '"></i></div>' +
           '<div class="text-sm font-semibold text-gray-800 leading-tight mb-1 truncate">' + item.nama_menu + '</div>' +
@@ -2619,7 +2619,7 @@
       if (!currentTableId) {
         const hint = currentOrderMode === 'takeaway' ? 'Pilih Pel' : 'Pilih Meja';
         const subhint = currentOrderMode === 'takeaway' ? 'Tap Pel untuk mulai pesanan' : 'Tap meja untuk mulai pesanan';
-        panel.innerHTML = '<div class="flex-1 flex flex-col items-center justify-center py-10 text-coffee-400">' +
+        panel.innerHTML = '<div class="flex-1 flex flex-col items-center justify-center py-10 text-slate-400">' +
           '<i class="fas fa-hand-pointer text-4xl mb-3"></i><p class="font-medium">' + hint + '</p><p class="text-sm">' + subhint + '</p></div>';
         return;
       }
@@ -2630,31 +2630,31 @@
       const isTA = tableIdStr.startsWith('TA_');
       const pelNum = isTA ? tableIdStr.replace('TA_', '') : '';
       const headerLabel = isTA ? 'Pel ' + pelNum : 'Meja ' + currentTableId;
-      const headerIcon = isTA ? 'shopping-bag text-amber-500' : 'receipt text-coffee-500';
+      const headerIcon = isTA ? 'shopping-bag text-amber-500' : 'receipt text-sky-500';
       const custName = tableCustomerNames[currentTableId] || '';
       panel.innerHTML = '<div class="flex items-center justify-between mb-3">' +
-        '<h3 class="font-bold text-coffee-800"><i class="fas fa-' + headerIcon + ' mr-2"></i>' + headerLabel + '</h3>' +
+        '<h3 class="font-bold text-sky-800"><i class="fas fa-' + headerIcon + ' mr-2"></i>' + headerLabel + '</h3>' +
         (totalItems > 0 ? '<button onclick="resetOrder()" class="text-xs text-red-500 hover:text-red-700"><i class="fas fa-trash mr-1"></i>Reset</button>' : '') +
         '</div>' +
         (items.length === 0 ?
-          '<div class="flex-1 flex flex-col items-center justify-center py-8 text-coffee-400"><i class="fas fa-clipboard-list text-3xl mb-2"></i><p class="text-sm">Belum ada pesanan</p></div>' :
+          '<div class="flex-1 flex flex-col items-center justify-center py-8 text-slate-400"><i class="fas fa-clipboard-list text-3xl mb-2"></i><p class="text-sm">Belum ada pesanan</p></div>' :
           '<div class="flex items-center gap-2 mb-2">' +
             (custName ? '<span class="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-lg font-semibold"><i class="fas fa-user mr-1"></i>' + custName + '</span>' : '') +
           '</div>' +
           '<div class="space-y-2 flex-1 overflow-y-auto mb-3">' + items.map(item =>
-            '<div class="flex items-center gap-2 bg-coffee-50 rounded-xl p-2">' +
-              '<div class="flex-1 min-w-0"><div class="text-sm font-semibold text-coffee-800 truncate">' + item.nama_menu + '</div><div class="text-xs text-coffee-500">' + formatIDR(item.harga) + '</div></div>' +
+            '<div class="flex items-center gap-2 bg-sky-50 rounded-xl p-2">' +
+              '<div class="flex-1 min-w-0"><div class="text-sm font-semibold text-sky-800 truncate">' + item.nama_menu + '</div><div class="text-xs text-sky-500">' + formatIDR(item.harga) + '</div></div>' +
               '<div class="flex items-center gap-1">' +
-                '<button onclick="updateQty(\'' + item.id + '\', -1)" class="w-7 h-7 rounded-lg bg-coffee-200 flex items-center justify-center text-coffee-700 hover:bg-coffee-300 transition text-xs"><i class="fas fa-minus"></i></button>' +
-                '<span class="w-8 text-center font-bold text-sm text-coffee-800">' + item.qty + '</span>' +
-                '<button onclick="updateQty(\'' + item.id + '\', 1)" class="w-7 h-7 rounded-lg bg-coffee-700 flex items-center justify-center text-white hover:bg-coffee-800 transition text-xs"><i class="fas fa-plus"></i></button>' +
+                '<button onclick="updateQty(\'' + item.id + '\', -1)" class="w-7 h-7 rounded-lg bg-sky-200 flex items-center justify-center text-sky-700 hover:bg-sky-300 transition text-xs"><i class="fas fa-minus"></i></button>' +
+                '<span class="w-8 text-center font-bold text-sm text-sky-800">' + item.qty + '</span>' +
+                '<button onclick="updateQty(\'' + item.id + '\', 1)" class="w-7 h-7 rounded-lg bg-sky-700 flex items-center justify-center text-white hover:bg-sky-800 transition text-xs"><i class="fas fa-plus"></i></button>' +
               '</div>' +
-              '<div class="text-right min-w-[70px]"><div class="text-sm font-bold text-coffee-800">' + formatIDR(item.harga * item.qty) + '</div></div>' +
+              '<div class="text-right min-w-[70px]"><div class="text-sm font-bold text-sky-800">' + formatIDR(item.harga * item.qty) + '</div></div>' +
               '<button onclick="removeItem(\'' + item.id + '\')" class="text-red-400 hover:text-red-600 ml-1"><i class="fas fa-times text-xs"></i></button>' +
             '</div>'
           ).join('') + '</div>' +
-          '<div class="border-t border-coffee-200 pt-3">' +
-            '<div class="flex justify-between items-center mb-3"><span class="text-coffee-600 font-medium">Total</span><span class="text-lg font-bold text-coffee-800">' + formatIDR(total) + '</span></div>' +
+          '<div class="border-t border-sky-200 pt-3">' +
+            '<div class="flex justify-between items-center mb-3"><span class="text-sky-600 font-medium">Total</span><span class="text-lg font-bold text-sky-800">' + formatIDR(total) + '</span></div>' +
             '<button onclick="openPaymentModal()" class="w-full py-3 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition shadow-md"><i class="fas fa-wallet mr-2"></i>Bayar</button>' +
           '</div>'
         );
@@ -2669,7 +2669,7 @@
       if (items.length === 0) return;
       const subtotal = items.reduce((s, i) => s + i.harga * i.qty, 0);
       document.getElementById('payment-items').innerHTML = items.map(i =>
-        '<div class="flex justify-between"><span class="text-coffee-700">' + i.qty + 'x ' + i.nama_menu + '</span><span class="font-medium">' + formatIDR(i.harga * i.qty) + '</span></div>'
+        '<div class="flex justify-between"><span class="text-sky-700">' + i.qty + 'x ' + i.nama_menu + '</span><span class="font-medium">' + formatIDR(i.harga * i.qty) + '</span></div>'
       ).join('');
       document.getElementById('pay-subtotal').textContent = formatIDR(subtotal);
       document.getElementById('pay-discount').value = 0;
@@ -2691,10 +2691,10 @@
 
     function updatePayMethodUI() {
       document.querySelectorAll('.pay-method-btn').forEach(btn => {
-        btn.className = 'pay-method-btn py-2.5 rounded-xl text-sm font-semibold bg-white text-coffee-600 border-2 border-coffee-200 transition hover:border-coffee-400';
+        btn.className = 'pay-method-btn py-2.5 rounded-xl text-sm font-semibold bg-white text-sky-600 border-2 border-sky-200 transition hover:border-sky-400';
       });
       const activeBtn = document.getElementById('pm-' + selectedPayMethod);
-      if (activeBtn) activeBtn.className = 'pay-method-btn py-2.5 rounded-xl text-sm font-semibold bg-coffee-700 text-white border-2 border-coffee-700 transition';
+      if (activeBtn) activeBtn.className = 'pay-method-btn py-2.5 rounded-xl text-sm font-semibold bg-sky-700 text-white border-2 border-sky-700 transition';
       document.getElementById('cash-input-section').style.display = selectedPayMethod === 'Tunai' ? 'block' : 'none';
     }
 
@@ -2803,39 +2803,39 @@
       const change = cash - trx.total;
 
       let html = '<div class="text-center mb-4">' +
-        '<div class="text-lg font-bold text-coffee-800">' + shopName + '</div>' +
-        (shopAddr ? '<div class="text-xs text-coffee-500">' + shopAddr + '</div>' : '') +
-        (shopPhone ? '<div class="text-xs text-coffee-500">' + shopPhone + '</div>' : '') +
+        '<div class="text-lg font-bold text-sky-800">' + shopName + '</div>' +
+        (shopAddr ? '<div class="text-xs text-sky-500">' + shopAddr + '</div>' : '') +
+        (shopPhone ? '<div class="text-xs text-sky-500">' + shopPhone + '</div>' : '') +
         '</div>' +
-        '<div class="border-t border-dashed border-coffee-300 my-3"></div>' +
+        '<div class="border-t border-dashed border-sky-300 my-3"></div>' +
         '<div class="space-y-1 text-sm mb-3">' +
-        '<div class="flex justify-between"><span class="text-coffee-500">No</span><span class="font-medium">' + trx.id + '</span></div>' +
-        '<div class="flex justify-between"><span class="text-coffee-500">Tanggal</span><span class="font-medium">' + formatDateTime(trx.date) + '</span></div>' +
-        '<div class="flex justify-between"><span class="text-coffee-500">' + (trx.table === 'Bungkus' ? 'Jenis' : 'Meja') + '</span><span class="font-medium">' + (trx.table === 'Bungkus' ? '<i class="fas fa-shopping-bag text-amber-500 mr-1"></i>Bungkus (Take Away)' : 'Meja ' + trx.table) + '</span></div>' +
-        (trx.customerName ? '<div class="flex justify-between"><span class="text-coffee-500">Pelanggan</span><span class="font-medium">' + trx.customerName + '</span></div>' : '') +
-        '<div class="flex justify-between"><span class="text-coffee-500">Kasir</span><span class="font-medium">' + cashier + '</span></div>' +
+        '<div class="flex justify-between"><span class="text-sky-500">No</span><span class="font-medium">' + trx.id + '</span></div>' +
+        '<div class="flex justify-between"><span class="text-sky-500">Tanggal</span><span class="font-medium">' + formatDateTime(trx.date) + '</span></div>' +
+        '<div class="flex justify-between"><span class="text-sky-500">' + (trx.table === 'Bungkus' ? 'Jenis' : 'Meja') + '</span><span class="font-medium">' + (trx.table === 'Bungkus' ? '<i class="fas fa-shopping-bag text-amber-500 mr-1"></i>Bungkus (Take Away)' : 'Meja ' + trx.table) + '</span></div>' +
+        (trx.customerName ? '<div class="flex justify-between"><span class="text-sky-500">Pelanggan</span><span class="font-medium">' + trx.customerName + '</span></div>' : '') +
+        '<div class="flex justify-between"><span class="text-sky-500">Kasir</span><span class="font-medium">' + cashier + '</span></div>' +
         '</div>' +
-        '<div class="border-t border-dashed border-coffee-300 my-3"></div>' +
+        '<div class="border-t border-dashed border-sky-300 my-3"></div>' +
         '<div class="space-y-1 text-sm mb-3">';
 
       trx.items.forEach(item => {
         html += '<div class="flex justify-between"><span>' + item.qty + 'x ' + item.nama_menu + '</span><span class="font-medium">' + formatIDR(item.harga * item.qty) + '</span></div>';
       });
 
-      html += '</div><div class="border-t border-dashed border-coffee-300 my-3"></div>' +
+      html += '</div><div class="border-t border-dashed border-sky-300 my-3"></div>' +
         '<div class="space-y-1 text-sm">' +
         '<div class="flex justify-between"><span>Subtotal</span><span>' + formatIDR(trx.subtotal) + '</span></div>';
       if (trx.discountPct > 0) {
         html += '<div class="flex justify-between text-red-500"><span>Diskon (' + trx.discountPct + '%)</span><span>-' + formatIDR(trx.discount) + '</span></div>';
       }
       html += '<div class="flex justify-between font-bold text-base pt-1"><span>TOTAL</span><span>' + formatIDR(trx.total) + '</span></div>' +
-        '<div class="flex justify-between text-coffee-600"><span>' + trx.paymentMethod + '</span><span>' + formatIDR(cash) + '</span></div>';
+        '<div class="flex justify-between text-sky-600"><span>' + trx.paymentMethod + '</span><span>' + formatIDR(cash) + '</span></div>';
       if (trx.paymentMethod === 'Tunai' && change > 0) {
         html += '<div class="flex justify-between font-semibold text-green-600"><span>Kembalian</span><span>' + formatIDR(change) + '</span></div>';
       }
       html += '</div>' +
-        '<div class="border-t border-dashed border-coffee-300 my-3"></div>' +
-        '<div class="text-center text-xs text-coffee-400">Terima kasih atas kunjungan Anda!</div>';
+        '<div class="border-t border-dashed border-sky-300 my-3"></div>' +
+        '<div class="text-center text-xs text-slate-400">Terima kasih atas kunjungan Anda!</div>';
       document.getElementById('receipt-modal-content').innerHTML = html;
       document.getElementById('receipt-modal').classList.remove('hidden');
     }
@@ -2889,12 +2889,12 @@
       currentReportTab = tab;
       document.querySelectorAll('.report-tab').forEach(t => {
         t.classList.remove('active-tab');
-        t.className = t.className.replace('bg-coffee-700 text-white shadow-sm', 'bg-white text-coffee-600 border-2 border-coffee-200');
+        t.className = t.className.replace('bg-sky-700 text-white shadow-sm', 'bg-white text-sky-600 border-2 border-sky-200');
       });
       const activeTab = document.getElementById('tab-' + tab);
       if (activeTab) {
         activeTab.classList.add('active-tab');
-        activeTab.className = activeTab.className.replace('bg-white text-coffee-600 border-2 border-coffee-200', 'bg-coffee-700 text-white shadow-sm');
+        activeTab.className = activeTab.className.replace('bg-white text-sky-600 border-2 border-sky-200', 'bg-sky-700 text-white shadow-sm');
       }
 
       document.querySelectorAll('.report-panel').forEach(p => p.classList.add('hidden'));
@@ -2924,7 +2924,7 @@
       const emptyEl = document.getElementById('history-empty');
       const topEl = document.getElementById('top-items-section');
       if (!summaryEl || !reportEl) return;
-      summaryEl.innerHTML = '<div class="col-span-2 text-center py-8"><div class="spinner-dark mx-auto mb-2"></div><p class="text-sm text-coffee-400">Memuat data...</p></div>';
+      summaryEl.innerHTML = '<div class="col-span-2 text-center py-8"><div class="spinner-dark mx-auto mb-2"></div><p class="text-sm text-slate-400">Memuat data...</p></div>';
       reportEl.innerHTML = '';
       if (emptyEl) emptyEl.classList.add('hidden');
       if (topEl) topEl.classList.add('hidden');
@@ -2945,7 +2945,7 @@
         startDate = document.getElementById('history-start').value;
         endDate = document.getElementById('history-end').value;
         if (!startDate || !endDate) {
-          summaryEl.innerHTML = '<div class="col-span-2 bg-white rounded-2xl p-4 shadow-sm border border-coffee-100 text-center text-coffee-400 text-sm">Pilih tanggal mulai dan akhir</div>';
+          summaryEl.innerHTML = '<div class="col-span-2 bg-white rounded-2xl p-4 shadow-sm border border-sky-100 text-center text-slate-400 text-sm">Pilih tanggal mulai dan akhir</div>';
           return;
         }
       }
@@ -2961,7 +2961,7 @@
         document.getElementById('history-load-more-container').classList.toggle('hidden', allFiltered.length <= 20);
       } catch (error) {
         console.error('Load history error:', error);
-        summaryEl.innerHTML = '<div class="col-span-2 bg-white rounded-2xl p-4 shadow-sm border border-coffee-100 text-center text-red-500 text-sm">Gagal memuat data</div>';
+        summaryEl.innerHTML = '<div class="col-span-2 bg-white rounded-2xl p-4 shadow-sm border border-sky-100 text-center text-red-500 text-sm">Gagal memuat data</div>';
       }
     }
 
@@ -2994,16 +2994,16 @@
     }
 
     function renderSingleTrxCard(trx) {
-      const nameBadge = trx.customerName ? '<span class="bg-teal-50 text-teal-700 text-xs font-semibold px-2 py-0.5 rounded-lg"><i class="fas fa-user text-[9px] mr-1"></i>' + trx.customerName + '</span>' : '';
-      return '<div class="bg-white rounded-2xl p-4 shadow-sm border border-coffee-100 cursor-pointer hover:shadow-md transition" onclick="showTrxDetail(\'' + trx.id + '\')">' +
+      const nameBadge = trx.customerName ? '<span class="bg-sky-50 text-sky-700 text-xs font-semibold px-2 py-0.5 rounded-lg"><i class="fas fa-user text-[9px] mr-1"></i>' + trx.customerName + '</span>' : '';
+      return '<div class="bg-white rounded-2xl p-4 shadow-sm border border-sky-100 cursor-pointer hover:shadow-md transition" onclick="showTrxDetail(\'' + trx.id + '\')">' +
         '<div class="flex items-center justify-between mb-2">' +
-          '<div class="flex items-center gap-2"><span class="' + (trx.table === 'Bungkus' ? 'bg-amber-100 text-amber-700' : 'bg-coffee-100 text-coffee-700') + ' text-xs font-bold px-2 py-0.5 rounded-lg">' + (trx.table === 'Bungkus' ? '<i class="fas fa-shopping-bag mr-1"></i>Bungkus' : 'Meja ' + trx.table) + '</span>' +
+          '<div class="flex items-center gap-2"><span class="' + (trx.table === 'Bungkus' ? 'bg-amber-100 text-amber-700' : 'bg-sky-100 text-sky-700') + ' text-xs font-bold px-2 py-0.5 rounded-lg">' + (trx.table === 'Bungkus' ? '<i class="fas fa-shopping-bag mr-1"></i>Bungkus' : 'Meja ' + trx.table) + '</span>' +
           nameBadge +
-          '<span class="text-xs text-coffee-400">' + formatDateTime(trx.date) + '</span></div>' +
-          '<span class="text-sm font-bold text-coffee-800">' + formatIDR(trx.total) + '</span>' +
+          '<span class="text-xs text-slate-400">' + formatDateTime(trx.date) + '</span></div>' +
+          '<span class="text-sm font-bold text-sky-800">' + formatIDR(trx.total) + '</span>' +
         '</div>' +
         '<div class="flex items-center justify-between">' +
-          '<div class="text-xs text-coffee-500">' + (trx.items || []).map(i => i.qty + 'x ' + i.nama_menu).join(', ') + '</div>' +
+          '<div class="text-xs text-sky-500">' + (trx.items || []).map(i => i.qty + 'x ' + i.nama_menu).join(', ') + '</div>' +
           '<span class="text-xs px-2 py-0.5 rounded-full ' + (trx.paymentMethod === 'Tunai' ? 'bg-green-100 text-green-700' : trx.paymentMethod === 'QRIS' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700') + ' font-semibold">' + trx.paymentMethod + '</span>' +
         '</div>' +
       '</div>';
@@ -3035,15 +3035,15 @@
       else periodLabel = formatDateShort(startDate) + ' - ' + formatDateShort(endDate);
 
       summaryEl.innerHTML =
-        '<div class="bg-white rounded-2xl p-4 shadow-sm border border-coffee-100">' +
-          '<div class="flex items-center gap-2 mb-1"><i class="fas fa-coins text-yellow-500"></i><span class="text-xs text-coffee-500">Total Pendapatan</span></div>' +
-          '<div class="text-xl font-bold text-coffee-800">' + formatIDR(totalRevenue) + '</div>' +
-          '<div class="text-xs text-coffee-400 mt-1">' + periodLabel + '</div>' +
+        '<div class="bg-white rounded-2xl p-4 shadow-sm border border-sky-100">' +
+          '<div class="flex items-center gap-2 mb-1"><i class="fas fa-coins text-yellow-500"></i><span class="text-xs text-sky-500">Total Pendapatan</span></div>' +
+          '<div class="text-xl font-bold text-sky-800">' + formatIDR(totalRevenue) + '</div>' +
+          '<div class="text-xs text-slate-400 mt-1">' + periodLabel + '</div>' +
         '</div>' +
-        '<div class="bg-white rounded-2xl p-4 shadow-sm border border-coffee-100">' +
-          '<div class="flex items-center gap-2 mb-1"><i class="fas fa-receipt text-coffee-500"></i><span class="text-xs text-coffee-500">Transaksi</span></div>' +
-          '<div class="text-xl font-bold text-coffee-800">' + totalTrx + '</div>' +
-          '<div class="text-xs text-coffee-400 mt-1">Rata-rata ' + formatIDR(avgTrx) + '/trx</div>' +
+        '<div class="bg-white rounded-2xl p-4 shadow-sm border border-sky-100">' +
+          '<div class="flex items-center gap-2 mb-1"><i class="fas fa-receipt text-sky-500"></i><span class="text-xs text-sky-500">Transaksi</span></div>' +
+          '<div class="text-xl font-bold text-sky-800">' + totalTrx + '</div>' +
+          '<div class="text-xs text-slate-400 mt-1">Rata-rata ' + formatIDR(avgTrx) + '/trx</div>' +
         '</div>';
 
       // Top items (use all filtered for accurate stats, not just the page)
@@ -3062,22 +3062,22 @@
         document.getElementById('top-items-list').innerHTML = topItems.map((item, idx) =>
           '<div class="flex items-center gap-3">' +
             '<div class="w-6 h-6 rounded-full bg-coffee-' + (idx === 0 ? '700' : idx === 1 ? '600' : '400') + ' text-white text-xs font-bold flex items-center justify-center flex-shrink-0">' + (idx + 1) + '</div>' +
-            '<div class="flex-1 min-w-0"><div class="text-sm font-semibold text-coffee-800 truncate">' + item.name + '</div><div class="text-xs text-coffee-500">' + item.qty + ' terjual</div></div>' +
-            '<div class="text-sm font-bold text-coffee-700">' + formatIDR(item.revenue) + '</div>' +
+            '<div class="flex-1 min-w-0"><div class="text-sm font-semibold text-sky-800 truncate">' + item.name + '</div><div class="text-xs text-sky-500">' + item.qty + ' terjual</div></div>' +
+            '<div class="text-sm font-bold text-sky-700">' + formatIDR(item.revenue) + '</div>' +
           '</div>'
         ).join('');
       }
 
       // Transaction list
       reportEl.innerHTML = trxs.map(trx =>
-        '<div class="bg-white rounded-2xl p-4 shadow-sm border border-coffee-100 cursor-pointer hover:shadow-md transition" onclick="showTrxDetail(\'' + trx.id + '\')">' +
+        '<div class="bg-white rounded-2xl p-4 shadow-sm border border-sky-100 cursor-pointer hover:shadow-md transition" onclick="showTrxDetail(\'' + trx.id + '\')">' +
           '<div class="flex items-center justify-between mb-2">' +
-            '<div class="flex items-center gap-2"><span class="' + (trx.table === 'Bungkus' ? 'bg-amber-100 text-amber-700' : 'bg-coffee-100 text-coffee-700') + ' text-xs font-bold px-2 py-0.5 rounded-lg">' + (trx.table === 'Bungkus' ? '<i class="fas fa-shopping-bag mr-1"></i>Bungkus' : 'Meja ' + trx.table) + '</span>' +
-            '<span class="text-xs text-coffee-400">' + formatDateTime(trx.date) + '</span></div>' +
-            '<span class="text-sm font-bold text-coffee-800">' + formatIDR(trx.total) + '</span>' +
+            '<div class="flex items-center gap-2"><span class="' + (trx.table === 'Bungkus' ? 'bg-amber-100 text-amber-700' : 'bg-sky-100 text-sky-700') + ' text-xs font-bold px-2 py-0.5 rounded-lg">' + (trx.table === 'Bungkus' ? '<i class="fas fa-shopping-bag mr-1"></i>Bungkus' : 'Meja ' + trx.table) + '</span>' +
+            '<span class="text-xs text-slate-400">' + formatDateTime(trx.date) + '</span></div>' +
+            '<span class="text-sm font-bold text-sky-800">' + formatIDR(trx.total) + '</span>' +
           '</div>' +
           '<div class="flex items-center justify-between">' +
-            '<div class="text-xs text-coffee-500">' + (trx.items || []).map(i => i.qty + 'x ' + i.nama_menu).join(', ') + '</div>' +
+            '<div class="text-xs text-sky-500">' + (trx.items || []).map(i => i.qty + 'x ' + i.nama_menu).join(', ') + '</div>' +
             '<span class="text-xs px-2 py-0.5 rounded-full ' + (trx.paymentMethod === 'Tunai' ? 'bg-green-100 text-green-700' : trx.paymentMethod === 'QRIS' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700') + ' font-semibold">' + trx.paymentMethod + '</span>' +
           '</div>' +
         '</div>'
@@ -3091,23 +3091,23 @@
       const cashier = trx.cashier || 'Admin';
       const shopName = currentShop ? currentShop.shopName : 'Warung Kopi';
       let html = '<div class="space-y-3">' +
-        '<div class="flex justify-between items-center pb-2 border-b border-coffee-200">' +
-          '<span class="text-sm text-coffee-500">ID Transaksi</span><span class="font-mono font-bold text-sm">' + trx.id + '</span></div>' +
-        '<div class="flex justify-between"><span class="text-sm text-coffee-500">Tanggal</span><span class="text-sm font-medium">' + formatDateTime(trx.date) + '</span></div>' +
-        '<div class="flex justify-between"><span class="text-sm text-coffee-500">Meja</span><span class="text-sm font-medium">' + trx.table + '</span></div>' +
-        '<div class="flex justify-between"><span class="text-sm text-coffee-500">Kasir</span><span class="text-sm font-medium">' + cashier + '</span></div>' +
-        '<div class="border-t border-coffee-200 pt-3">' +
-          '<h4 class="text-sm font-bold text-coffee-800 mb-2">Item Pesanan</h4>' +
+        '<div class="flex justify-between items-center pb-2 border-b border-sky-200">' +
+          '<span class="text-sm text-sky-500">ID Transaksi</span><span class="font-mono font-bold text-sm">' + trx.id + '</span></div>' +
+        '<div class="flex justify-between"><span class="text-sm text-sky-500">Tanggal</span><span class="text-sm font-medium">' + formatDateTime(trx.date) + '</span></div>' +
+        '<div class="flex justify-between"><span class="text-sm text-sky-500">Meja</span><span class="text-sm font-medium">' + trx.table + '</span></div>' +
+        '<div class="flex justify-between"><span class="text-sm text-sky-500">Kasir</span><span class="text-sm font-medium">' + cashier + '</span></div>' +
+        '<div class="border-t border-sky-200 pt-3">' +
+          '<h4 class="text-sm font-bold text-sky-800 mb-2">Item Pesanan</h4>' +
           '<div class="space-y-2">' +
-          (trx.items || []).map(i => '<div class="flex justify-between text-sm"><span>' + i.qty + 'x ' + i.nama_menu + ' <span class="text-coffee-400">(' + formatIDR(i.harga) + ')</span></span><span class="font-semibold">' + formatIDR(i.harga * i.qty) + '</span></div>').join('') +
+          (trx.items || []).map(i => '<div class="flex justify-between text-sm"><span>' + i.qty + 'x ' + i.nama_menu + ' <span class="text-slate-400">(' + formatIDR(i.harga) + ')</span></span><span class="font-semibold">' + formatIDR(i.harga * i.qty) + '</span></div>').join('') +
           '</div></div>' +
-        '<div class="border-t border-coffee-200 pt-3 space-y-1">' +
-          '<div class="flex justify-between text-sm"><span class="text-coffee-500">Subtotal</span><span>' + formatIDR(trx.subtotal) + '</span></div>';
+        '<div class="border-t border-sky-200 pt-3 space-y-1">' +
+          '<div class="flex justify-between text-sm"><span class="text-sky-500">Subtotal</span><span>' + formatIDR(trx.subtotal) + '</span></div>';
       if (trx.discountPct > 0) {
         html += '<div class="flex justify-between text-sm text-red-500"><span>Diskon (' + trx.discountPct + '%)</span><span>-' + formatIDR(trx.discount) + '</span></div>';
       }
-      html += '<div class="flex justify-between text-base font-bold text-coffee-800 pt-2 border-t border-coffee-200"><span>Total</span><span>' + formatIDR(trx.total) + '</span></div>' +
-        '<div class="flex justify-between text-sm text-coffee-600"><span>Metode Bayar</span><span class="font-medium">' + trx.paymentMethod + '</span></div>' +
+      html += '<div class="flex justify-between text-base font-bold text-sky-800 pt-2 border-t border-sky-200"><span>Total</span><span>' + formatIDR(trx.total) + '</span></div>' +
+        '<div class="flex justify-between text-sm text-sky-600"><span>Metode Bayar</span><span class="font-medium">' + trx.paymentMethod + '</span></div>' +
         '</div></div>';
 
       document.getElementById('trx-detail-content').innerHTML = html;
@@ -3260,10 +3260,10 @@
     function setMenuMgmtCategory(cat) {
       currentMgmtCategory = cat;
       document.querySelectorAll('.cat-btn-mgmt').forEach(btn => {
-        btn.className = 'cat-btn-mgmt tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-white text-coffee-600 border border-coffee-200';
+        btn.className = 'cat-btn-mgmt tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-white text-sky-600 border border-sky-200';
       });
       const activeBtn = document.getElementById('mgmt-cat-' + (cat === 'Semua' ? 'all' : cat));
-      if (activeBtn) activeBtn.className = 'cat-btn-mgmt tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-coffee-700 text-white';
+      if (activeBtn) activeBtn.className = 'cat-btn-mgmt tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-sky-700 text-white';
       renderMenuManagement();
     }
 
@@ -3273,21 +3273,21 @@
       if (currentMgmtCategory !== 'Semua') items = items.filter(m => m.kategori === currentMgmtCategory);
 
       if (items.length === 0) {
-        list.innerHTML = '<div class="text-center py-8 text-coffee-400"><i class="fas fa-utensils text-3xl mb-2"></i><p class="text-sm">Tidak ada menu</p></div>';
+        list.innerHTML = '<div class="text-center py-8 text-slate-400"><i class="fas fa-utensils text-3xl mb-2"></i><p class="text-sm">Tidak ada menu</p></div>';
         return;
       }
 
       list.innerHTML = items.map(item => {
         const icon = getMenuIcon(item.kategori, item.nama_menu);
-        return '<div class="bg-white rounded-2xl p-4 shadow-sm border border-coffee-100 flex items-center gap-3">' +
-          '<div class="w-10 h-10 rounded-xl bg-coffee-100 flex items-center justify-center flex-shrink-0"><i class="fas ' + icon + ' text-coffee-600"></i></div>' +
+        return '<div class="bg-white rounded-2xl p-4 shadow-sm border border-sky-100 flex items-center gap-3">' +
+          '<div class="w-10 h-10 rounded-xl bg-sky-100 flex items-center justify-center flex-shrink-0"><i class="fas ' + icon + ' text-sky-600"></i></div>' +
           '<div class="flex-1 min-w-0">' +
-            '<div class="text-sm font-semibold text-coffee-800 truncate">' + item.nama_menu + '</div>' +
-            '<div class="flex items-center gap-2"><span class="text-xs font-bold text-coffee-600">' + formatIDR(item.harga) + '</span>' +
+            '<div class="text-sm font-semibold text-sky-800 truncate">' + item.nama_menu + '</div>' +
+            '<div class="flex items-center gap-2"><span class="text-xs font-bold text-sky-600">' + formatIDR(item.harga) + '</span>' +
             '<span class="text-xs px-2 py-0.5 rounded-full ' + (item.kategori === 'Minuman' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700') + ' font-medium">' + item.kategori + '</span></div>' +
           '</div>' +
           '<div class="flex gap-1 flex-shrink-0">' +
-            '<button onclick="editMenuItem(\'' + item.id + '\')" class="w-9 h-9 rounded-xl bg-coffee-100 flex items-center justify-center text-coffee-600 hover:bg-coffee-200 transition"><i class="fas fa-edit text-sm"></i></button>' +
+            '<button onclick="editMenuItem(\'' + item.id + '\')" class="w-9 h-9 rounded-xl bg-sky-100 flex items-center justify-center text-sky-600 hover:bg-sky-200 transition"><i class="fas fa-edit text-sm"></i></button>' +
             '<button onclick="deleteMenuItemConfirm(\'' + item.id + '\', \'' + item.nama_menu.replace(/'/g, "\\'") + '\')" class="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center text-red-500 hover:bg-red-100 transition"><i class="fas fa-trash text-sm"></i></button>' +
           '</div></div>';
       }).join('');
@@ -3310,8 +3310,8 @@
       document.querySelectorAll('#menu-edit-modal .border-2').forEach(btn => {
         if (btn.id && btn.id.startsWith('mk-')) {
           btn.className = btn.id === 'mk-' + cat
-            ? 'flex-1 py-2 rounded-xl text-sm font-semibold bg-coffee-700 text-white border-2 border-coffee-700 transition'
-            : 'flex-1 py-2 rounded-xl text-sm font-semibold bg-white text-coffee-600 border-2 border-coffee-200 transition';
+            ? 'flex-1 py-2 rounded-xl text-sm font-semibold bg-sky-700 text-white border-2 border-sky-700 transition'
+            : 'flex-1 py-2 rounded-xl text-sm font-semibold bg-white text-sky-600 border-2 border-sky-200 transition';
         }
       });
     }
