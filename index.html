@@ -252,43 +252,153 @@
       background: rgba(19, 78, 74, 0.5);
       backdrop-filter: blur(8px);
     }
+    /* ===== OCEAN BLUE AUTH THEME ===== */
     .auth-bg {
-      background: linear-gradient(135deg, #0f766e 0%, #0d9488 25%, #14b8a6 55%, #2dd4bf 80%, #5eead4 100%);
+      background: #F8FAFC;
       min-height: 100vh;
       position: relative;
       overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
-    .auth-bg::before {
+    .auth-hero {
+      background: linear-gradient(160deg, #0C4A6E 0%, #0369A1 30%, #0284C7 55%, #0EA5E9 85%, #38BDF8 100%);
+      position: relative;
+      padding: 2.5rem 1.5rem 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      min-height: 280px;
+      flex-shrink: 0;
+    }
+    .auth-hero::before {
       content: '';
       position: absolute;
-      top: -50%; left: -50%;
-      width: 200%; height: 200%;
-      background: radial-gradient(circle at 30% 50%, rgba(255,255,255,0.12) 0%, transparent 50%),
-                  radial-gradient(circle at 70% 80%, rgba(255,255,255,0.08) 0%, transparent 40%);
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(ellipse at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 60%),
+                  radial-gradient(ellipse at 80% 20%, rgba(251,191,36,0.08) 0%, transparent 50%);
       pointer-events: none;
     }
-    .auth-bg::after {
+    .auth-hero::after {
       content: '';
       position: absolute;
-      top: 10%; right: -10%;
-      width: 300px; height: 300px;
-      background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+      top: 8%; right: 5%;
+      width: 80px; height: 80px;
+      background: radial-gradient(circle, rgba(251,191,36,0.2) 0%, transparent 70%);
       border-radius: 50%;
       pointer-events: none;
-      animation: drift 12s ease-in-out infinite;
+      animation: drift 8s ease-in-out infinite;
     }
     @keyframes drift {
-      0%, 100% { transform: translate(0, 0) rotate(0deg); }
-      33% { transform: translate(15px, -20px) rotate(3deg); }
-      66% { transform: translate(-10px, 10px) rotate(-2deg); }
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(10px, -8px); }
+    }
+    .auth-wave {
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 100%;
+      line-height: 0;
+      z-index: 2;
+    }
+    .auth-wave svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+    .auth-logo-img {
+      width: 80px;
+      height: 80px;
+      border-radius: 1rem;
+      object-fit: contain;
+      margin-bottom: 0.75rem;
+      filter: drop-shadow(0 4px 12px rgba(0,0,0,0.2));
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(8px);
+      padding: 8px;
+    }
+    .auth-form-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto;
+      padding: 1.5rem;
+      position: relative;
+      z-index: 3;
     }
     .auth-card {
-      background: rgba(255, 255, 255, 0.88);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border-radius: 1.5rem;
-      border: 1px solid rgba(255, 255, 255, 0.6);
-      box-shadow: 0 25px 60px rgba(0,0,0,0.1), 0 0 0 1px rgba(255,255,255,0.15), inset 0 1px 0 rgba(255,255,255,0.4);
+      background: transparent;
+      backdrop-filter: none;
+      border-radius: 0;
+      border: none;
+      box-shadow: none;
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto;
+    }
+    .auth-input-field {
+      width: 100%;
+      padding: 0.75rem 1rem 0.75rem 2.75rem;
+      background: #F1F5F9;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 0.75rem;
+      font-size: 0.875rem;
+      color: #1E293B;
+      transition: all 0.2s ease;
+      outline: none;
+    }
+    .auth-input-field::placeholder {
+      color: #94A3B8;
+    }
+    .auth-input-field:focus {
+      background: #FFFFFF;
+      border-color: #0EA5E9;
+      box-shadow: 0 0 0 3px rgba(14,165,233,0.12);
+    }
+    .auth-input-icon {
+      position: absolute;
+      left: 0.85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94A3B8;
+      font-size: 0.875rem;
+      pointer-events: none;
+      transition: color 0.2s;
+    }
+    .auth-input-wrapper:focus-within .auth-input-icon {
+      color: #0EA5E9;
+    }
+    .auth-btn-primary {
+      width: 100%;
+      padding: 0.8rem;
+      background: linear-gradient(135deg, #0369A1, #0EA5E9);
+      color: white;
+      border-radius: 0.75rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.25s ease;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(3,105,161,0.3);
+    }
+    .auth-btn-primary:hover {
+      background: linear-gradient(135deg, #0C4A6E, #0369A1);
+      box-shadow: 0 6px 20px rgba(3,105,161,0.4);
+      transform: translateY(-1px);
+    }
+    .auth-btn-primary:active {
+      transform: translateY(0);
+    }
+    .auth-label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #475569;
+      margin-bottom: 0.35rem;
     }
     .spinner {
       border: 3px solid rgba(255,255,255,0.3);
@@ -336,40 +446,47 @@
   <!-- ============================================== -->
   <!-- ============ AUTH: LOGIN SCREEN ============== -->
   <!-- ============================================== -->
-  <div id="screen-login" class="screen auth-bg items-center justify-center p-4">
-    <div class="auth-card w-full max-w-md p-8 animate-fade-in">
-      <div class="text-center mb-6">
-        <div class="w-20 h-20 bg-coffee-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-          <i class="fas fa-mug-hot text-3xl text-coffee-700"></i>
-        </div>
-        <h1 class="font-display text-2xl font-bold text-coffee-900">Warung Kopi POS</h1>
-        <p class="text-coffee-500 text-sm mt-1">Masuk ke akun Anda</p>
+  <div id="screen-login" class="screen auth-bg">
+    <!-- Hero Wave Section -->
+    <div class="auth-hero">
+      <img src="logo-wp.png" alt="WARKOPOS" class="auth-logo-img">
+      <h1 class="font-display text-2xl font-bold text-white mb-1" style="text-shadow:0 2px 8px rgba(0,0,0,0.2);">WARKOPOS</h1>
+      <p class="text-blue-100 text-sm">Warung Kopi Point of Sale</p>
+      <!-- Wave SVG -->
+      <div class="auth-wave">
+        <svg viewBox="0 0 1440 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0,40 C180,100 360,0 540,50 C720,100 900,20 1080,60 C1260,100 1380,30 1440,50 L1440,120 L0,120 Z" fill="#F8FAFC" opacity="0.5"/>
+          <path d="M0,70 C200,20 400,100 600,60 C800,20 1000,90 1200,50 C1320,30 1400,60 1440,45 L1440,120 L0,120 Z" fill="#F8FAFC"/>
+        </svg>
       </div>
+    </div>
+    <!-- Form Area -->
+    <div class="auth-form-area animate-fade-in">
       <div id="login-error" class="hidden bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl p-3 mb-4">
         <i class="fas fa-exclamation-circle mr-1"></i><span id="login-error-text"></span>
       </div>
-      <div class="space-y-4">
+      <div class="space-y-3 mb-4">
         <div>
-          <label class="block text-sm font-semibold text-coffee-700 mb-1">Email</label>
-          <div class="relative">
-            <i class="fas fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-coffee-400"></i>
-            <input type="email" id="login-email" placeholder="email@toko.com" class="w-full pl-10 pr-4 py-2.5 border border-coffee-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coffee-400">
+          <label class="auth-label">Email</label>
+          <div class="relative auth-input-wrapper">
+            <i class="fas fa-envelope auth-input-icon"></i>
+            <input type="email" id="login-email" placeholder="email@toko.com" class="auth-input-field">
           </div>
         </div>
         <div>
-          <label class="block text-sm font-semibold text-coffee-700 mb-1">Password</label>
-          <div class="relative">
-            <i class="fas fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-coffee-400"></i>
-            <input type="password" id="login-password" placeholder="Masukkan password" class="w-full pl-10 pr-4 py-2.5 border border-coffee-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coffee-400" onkeydown="if(event.key==='Enter')doLogin()">
+          <label class="auth-label">Password</label>
+          <div class="relative auth-input-wrapper">
+            <i class="fas fa-lock auth-input-icon"></i>
+            <input type="password" id="login-password" placeholder="Masukkan password" class="auth-input-field" onkeydown="if(event.key==='Enter')doLogin()">
           </div>
         </div>
-        <button onclick="doLogin()" id="login-btn" class="w-full py-3 bg-coffee-700 text-white rounded-xl font-semibold hover:bg-coffee-800 transition shadow-md">
+        <button onclick="doLogin()" id="login-btn" class="auth-btn-primary">
           <i class="fas fa-sign-in-alt mr-2"></i> Masuk
         </button>
       </div>
-      <div class="mt-4 text-center space-y-2">
-        <button onclick="showScreen('forgot')" class="text-sm text-coffee-500 hover:text-coffee-700 transition">Lupa Password?</button>
-        <p class="text-sm text-coffee-500">Belum punya akun? <button onclick="showScreen('register')" class="text-coffee-700 font-semibold hover:underline">Daftar</button></p>
+      <div class="text-center space-y-2">
+        <button onclick="showScreen('forgot')" class="text-sm text-slate-400 hover:text-sky-600 transition">Lupa Password?</button>
+        <p class="text-sm text-slate-400">Belum punya akun? <button onclick="showScreen('register')" class="text-sky-600 font-semibold hover:underline">Daftar</button></p>
       </div>
     </div>
   </div>
@@ -377,137 +494,161 @@
   <!-- ============================================== -->
   <!-- ============ AUTH: REGISTER SCREEN =========== -->
   <!-- ============================================== -->
-  <div id="screen-register" class="screen auth-bg items-center justify-center p-4">
-    <div class="auth-card w-full max-w-md p-8 animate-fade-in max-h-[95vh] overflow-y-auto">
-      <div class="text-center mb-6">
-        <div class="w-16 h-16 bg-coffee-100 rounded-full mx-auto mb-3 flex items-center justify-center">
-          <i class="fas fa-store text-2xl text-coffee-700"></i>
-        </div>
-        <h1 class="font-display text-xl font-bold text-coffee-900">Daftar Akun Baru</h1>
-        <p class="text-coffee-500 text-sm mt-1">Buat akun untuk toko Anda</p>
+  <div id="screen-register" class="screen auth-bg">
+    <!-- Hero Wave Section -->
+    <div class="auth-hero">
+      <img src="logo-wp.png" alt="WARKOPOS" class="auth-logo-img">
+      <h1 class="font-display text-2xl font-bold text-white mb-1" style="text-shadow:0 2px 8px rgba(0,0,0,0.2);">WARKOPOS</h1>
+      <p class="text-blue-100 text-sm">Buat akun untuk toko Anda</p>
+      <!-- Wave SVG -->
+      <div class="auth-wave">
+        <svg viewBox="0 0 1440 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0,40 C180,100 360,0 540,50 C720,100 900,20 1080,60 C1260,100 1380,30 1440,50 L1440,120 L0,120 Z" fill="#F8FAFC" opacity="0.5"/>
+          <path d="M0,70 C200,20 400,100 600,60 C800,20 1000,90 1200,50 C1320,30 1400,60 1440,45 L1440,120 L0,120 Z" fill="#F8FAFC"/>
+        </svg>
       </div>
-      <div id="register-error" class="hidden bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl p-3 mb-4">
+    </div>
+    <!-- Form Area -->
+    <div class="auth-form-area animate-fade-in" style="justify-content:flex-start;">
+      <div id="register-error" class="hidden bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl p-3 mb-3">
         <i class="fas fa-exclamation-circle mr-1"></i><span id="register-error-text"></span>
       </div>
-      <div class="space-y-3">
+      <div class="space-y-3 mb-3">
         <div>
-          <label class="block text-sm font-semibold text-coffee-700 mb-1">Nama Pemilik</label>
-          <div class="relative">
-            <i class="fas fa-user absolute left-3 top-1/2 -translate-y-1/2 text-coffee-400"></i>
-            <input type="text" id="reg-owner" placeholder="Nama lengkap" class="w-full pl-10 pr-4 py-2.5 border border-coffee-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coffee-400">
+          <label class="auth-label">Nama Pemilik</label>
+          <div class="relative auth-input-wrapper">
+            <i class="fas fa-user auth-input-icon"></i>
+            <input type="text" id="reg-owner" placeholder="Nama lengkap" class="auth-input-field">
           </div>
         </div>
         <div>
-          <label class="block text-sm font-semibold text-coffee-700 mb-1">Nama Toko</label>
-          <div class="relative">
-            <i class="fas fa-store absolute left-3 top-1/2 -translate-y-1/2 text-coffee-400"></i>
-            <input type="text" id="reg-shop" placeholder="Nama toko Anda" class="w-full pl-10 pr-4 py-2.5 border border-coffee-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coffee-400">
+          <label class="auth-label">Nama Toko</label>
+          <div class="relative auth-input-wrapper">
+            <i class="fas fa-store auth-input-icon"></i>
+            <input type="text" id="reg-shop" placeholder="Nama toko Anda" class="auth-input-field">
           </div>
         </div>
         <div>
-          <label class="block text-sm font-semibold text-coffee-700 mb-1">Email</label>
-          <div class="relative">
-            <i class="fas fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-coffee-400"></i>
-            <input type="email" id="reg-email" placeholder="email@toko.com" class="w-full pl-10 pr-4 py-2.5 border border-coffee-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coffee-400">
+          <label class="auth-label">Email</label>
+          <div class="relative auth-input-wrapper">
+            <i class="fas fa-envelope auth-input-icon"></i>
+            <input type="email" id="reg-email" placeholder="email@toko.com" class="auth-input-field">
           </div>
         </div>
         <div>
-          <label class="block text-sm font-semibold text-coffee-700 mb-1">No. Telepon</label>
-          <div class="relative">
-            <i class="fas fa-phone absolute left-3 top-1/2 -translate-y-1/2 text-coffee-400"></i>
-            <input type="tel" id="reg-phone" placeholder="08xx-xxxx-xxxx" class="w-full pl-10 pr-4 py-2.5 border border-coffee-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coffee-400">
+          <label class="auth-label">No. Telepon</label>
+          <div class="relative auth-input-wrapper">
+            <i class="fas fa-phone auth-input-icon"></i>
+            <input type="tel" id="reg-phone" placeholder="08xx-xxxx-xxxx" class="auth-input-field">
           </div>
         </div>
         <div>
-          <label class="block text-sm font-semibold text-coffee-700 mb-1">Password (min 6 karakter)</label>
-          <div class="relative">
-            <i class="fas fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-coffee-400"></i>
-            <input type="password" id="reg-password" placeholder="Min 6 karakter" class="w-full pl-10 pr-4 py-2.5 border border-coffee-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coffee-400">
+          <label class="auth-label">Password (min 6 karakter)</label>
+          <div class="relative auth-input-wrapper">
+            <i class="fas fa-lock auth-input-icon"></i>
+            <input type="password" id="reg-password" placeholder="Min 6 karakter" class="auth-input-field">
           </div>
         </div>
         <div>
-          <label class="block text-sm font-semibold text-coffee-700 mb-1">Konfirmasi Password</label>
-          <div class="relative">
-            <i class="fas fa-lock absolute left-3 top-1/2 -translate-y-1/2 text-coffee-400"></i>
-            <input type="password" id="reg-confirm" placeholder="Ulangi password" class="w-full pl-10 pr-4 py-2.5 border border-coffee-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coffee-400" onkeydown="if(event.key==='Enter')doRegister()">
+          <label class="auth-label">Konfirmasi Password</label>
+          <div class="relative auth-input-wrapper">
+            <i class="fas fa-lock auth-input-icon"></i>
+            <input type="password" id="reg-confirm" placeholder="Ulangi password" class="auth-input-field" onkeydown="if(event.key==='Enter')doRegister()">
           </div>
         </div>
-        <button onclick="doRegister()" id="register-btn" class="w-full py-3 bg-coffee-700 text-white rounded-xl font-semibold hover:bg-coffee-800 transition shadow-md">
+        <button onclick="doRegister()" id="register-btn" class="auth-btn-primary">
           <i class="fas fa-user-plus mr-2"></i> Daftar
         </button>
       </div>
-      <p class="mt-4 text-center text-sm text-coffee-500">Sudah punya akun? <button onclick="showScreen('login')" class="text-coffee-700 font-semibold hover:underline">Masuk</button></p>
+      <p class="text-center text-sm text-slate-400">Sudah punya akun? <button onclick="showScreen('login')" class="text-sky-600 font-semibold hover:underline">Masuk</button></p>
     </div>
   </div>
 
   <!-- ============================================== -->
   <!-- ============ AUTH: FORGOT PASSWORD ============ -->
   <!-- ============================================== -->
-  <div id="screen-forgot" class="screen auth-bg items-center justify-center p-4">
-    <div class="auth-card w-full max-w-md p-8 animate-fade-in">
-      <div class="text-center mb-6">
-        <div class="w-16 h-16 bg-coffee-100 rounded-full mx-auto mb-3 flex items-center justify-center">
-          <i class="fas fa-key text-2xl text-coffee-700"></i>
-        </div>
-        <h1 class="font-display text-xl font-bold text-coffee-900">Lupa Password</h1>
-        <p class="text-coffee-500 text-sm mt-1">Kirim link reset ke email Anda</p>
+  <div id="screen-forgot" class="screen auth-bg">
+    <!-- Hero Wave Section -->
+    <div class="auth-hero">
+      <img src="logo-wp.png" alt="WARKOPOS" class="auth-logo-img">
+      <h1 class="font-display text-2xl font-bold text-white mb-1" style="text-shadow:0 2px 8px rgba(0,0,0,0.2);">WARKOPOS</h1>
+      <p class="text-blue-100 text-sm">Kirim link reset ke email Anda</p>
+      <div class="auth-wave">
+        <svg viewBox="0 0 1440 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0,40 C180,100 360,0 540,50 C720,100 900,20 1080,60 C1260,100 1380,30 1440,50 L1440,120 L0,120 Z" fill="#F8FAFC" opacity="0.5"/>
+          <path d="M0,70 C200,20 400,100 600,60 C800,20 1000,90 1200,50 C1320,30 1400,60 1440,45 L1440,120 L0,120 Z" fill="#F8FAFC"/>
+        </svg>
       </div>
+    </div>
+    <!-- Form Area -->
+    <div class="auth-form-area animate-fade-in">
       <div id="forgot-error" class="hidden bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl p-3 mb-4">
         <i class="fas fa-exclamation-circle mr-1"></i><span id="forgot-error-text"></span>
       </div>
       <div id="forgot-success" class="hidden bg-green-50 border border-green-200 text-green-700 text-sm rounded-xl p-3 mb-4">
         <i class="fas fa-check-circle mr-1"></i><span id="forgot-success-text"></span>
       </div>
-      <div class="space-y-4">
+      <div class="space-y-3 mb-4">
         <div>
-          <label class="block text-sm font-semibold text-coffee-700 mb-1">Email</label>
-          <div class="relative">
-            <i class="fas fa-envelope absolute left-3 top-1/2 -translate-y-1/2 text-coffee-400"></i>
-            <input type="email" id="forgot-email" placeholder="email@toko.com" class="w-full pl-10 pr-4 py-2.5 border border-coffee-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-coffee-400" onkeydown="if(event.key==='Enter')doForgotPassword()">
+          <label class="auth-label">Email</label>
+          <div class="relative auth-input-wrapper">
+            <i class="fas fa-envelope auth-input-icon"></i>
+            <input type="email" id="forgot-email" placeholder="email@toko.com" class="auth-input-field" onkeydown="if(event.key==='Enter')doForgotPassword()">
           </div>
         </div>
-        <button onclick="doForgotPassword()" id="forgot-btn" class="w-full py-3 bg-coffee-700 text-white rounded-xl font-semibold hover:bg-coffee-800 transition shadow-md">
+        <button onclick="doForgotPassword()" id="forgot-btn" class="auth-btn-primary">
           <i class="fas fa-paper-plane mr-2"></i> Kirim Link Reset
         </button>
       </div>
-      <p class="mt-4 text-center text-sm text-coffee-500"><button onclick="showScreen('login')" class="text-coffee-700 font-semibold hover:underline"><i class="fas fa-arrow-left mr-1"></i> Kembali ke Login</button></p>
+      <p class="text-center text-sm text-slate-400"><button onclick="showScreen('login')" class="text-sky-600 font-semibold hover:underline"><i class="fas fa-arrow-left mr-1"></i> Kembali ke Login</button></p>
     </div>
   </div>
 
   <!-- ============================================== -->
   <!-- ============ AUTH: AKTIVASI KODE ============= -->
   <!-- ============================================== -->
-  <div id="screen-pending" class="screen auth-bg items-center justify-center p-4">
-    <div class="auth-card w-full max-w-md p-8 text-center animate-fade-in">
+  <div id="screen-pending" class="screen auth-bg">
+    <!-- Hero Wave Section -->
+    <div class="auth-hero">
+      <img src="logo-wp.png" alt="WARKOPOS" class="auth-logo-img">
+      <h1 class="font-display text-2xl font-bold text-white mb-1" style="text-shadow:0 2px 8px rgba(0,0,0,0.2);">WARKOPOS</h1>
+      <p class="text-blue-100 text-sm">Aktivasi Akun</p>
+      <div class="auth-wave">
+        <svg viewBox="0 0 1440 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0,40 C180,100 360,0 540,50 C720,100 900,20 1080,60 C1260,100 1380,30 1440,50 L1440,120 L0,120 Z" fill="#F8FAFC" opacity="0.5"/>
+          <path d="M0,70 C200,20 400,100 600,60 C800,20 1000,90 1200,50 C1320,30 1400,60 1440,45 L1440,120 L0,120 Z" fill="#F8FAFC"/>
+        </svg>
+      </div>
+    </div>
+    <!-- Content Area -->
+    <div class="auth-form-area animate-fade-in" style="justify-content:flex-start;">
       <!-- Step Icons -->
-      <div class="flex items-center justify-center gap-3 mb-5">
+      <div class="flex items-center justify-center gap-3 mb-4">
         <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
           <i class="fas fa-check text-green-600 text-lg"></i>
         </div>
-        <div class="w-12 h-0.5 bg-coffee-200"></div>
+        <div class="w-12 h-0.5 bg-sky-200"></div>
         <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
           <i class="fas fa-clock text-amber-600 text-lg animate-pulse"></i>
         </div>
-        <div class="w-12 h-0.5 bg-coffee-200"></div>
-        <div class="w-10 h-10 rounded-full bg-coffee-100 flex items-center justify-center">
-          <i class="fas fa-key text-coffee-400 text-lg"></i>
+        <div class="w-12 h-0.5 bg-sky-200"></div>
+        <div class="w-10 h-10 rounded-full bg-sky-100 flex items-center justify-center">
+          <i class="fas fa-key text-sky-400 text-lg"></i>
         </div>
       </div>
-
-      <h1 class="font-display text-2xl font-bold text-coffee-900 mb-1">Aktivasi Akun</h1>
-      <p class="text-coffee-500 text-sm mb-5">Pendaftaran berhasil! Ikuti langkah berikut untuk mengaktifkan akun Anda.</p>
+      <p class="text-slate-500 text-sm mb-4">Pendaftaran berhasil! Ikuti langkah berikut untuk mengaktifkan akun Anda.</p>
 
       <!-- Step 1: Kode Aktivasi -->
-      <div class="bg-coffee-50 border-2 border-dashed border-coffee-300 rounded-2xl p-5 mb-4">
-        <p class="text-xs font-bold text-coffee-400 uppercase tracking-wider mb-2"><i class="fas fa-key mr-1"></i> Kode Aktivasi Anda</p>
-        <div id="activation-code-display" class="font-mono text-3xl font-bold text-coffee-800 tracking-[0.3em] my-2 select-all">WK-XXXXXX</div>
-        <button onclick="copyActivationCode()" id="copy-code-btn" class="mt-2 px-4 py-1.5 bg-coffee-200 hover:bg-coffee-300 text-coffee-700 rounded-lg text-xs font-semibold transition">
+      <div class="bg-sky-50 border-2 border-dashed border-sky-300 rounded-2xl p-4 mb-3">
+        <p class="text-xs font-bold text-sky-400 uppercase tracking-wider mb-2"><i class="fas fa-key mr-1"></i> Kode Aktivasi Anda</p>
+        <div id="activation-code-display" class="font-mono text-3xl font-bold text-sky-800 tracking-[0.3em] my-2 select-all">WK-XXXXXX</div>
+        <button onclick="copyActivationCode()" id="copy-code-btn" class="mt-2 px-4 py-1.5 bg-sky-200 hover:bg-sky-300 text-sky-700 rounded-lg text-xs font-semibold transition">
           <i class="fas fa-copy mr-1"></i> Salin Kode
         </button>
       </div>
 
       <!-- Step 2: Hubungi Admin -->
-      <div class="bg-green-50 border border-green-200 rounded-2xl p-5 mb-4 text-left">
+      <div class="bg-green-50 border border-green-200 rounded-2xl p-4 mb-3 text-left">
         <div class="flex items-center gap-2 mb-2">
           <span class="w-6 h-6 bg-green-600 text-white rounded-full flex items-center justify-center text-xs font-bold">2</span>
           <p class="text-sm font-bold text-green-800">Hubungi Admin via WhatsApp</p>
@@ -523,7 +664,7 @@
       </div>
 
       <!-- Step 3: Tunggu Aktivasi -->
-      <div class="bg-amber-50 border border-amber-200 rounded-2xl p-5 mb-5 text-left">
+      <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-4 text-left">
         <div class="flex items-center gap-2 mb-2">
           <span class="w-6 h-6 bg-amber-500 text-white rounded-full flex items-center justify-center text-xs font-bold">3</span>
           <p class="text-sm font-bold text-amber-800">Tunggu Aktivasi</p>
@@ -532,23 +673,23 @@
       </div>
 
       <!-- Refresh Button -->
-      <button onclick="refreshActivationStatus()" id="refresh-activation-btn" class="px-6 py-2.5 bg-coffee-700 text-white rounded-xl font-semibold hover:bg-coffee-800 transition shadow-md mb-3">
+      <button onclick="refreshActivationStatus()" id="refresh-activation-btn" class="auth-btn-primary mb-3">
         <i class="fas fa-sync-alt mr-2"></i> Cek Status Aktivasi
       </button>
 
       <!-- Demo Code Input -->
-      <div class="border-t border-coffee-200 pt-4 mt-4">
+      <div class="border-t border-slate-200 pt-4 mt-3">
         <div class="flex items-center gap-2 mb-2">
           <span class="w-6 h-6 bg-purple-100 flex items-center justify-center rounded-full">
             <i class="fas fa-play-circle text-purple-600 text-xs"></i>
           </span>
-          <p class="text-sm font-bold text-coffee-700">Coba Demo 24 Jam?</p>
+          <p class="text-sm font-bold text-slate-700">Coba Demo 24 Jam?</p>
         </div>
-        <p class="text-xs text-coffee-500 mb-3">Punya kode demo? Masukkan untuk mencoba aplikasi selama 24 jam.</p>
+        <p class="text-xs text-slate-500 mb-3">Punya kode demo? Masukkan untuk mencoba aplikasi selama 24 jam.</p>
         <div class="flex gap-2">
           <input type="text" id="demo-code-input" placeholder="DEMO-XXXXXX"
             oninput="this.value=this.value.toUpperCase()"
-            class="flex-1 px-3 py-2 border border-coffee-200 rounded-xl text-sm font-mono tracking-wider focus:outline-none focus:ring-2 focus:ring-purple-400">
+            class="auth-input-field font-mono tracking-wider">
           <button onclick="redeemDemoCode()" id="redeem-demo-btn" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-sm font-semibold transition whitespace-nowrap">
             <i class="fas fa-play mr-1"></i> Mulai Demo
           </button>
@@ -558,7 +699,7 @@
         </div>
       </div>
 
-      <button onclick="doLogout()" class="w-full px-6 py-2.5 bg-coffee-200 text-coffee-800 rounded-xl font-semibold hover:bg-coffee-300 transition">
+      <button onclick="doLogout()" class="w-full px-6 py-2.5 bg-slate-200 text-slate-700 rounded-xl font-semibold hover:bg-slate-300 transition mt-4">
         <i class="fas fa-sign-out-alt mr-2"></i> Keluar
       </button>
     </div>
@@ -567,31 +708,53 @@
   <!-- ============================================== -->
   <!-- ============ AUTH: REJECTED =================== -->
   <!-- ============================================== -->
-  <div id="screen-rejected" class="screen auth-bg items-center justify-center p-4">
-    <div class="auth-card w-full max-w-md p-8 text-center animate-fade-in">
-      <div class="w-24 h-24 bg-red-100 rounded-full mx-auto mb-5 flex items-center justify-center">
-        <i class="fas fa-times-circle text-4xl text-red-500"></i>
+  <div id="screen-rejected" class="screen auth-bg">
+    <div class="auth-hero">
+      <img src="logo-wp.png" alt="WARKOPOS" class="auth-logo-img">
+      <h1 class="font-display text-2xl font-bold text-white mb-1" style="text-shadow:0 2px 8px rgba(0,0,0,0.2);">WARKOPOS</h1>
+      <p class="text-blue-100 text-sm">Pendaftaran Ditolak</p>
+      <div class="auth-wave">
+        <svg viewBox="0 0 1440 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0,40 C180,100 360,0 540,50 C720,100 900,20 1080,60 C1260,100 1380,30 1440,50 L1440,120 L0,120 Z" fill="#F8FAFC" opacity="0.5"/>
+          <path d="M0,70 C200,20 400,100 600,60 C800,20 1000,90 1200,50 C1320,30 1400,60 1440,45 L1440,120 L0,120 Z" fill="#F8FAFC"/>
+        </svg>
       </div>
-      <h1 class="font-display text-2xl font-bold text-coffee-900 mb-2">Pendaftaran Ditolak</h1>
-      <p class="text-coffee-600 mb-6">Akun Anda ditolak. Silakan hubungi admin untuk informasi lebih lanjut.</p>
-      <button onclick="doLogout()" class="px-6 py-2.5 bg-coffee-200 text-coffee-800 rounded-xl font-semibold hover:bg-coffee-300 transition">
-        <i class="fas fa-sign-out-alt mr-2"></i> Keluar
-      </button>
+    </div>
+    <div class="auth-form-area animate-fade-in">
+      <div class="text-center">
+        <div class="w-20 h-20 bg-red-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+          <i class="fas fa-times-circle text-4xl text-red-500"></i>
+        </div>
+        <p class="text-slate-600 mb-6">Akun Anda ditolak. Silakan hubungi admin untuk informasi lebih lanjut.</p>
+        <button onclick="doLogout()" class="w-full px-6 py-2.5 bg-slate-200 text-slate-700 rounded-xl font-semibold hover:bg-slate-300 transition">
+          <i class="fas fa-sign-out-alt mr-2"></i> Keluar
+        </button>
+      </div>
     </div>
   </div>
 
   <!-- ============================================== -->
   <!-- ============ AUTH: DEMO EXPIRED ============== -->
   <!-- ============================================== -->
-  <div id="screen-demo-expired" class="screen auth-bg items-center justify-center p-4">
-    <div class="auth-card w-full max-w-md p-8 text-center animate-fade-in">
-      <div class="w-24 h-24 bg-orange-100 rounded-full mx-auto mb-5 flex items-center justify-center">
+  <div id="screen-demo-expired" class="screen auth-bg">
+    <div class="auth-hero">
+      <img src="logo-wp.png" alt="WARKOPOS" class="auth-logo-img">
+      <h1 class="font-display text-2xl font-bold text-white mb-1" style="text-shadow:0 2px 8px rgba(0,0,0,0.2);">WARKOPOS</h1>
+      <p class="text-blue-100 text-sm">Masa Demo Berakhir</p>
+      <div class="auth-wave">
+        <svg viewBox="0 0 1440 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0,40 C180,100 360,0 540,50 C720,100 900,20 1080,60 C1260,100 1380,30 1440,50 L1440,120 L0,120 Z" fill="#F8FAFC" opacity="0.5"/>
+          <path d="M0,70 C200,20 400,100 600,60 C800,20 1000,90 1200,50 C1320,30 1400,60 1440,45 L1440,120 L0,120 Z" fill="#F8FAFC"/>
+        </svg>
+      </div>
+    </div>
+    <div class="auth-form-area animate-fade-in">
+      <div class="w-20 h-20 bg-orange-100 rounded-full mx-auto mb-4 flex items-center justify-center">
         <i class="fas fa-hourglass-end text-4xl text-orange-500"></i>
       </div>
-      <h1 class="font-display text-2xl font-bold text-coffee-900 mb-2">Masa Demo Berakhir</h1>
-      <p class="text-coffee-600 mb-2">Masa demo 24 jam Anda telah berakhir.</p>
-      <p class="text-coffee-500 text-sm mb-2">Untuk mendapatkan akses permanen, hubungi admin:</p>
-      <div class="bg-green-50 border border-green-200 rounded-2xl p-4 mb-5">
+      <p class="text-slate-600 mb-2 text-center">Masa demo 24 jam Anda telah berakhir.</p>
+      <p class="text-slate-500 text-sm mb-3 text-center">Untuk mendapatkan akses permanen, hubungi admin:</p>
+      <div class="bg-green-50 border border-green-200 rounded-2xl p-4 mb-3">
         <p class="text-xs font-bold text-green-800 mb-2">Kode Aktivasi Anda</p>
         <div id="demo-expired-code" class="font-mono text-xl font-bold text-green-800 tracking-wider select-all">WK-XXXXXX</div>
       </div>
@@ -602,7 +765,7 @@
           <p class="text-base font-bold text-green-800 select-all">0896-8515-7213</p>
         </div>
       </div>
-      <button onclick="doLogout()" class="w-full px-6 py-2.5 bg-coffee-200 text-coffee-800 rounded-xl font-semibold hover:bg-coffee-300 transition">
+      <button onclick="doLogout()" class="w-full px-6 py-2.5 bg-slate-200 text-slate-700 rounded-xl font-semibold hover:bg-slate-300 transition">
         <i class="fas fa-sign-out-alt mr-2"></i> Keluar
       </button>
     </div>
@@ -611,12 +774,11 @@
   <!-- ============================================== -->
   <!-- ============ LOADING SCREEN =================== -->
   <!-- ============================================== -->
-  <div id="screen-loading" class="screen auth-bg items-center justify-center p-4">
+  <div id="screen-loading" class="screen auth-bg items-center justify-center p-4" style="flex-direction:row;">
     <div class="text-center animate-fade-in">
-      <div class="w-20 h-20 bg-coffee-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-        <div class="spinner" style="width:32px;height:32px;border-width:4px;border-color:rgba(15,118,110,0.15);border-top-color:#0f766e;"></div>
-      </div>
-      <p class="text-coffee-400 text-sm mt-1">Memuat...</p>
+      <img src="logo-wp.png" alt="WARKOPOS" class="w-20 h-20 mx-auto mb-4 rounded-xl object-contain" style="filter:drop-shadow(0 4px 12px rgba(0,0,0,0.15));">
+      <div class="spinner" style="width:32px;height:32px;border-width:4px;border-color:rgba(14,165,233,0.15);border-top-color:#0EA5E9;margin:0 auto 0.75rem;"></div>
+      <p class="text-slate-400 text-sm mt-1">Memuat...</p>
     </div>
   </div>
 
