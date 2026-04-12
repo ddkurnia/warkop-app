@@ -441,6 +441,285 @@
     *::-webkit-scrollbar { width: 4px; }
     *::-webkit-scrollbar-track { background: transparent; }
     *::-webkit-scrollbar-thumb { background: #bae6fd; border-radius: 99px; }
+
+    /* ============================================== */
+    /* ===== MODERN POS DESIGN SYSTEM ===== */
+    /* ============================================== */
+
+    /* Body - subtle gradient texture */
+    body { background: linear-gradient(160deg, #f0f9ff 0%, #f8fafc 40%, #f0f4ff 100%) !important; }
+
+    /* ----- GLASSMORPHISM HEADER ----- */
+    #pos-app > header {
+      background: rgba(255,255,255,0.82) !important;
+      backdrop-filter: blur(24px) saturate(1.2) !important;
+      -webkit-backdrop-filter: blur(24px) saturate(1.2) !important;
+      border-bottom: none !important;
+      box-shadow: 0 1px 0 rgba(14,165,233,0.06), 0 4px 20px rgba(0,0,0,0.04);
+      position: relative;
+    }
+    #pos-app > header::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #0C4A6E 0%, #0369A1 25%, #0EA5E9 50%, #EAB308 75%, #EF4444 100%);
+      z-index: 1;
+    }
+    #pos-app > header > div { position: relative; z-index: 2; }
+
+    /* ----- FLOATING BOTTOM NAV ----- */
+    #pos-app > nav.no-print {
+      background: transparent !important;
+      border: none !important;
+      padding: 0 0.75rem 0.6rem;
+    }
+    #pos-app > nav.no-print > div {
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: blur(24px) saturate(1.2);
+      -webkit-backdrop-filter: blur(24px) saturate(1.2);
+      border-radius: 1.25rem;
+      padding: 0.3rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1), 0 1px 0 rgba(255,255,255,0.6) inset;
+      border: 1px solid rgba(255,255,255,0.5);
+      overflow: hidden;
+    }
+    .nav-btn {
+      border-radius: 0.85rem !important;
+      border-top: none !important;
+      transition: all 0.35s cubic-bezier(.4,0,.2,1) !important;
+      position: relative;
+      overflow: hidden;
+    }
+    .nav-btn.text-sky-600,
+    .nav-btn.text-gray-400 {
+      background: transparent !important;
+      border-top: none !important;
+    }
+    .nav-btn.text-sky-600 {
+      background: linear-gradient(135deg, #0369A1, #0EA5E9) !important;
+      color: white !important;
+      box-shadow: 0 2px 12px rgba(3,105,161,0.35);
+    }
+    .nav-btn.text-sky-600 i,
+    .nav-btn.text-sky-600 span {
+      color: white !important;
+    }
+    .nav-btn.text-gray-400:hover {
+      background: #F1F5F9 !important;
+    }
+
+    /* ----- GLASSMORPHISM CARDS ----- */
+    #pos-app .bg-white.rounded-2xl,
+    #pos-app div[class*="bg-white"][class*="rounded-2xl"],
+    #pos-app div[class*="bg-white"][class*="rounded-xl"] {
+      background: rgba(255,255,255,0.72) !important;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.5) !important;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03);
+    }
+
+    /* ----- MODERN TABLE CARDS (override) ----- */
+    .table-card {
+      border-radius: 1.125rem !important;
+      background: rgba(255,255,255,0.85) !important;
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(14,165,233,0.06) !important;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.03), 0 0 0 0.5px rgba(0,0,0,0.02);
+    }
+    .table-card:hover {
+      box-shadow: 0 8px 28px rgba(3,105,161,0.1), 0 0 0 0.5px rgba(14,165,233,0.08);
+      transform: translateY(-3px) scale(1.02);
+    }
+    .table-card.active-table {
+      background: linear-gradient(145deg, #e0f2fe, #bae6fd) !important;
+      border: 1.5px solid rgba(14,165,233,0.25) !important;
+      box-shadow: 0 8px 28px rgba(14,165,233,0.18), 0 0 0 0.5px rgba(14,165,233,0.15) !important;
+    }
+    .table-card.unpaid-table {
+      border: 1.5px solid rgba(239,68,68,0.2) !important;
+    }
+    .table-card.selected-table {
+      box-shadow: 0 8px 32px rgba(14,165,233,0.25), 0 0 0 2.5px #0284C7 !important;
+    }
+
+    /* ----- MODERN PEL CARDS (override) ----- */
+    .pel-card {
+      border-radius: 1.125rem !important;
+      background: rgba(255,255,255,0.85) !important;
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(234,179,8,0.06) !important;
+    }
+    .pel-card.pel-active {
+      background: linear-gradient(145deg, #fefce8, #fef9c3) !important;
+      border: 1.5px solid rgba(234,179,8,0.2) !important;
+      box-shadow: 0 8px 24px rgba(234,179,8,0.15);
+    }
+    .pel-card.pel-unpaid {
+      border: 1.5px solid rgba(239,68,68,0.2) !important;
+    }
+    .pel-card.pel-selected {
+      box-shadow: 0 8px 32px rgba(234,179,8,0.2), 0 0 0 2.5px #CA8A04 !important;
+    }
+
+    /* ----- MODERN BUTTONS ----- */
+    #pos-app button[class*="bg-sky-700"],
+    #pos-app button[class*="bg-sky-800"] {
+      background: linear-gradient(135deg, #0369A1 0%, #0284C7 100%) !important;
+      box-shadow: 0 2px 10px rgba(3,105,161,0.2);
+      transition: all 0.3s cubic-bezier(.4,0,.2,1) !important;
+    }
+    #pos-app button[class*="bg-sky-700"]:hover,
+    #pos-app button[class*="bg-sky-800"]:hover {
+      box-shadow: 0 4px 18px rgba(3,105,161,0.35);
+      transform: translateY(-1px);
+    }
+    #pos-app button[class*="bg-sky-700"]:active {
+      transform: translateY(0);
+    }
+    #pos-app button[class*="bg-green-600"] {
+      background: linear-gradient(135deg, #059669, #10B981) !important;
+      box-shadow: 0 2px 10px rgba(5,150,105,0.2);
+    }
+    #pos-app button[class*="bg-green-600"]:hover {
+      box-shadow: 0 4px 18px rgba(5,150,105,0.35);
+      transform: translateY(-1px);
+    }
+
+    /* ----- MODERN INPUTS ----- */
+    #pos-app input[type="text"],
+    #pos-app input[type="email"],
+    #pos-app input[type="tel"],
+    #pos-app input[type="number"],
+    #pos-app input[type="password"],
+    #pos-app input[type="date"],
+    #pos-app input[type="month"],
+    #pos-app textarea {
+      background: rgba(248,250,252,0.8) !important;
+      border: 1.5px solid #E2E8F0 !important;
+      border-radius: 0.85rem !important;
+      padding: 0.7rem 1rem !important;
+      transition: all 0.25s cubic-bezier(.4,0,.2,1) !important;
+      font-size: 0.875rem !important;
+      color: #1E293B;
+    }
+    #pos-app input:focus,
+    #pos-app textarea:focus {
+      background: #FFFFFF !important;
+      border-color: #0EA5E9 !important;
+      box-shadow: 0 0 0 3px rgba(14,165,233,0.1) !important;
+      outline: none;
+    }
+    #pos-app input::placeholder,
+    #pos-app textarea::placeholder {
+      color: #94A3B8 !important;
+    }
+
+    /* ----- MODERN ORDER MODE TABS ----- */
+    .order-mode-tab {
+      border-radius: 0.85rem !important;
+      letter-spacing: 0.01em;
+    }
+    .order-mode-tab.active-mode {
+      background: linear-gradient(135deg, #0369A1, #0EA5E9) !important;
+      box-shadow: 0 4px 16px rgba(3,105,161,0.3);
+    }
+    .order-mode-tab:not(.active-mode) {
+      background: rgba(255,255,255,0.7) !important;
+      border: 1.5px solid #E2E8F0 !important;
+    }
+
+    /* ----- MODERN CATEGORY CHIPS ----- */
+    .tab-btn {
+      border-radius: 2rem !important;
+      letter-spacing: 0.01em;
+    }
+
+    /* ----- MODERN REPORT TABS ----- */
+    .report-tab.active-tab {
+      background: linear-gradient(135deg, #0369A1, #0284C7) !important;
+      box-shadow: 0 4px 14px rgba(3,105,161,0.3) !important;
+    }
+
+    /* ----- MODERN MODAL OVERLAY ----- */
+    .modal-overlay {
+      background: rgba(12, 74, 110, 0.4) !important;
+      backdrop-filter: blur(12px) !important;
+      -webkit-backdrop-filter: blur(12px) !important;
+    }
+
+    /* ----- MODERN MODAL CARDS ----- */
+    #pos-app [id$="-modal"] > div:last-child,
+    #payment-modal > div:last-child:not(.modal-overlay),
+    #receipt-modal > div:last-child:not(.modal-overlay),
+    #menu-edit-modal > div:last-child:not(.modal-overlay),
+    #trx-detail-modal > div:last-child:not(.modal-overlay) {
+      border-radius: 1.5rem !important;
+      overflow: hidden;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.15), 0 0 0 1px rgba(255,255,255,0.1);
+    }
+
+    /* ----- MODAL HEADERS ----- */
+    #pos-app [id$="-modal"] [class*="bg-sky-700"][class*="rounded-t"] {
+      background: linear-gradient(135deg, #0C4A6E 0%, #0369A1 40%, #0EA5E9 100%) !important;
+      padding: 1.1rem 1.25rem !important;
+    }
+
+    /* ----- MODERN SECTION HEADINGS ----- */
+    #pos-app h2[class*="font-bold"] {
+      font-size: 1.15rem !important;
+      letter-spacing: -0.01em;
+    }
+    #pos-app h3[class*="font-bold"] {
+      letter-spacing: -0.01em;
+    }
+
+    /* ----- MOBILE PANEL ----- */
+    #mobile-panel > div:last-child {
+      background: rgba(255,255,255,0.95) !important;
+      backdrop-filter: blur(24px) !important;
+      -webkit-backdrop-filter: blur(24px) !important;
+      box-shadow: 0 -8px 40px rgba(0,0,0,0.12) !important;
+    }
+
+    /* ----- DESKTOP ORDER PANEL ----- */
+    #pos-app .hidden.lg\\:block > div[class*="rounded-2xl"] {
+      background: rgba(255,255,255,0.72) !important;
+      backdrop-filter: blur(20px) !important;
+      -webkit-backdrop-filter: blur(20px) !important;
+    }
+
+    /* ----- SUBTLE PAGE TRANSITION ----- */
+    .page { animation: fadeIn 0.3s cubic-bezier(.4,0,.2,1); }
+
+    /* ----- MODERN SEARCH BAR ----- */
+    #pos-app #menu-search {
+      background: rgba(255,255,255,0.8) !important;
+      border: 1.5px solid #E2E8F0 !important;
+      border-radius: 0.85rem !important;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.02);
+      padding: 0.75rem 1rem 0.75rem 2.75rem !important;
+      transition: all 0.25s ease !important;
+    }
+    #pos-app #menu-search:focus {
+      background: #FFFFFF !important;
+      border-color: #0EA5E9 !important;
+      box-shadow: 0 0 0 3px rgba(14,165,233,0.1), 0 4px 12px rgba(14,165,233,0.08) !important;
+    }
+
+    /* ----- PAYMENT METHOD BUTTONS ----- */
+    .pay-method-btn {
+      transition: all 0.25s cubic-bezier(.4,0,.2,1) !important;
+    }
+    .pay-method-btn[class*="bg-sky-700"] {
+      background: linear-gradient(135deg, #0369A1, #0EA5E9) !important;
+      box-shadow: 0 2px 8px rgba(3,105,161,0.25);
+    }
+    .pay-method-btn:not([class*="bg-sky-700"]):hover {
+      border-color: #0EA5E9 !important;
+      background: #F0F9FF !important;
+    }
   </style>
 </head>
 <body class="bg-slate-50 min-h-screen">
