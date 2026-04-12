@@ -12,7 +12,7 @@
   <link rel="apple-touch-icon" href="/apple-touch-icon.png">
   <link rel="icon" href="/logo-wp.png" sizes="192x192" type="image/png">
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <!-- Firebase CDN (compat) -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -50,40 +50,44 @@
       #print-sheet { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 999999; background: white; overflow-y: auto; }
       .no-print { display: none !important; }
     }
-    /* ===== MODERN TABLE CARDS ===== */
+    /* ===== TABLE CARDS ===== */
     .table-card {
-      transition: all 0.3s cubic-bezier(.4,0,.2,1);
-      border: 2px solid transparent;
+      transition: all 0.25s cubic-bezier(.4,0,.2,1);
       position: relative;
       overflow: hidden;
-      border-radius: 1rem;
-      background: white;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.03);
+      border-radius: 0.875rem;
+      border: 2px solid #E2E8F0;
+      background: #FFFFFF;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+      cursor: pointer;
     }
     .table-card:hover {
-      transform: translateY(-4px) scale(1.03);
-      box-shadow: 0 12px 28px rgba(3,105,161,0.12), 0 0 0 1px rgba(0,0,0,0.04);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(14,165,233,0.1);
+      border-color: #BAE6FD;
     }
     .table-card.active-table {
       border-color: transparent;
-      background: linear-gradient(145deg, #e0f2fe, #bae6fd, #7dd3fc);
-      box-shadow: 0 6px 20px rgba(14,165,233,0.25), 0 0 0 2px #0EA5E9, inset 0 1px 0 rgba(255,255,255,0.6);
+      background: linear-gradient(145deg, #0EA5E9, #0284C7);
+      box-shadow: 0 8px 28px rgba(2,132,199,0.35);
     }
     .table-card.active-table:hover {
-      box-shadow: 0 12px 30px rgba(14,165,233,0.35), 0 0 0 2px #0284C7, inset 0 1px 0 rgba(255,255,255,0.6);
+      box-shadow: 0 12px 36px rgba(2,132,199,0.45);
+      transform: translateY(-3px);
     }
     .table-card.unpaid-table {
       border-color: transparent;
-      background: linear-gradient(145deg, #fff1f2, #fecdd3, #fda4af);
-      box-shadow: 0 6px 20px rgba(239,68,68,0.2), 0 0 0 2px #ef4444, inset 0 1px 0 rgba(255,255,255,0.5);
-      animation: unpaid-glow 2s ease-in-out infinite;
+      background: linear-gradient(145deg, #FB7185, #E11D48);
+      box-shadow: 0 8px 28px rgba(225,29,72,0.35);
+      animation: unpaid-pulse 2s ease-in-out infinite;
     }
     .table-card.unpaid-table:hover {
-      box-shadow: 0 12px 30px rgba(239,68,68,0.3), 0 0 0 2px #dc2626, inset 0 1px 0 rgba(255,255,255,0.5);
+      box-shadow: 0 12px 36px rgba(225,29,72,0.45);
+      transform: translateY(-3px);
     }
-    @keyframes unpaid-glow {
-      0%, 100% { box-shadow: 0 6px 20px rgba(239,68,68,0.2), 0 0 0 2px #ef4444, inset 0 1px 0 rgba(255,255,255,0.5); }
-      50% { box-shadow: 0 6px 24px rgba(239,68,68,0.35), 0 0 0 3px #f87171, inset 0 1px 0 rgba(255,255,255,0.5); }
+    @keyframes unpaid-pulse {
+      0%, 100% { box-shadow: 0 8px 28px rgba(225,29,72,0.35); }
+      50% { box-shadow: 0 8px 34px rgba(225,29,72,0.5); }
     }
     .table-card .pulse-dot {
       position: absolute;
@@ -95,7 +99,7 @@
       box-shadow: 0 0 6px rgba(239,68,68,0.6);
     }
     .table-card .pulse-dot.unpaid {
-      background: #ef4444;
+      background: #FFFFFF;
       animation: pulse-dot 1.5s ease-in-out infinite;
     }
     @keyframes pulse-dot {
@@ -103,40 +107,51 @@
       50% { opacity: 0.4; transform: scale(1.5); }
     }
     .table-card .table-number {
-      font-size: 1.5rem;
-      font-weight: 800;
+      font-size: 1.65rem;
+      font-weight: 900;
       line-height: 1;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.08);
     }
     .table-card .table-icon {
-      font-size: 1.25rem;
-      margin-bottom: 2px;
-      filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1));
+      font-size: 1.1rem;
+      margin-bottom: 0.35rem;
     }
     .table-card .table-status {
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       font-weight: 700;
-      letter-spacing: 0.02em;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
     }
     .table-card .customer-badge {
-      font-size: 0.72rem;
+      font-size: 0.65rem;
       font-weight: 700;
       padding: 2px 8px;
       border-radius: 9999px;
       letter-spacing: 0.01em;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
     .table-card .edit-btn {
-      opacity: 0.4;
-      transition: all 0.2s;
+      opacity: 0;
+      transition: opacity 0.2s;
     }
     .table-card:hover .edit-btn {
       opacity: 1;
     }
     .table-card.selected-table {
-      box-shadow: 0 8px 24px rgba(14,165,233,0.35), 0 0 0 3px #0284C7, inset 0 1px 0 rgba(255,255,255,0.6);
-      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 10px 36px rgba(2,132,199,0.4), 0 0 0 3px #0369A1;
+      transform: translateY(-2px) scale(1.02);
     }
+    /* White text overrides for colored cards */
+    .table-card.active-table .table-number,
+    .table-card.unpaid-table .table-number { color: #FFFFFF !important; text-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+    .table-card.active-table .table-status,
+    .table-card.unpaid-table .table-status { color: rgba(255,255,255,0.9) !important; }
+    .table-card.active-table .table-icon,
+    .table-card.unpaid-table .table-icon { background: rgba(255,255,255,0.2) !important; }
+    .table-card.active-table .table-icon i,
+    .table-card.unpaid-table .table-icon i { color: #FFFFFF !important; }
+    .table-card.active-table .customer-badge,
+    .table-card.unpaid-table .customer-badge { background: rgba(255,255,255,0.22) !important; color: white !important; }
+    .table-card.active-table .edit-btn i,
+    .table-card.unpaid-table .edit-btn i { color: rgba(255,255,255,0.5) !important; }
     /* ===== ORDER MODE TABS ===== */
     .order-mode-tab {
       transition: all 0.25s cubic-bezier(.4,0,.2,1);
@@ -163,40 +178,42 @@
     }
     /* ===== TAKEAWAY / PEL CARDS ===== */
     .pel-card {
-      transition: all 0.3s cubic-bezier(.4,0,.2,1);
-      border: 2px solid transparent;
+      transition: all 0.25s cubic-bezier(.4,0,.2,1);
       position: relative;
       overflow: hidden;
-      border-radius: 1rem;
-      background: white;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.03);
+      border-radius: 0.875rem;
+      border: 2px solid #E2E8F0;
+      background: #FFFFFF;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
       cursor: pointer;
     }
     .pel-card:hover {
-      transform: translateY(-4px) scale(1.03);
-      box-shadow: 0 12px 28px rgba(3,105,161,0.12), 0 0 0 1px rgba(0,0,0,0.04);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(234,179,8,0.1);
+      border-color: #FDE68A;
     }
     .pel-card.pel-active {
       border-color: transparent;
-      background: linear-gradient(145deg, #fef9c3, #fef08a, #fde047);
-      box-shadow: 0 6px 20px rgba(234,179,8,0.25), 0 0 0 2px #EAB308, inset 0 1px 0 rgba(255,255,255,0.6);
+      background: linear-gradient(145deg, #FBBF24, #D97706);
+      box-shadow: 0 8px 28px rgba(217,119,6,0.35);
     }
     .pel-card.pel-active:hover {
-      box-shadow: 0 12px 30px rgba(234,179,8,0.35), 0 0 0 2px #CA8A04, inset 0 1px 0 rgba(255,255,255,0.6);
+      box-shadow: 0 12px 36px rgba(217,119,6,0.45);
+      transform: translateY(-3px);
     }
     .pel-card.pel-unpaid {
       border-color: transparent;
-      background: linear-gradient(145deg, #fff1f2, #fecdd3, #fda4af);
-      box-shadow: 0 6px 20px rgba(239,68,68,0.2), 0 0 0 2px #ef4444, inset 0 1px 0 rgba(255,255,255,0.5);
+      background: linear-gradient(145deg, #FB7185, #E11D48);
+      box-shadow: 0 8px 28px rgba(225,29,72,0.35);
       animation: pel-unpaid-glow 2s ease-in-out infinite;
     }
     @keyframes pel-unpaid-glow {
-      0%, 100% { box-shadow: 0 6px 20px rgba(239,68,68,0.2), 0 0 0 2px #ef4444, inset 0 1px 0 rgba(255,255,255,0.5); }
-      50% { box-shadow: 0 6px 24px rgba(239,68,68,0.35), 0 0 0 3px #f87171, inset 0 1px 0 rgba(255,255,255,0.5); }
+      0%, 100% { box-shadow: 0 8px 28px rgba(225,29,72,0.35); }
+      50% { box-shadow: 0 8px 34px rgba(225,29,72,0.5); }
     }
     .pel-card.pel-selected {
-      box-shadow: 0 8px 24px rgba(234,179,8,0.35), 0 0 0 3px #CA8A04, inset 0 1px 0 rgba(255,255,255,0.6);
-      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 10px 36px rgba(217,119,6,0.4), 0 0 0 3px #B45309;
+      transform: translateY(-2px) scale(1.02);
     }
     .pel-card .pel-dot {
       position: absolute;
@@ -206,9 +223,22 @@
       height: 10px;
       border-radius: 50%;
       box-shadow: 0 0 6px rgba(239,68,68,0.6);
-      background: #ef4444;
+      background: #FFFFFF;
       animation: pulse-dot 1.5s ease-in-out infinite;
     }
+    /* White text overrides for colored pel cards */
+    .pel-card.pel-active .table-number,
+    .pel-card.pel-unpaid .table-number { color: #FFFFFF !important; text-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+    .pel-card.pel-active .table-status,
+    .pel-card.pel-unpaid .table-status { color: rgba(255,255,255,0.9) !important; }
+    .pel-card.pel-active .table-icon,
+    .pel-card.pel-unpaid .table-icon { background: rgba(255,255,255,0.2) !important; }
+    .pel-card.pel-active .table-icon i,
+    .pel-card.pel-unpaid .table-icon i { color: #FFFFFF !important; }
+    .pel-card.pel-active .table-customer-badge,
+    .pel-card.pel-unpaid .table-customer-badge { background: rgba(255,255,255,0.22) !important; color: white !important; }
+    .pel-card.pel-active .edit-btn i,
+    .pel-card.pel-unpaid .edit-btn i { color: rgba(255,255,255,0.5) !important; }
     .tab-btn { transition: all 0.25s cubic-bezier(.4,0,.2,1); }
     .tab-btn:hover { transform: translateY(-1px); }
     .toast-enter { animation: slideUp 0.4s cubic-bezier(.4,0,.2,1); }
@@ -484,110 +514,183 @@
       border: 1px solid rgba(255,255,255,0.5);
       overflow: hidden;
     }
+    /* ===== BOLD MODERN POS DESIGN ===== */
+
+    /* --- BOTTOM NAV: Clean pill indicator --- */
     .nav-btn {
       border-radius: 0.85rem !important;
       border-top: none !important;
-      transition: all 0.35s cubic-bezier(.4,0,.2,1) !important;
+      background: transparent !important;
+      transition: all 0.3s cubic-bezier(.4,0,.2,1) !important;
       position: relative;
-      overflow: hidden;
+      overflow: visible !important;
     }
     .nav-btn.text-sky-600,
     .nav-btn.text-gray-400 {
       background: transparent !important;
       border-top: none !important;
+      box-shadow: none !important;
     }
     .nav-btn.text-sky-600 {
-      background: linear-gradient(135deg, #0369A1, #0EA5E9) !important;
-      color: white !important;
-      box-shadow: 0 2px 12px rgba(3,105,161,0.35);
+      color: #0284C7 !important;
     }
     .nav-btn.text-sky-600 i,
     .nav-btn.text-sky-600 span {
-      color: white !important;
+      color: #0284C7 !important;
+    }
+    .nav-btn.text-sky-600::after {
+      content: '';
+      position: absolute;
+      bottom: 6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 24px;
+      height: 4px;
+      border-radius: 4px 4px 0 0;
+      background: linear-gradient(135deg, #0369A1, #0EA5E9);
     }
     .nav-btn.text-gray-400:hover {
-      background: #F1F5F9 !important;
+      background: #F8FAFC !important;
     }
 
-    /* ----- GLASSMORPHISM CARDS ----- */
+    /* --- SOLID PANEL CARDS --- */
     #pos-app .bg-white.rounded-2xl,
     #pos-app div[class*="bg-white"][class*="rounded-2xl"],
     #pos-app div[class*="bg-white"][class*="rounded-xl"] {
-      background: rgba(255,255,255,0.72) !important;
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255,255,255,0.5) !important;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03);
+      background: #FFFFFF !important;
+      border: 1px solid #E2E8F0 !important;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02) !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
     }
 
-    /* ----- MODERN TABLE CARDS (override) ----- */
+    /* --- TABLE CARDS: Bold Solid Design --- */
     .table-card {
-      border-radius: 1.125rem !important;
-      background: rgba(255,255,255,0.85) !important;
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(14,165,233,0.06) !important;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.03), 0 0 0 0.5px rgba(0,0,0,0.02);
+      border-radius: 0.875rem !important;
+      background: #FFFFFF !important;
+      border: 2px solid #E2E8F0 !important;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04) !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      transition: all 0.25s cubic-bezier(.4,0,.2,1) !important;
     }
     .table-card:hover {
-      box-shadow: 0 8px 28px rgba(3,105,161,0.1), 0 0 0 0.5px rgba(14,165,233,0.08);
-      transform: translateY(-3px) scale(1.02);
+      border-color: #BAE6FD !important;
+      box-shadow: 0 6px 20px rgba(14,165,233,0.1) !important;
+      transform: translateY(-2px) !important;
     }
     .table-card.active-table {
-      background: linear-gradient(145deg, #e0f2fe, #bae6fd) !important;
-      border: 1.5px solid rgba(14,165,233,0.25) !important;
-      box-shadow: 0 8px 28px rgba(14,165,233,0.18), 0 0 0 0.5px rgba(14,165,233,0.15) !important;
+      background: linear-gradient(145deg, #0EA5E9, #0284C7) !important;
+      border-color: transparent !important;
+      box-shadow: 0 8px 28px rgba(2,132,199,0.35) !important;
+    }
+    .table-card.active-table:hover {
+      box-shadow: 0 12px 36px rgba(2,132,199,0.45) !important;
+      transform: translateY(-3px) !important;
     }
     .table-card.unpaid-table {
-      border: 1.5px solid rgba(239,68,68,0.2) !important;
+      background: linear-gradient(145deg, #FB7185, #E11D48) !important;
+      border-color: transparent !important;
+      box-shadow: 0 8px 28px rgba(225,29,72,0.35) !important;
+      animation: unpaid-pulse 2s ease-in-out infinite !important;
+    }
+    .table-card.unpaid-table:hover {
+      box-shadow: 0 12px 36px rgba(225,29,72,0.45) !important;
+      transform: translateY(-3px) !important;
+    }
+    @keyframes unpaid-pulse {
+      0%, 100% { box-shadow: 0 8px 28px rgba(225,29,72,0.35); }
+      50% { box-shadow: 0 8px 34px rgba(225,29,72,0.5); }
     }
     .table-card.selected-table {
-      box-shadow: 0 8px 32px rgba(14,165,233,0.25), 0 0 0 2.5px #0284C7 !important;
+      box-shadow: 0 10px 36px rgba(2,132,199,0.4), 0 0 0 3px #0369A1 !important;
+      transform: translateY(-2px) scale(1.02) !important;
     }
+    /* White text on gradient table cards */
+    .table-card.active-table .table-number,
+    .table-card.unpaid-table .table-number { color: #FFFFFF !important; text-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+    .table-card.active-table .table-status,
+    .table-card.unpaid-table .table-status { color: rgba(255,255,255,0.92) !important; }
+    .table-card.active-table .table-icon,
+    .table-card.unpaid-table .table-icon { background: rgba(255,255,255,0.2) !important; }
+    .table-card.active-table .table-icon i,
+    .table-card.unpaid-table .table-icon i { color: #FFFFFF !important; }
+    .table-card.active-table .customer-badge,
+    .table-card.unpaid-table .customer-badge { background: rgba(255,255,255,0.22) !important; color: white !important; }
+    .table-card.active-table .edit-btn i,
+    .table-card.unpaid-table .edit-btn i { color: rgba(255,255,255,0.5) !important; }
 
-    /* ----- MODERN PEL CARDS (override) ----- */
+    /* --- PEL CARDS: Bold Solid Design --- */
     .pel-card {
-      border-radius: 1.125rem !important;
-      background: rgba(255,255,255,0.85) !important;
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(234,179,8,0.06) !important;
+      border-radius: 0.875rem !important;
+      background: #FFFFFF !important;
+      border: 2px solid #E2E8F0 !important;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04) !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(.4,0,.2,1) !important;
+    }
+    .pel-card:hover {
+      border-color: #FDE68A !important;
+      box-shadow: 0 6px 20px rgba(234,179,8,0.1) !important;
+      transform: translateY(-2px) !important;
     }
     .pel-card.pel-active {
-      background: linear-gradient(145deg, #fefce8, #fef9c3) !important;
-      border: 1.5px solid rgba(234,179,8,0.2) !important;
-      box-shadow: 0 8px 24px rgba(234,179,8,0.15);
+      background: linear-gradient(145deg, #FBBF24, #D97706) !important;
+      border-color: transparent !important;
+      box-shadow: 0 8px 28px rgba(217,119,6,0.35) !important;
+    }
+    .pel-card.pel-active:hover {
+      box-shadow: 0 12px 36px rgba(217,119,6,0.45) !important;
+      transform: translateY(-3px) !important;
     }
     .pel-card.pel-unpaid {
-      border: 1.5px solid rgba(239,68,68,0.2) !important;
+      background: linear-gradient(145deg, #FB7185, #E11D48) !important;
+      border-color: transparent !important;
+      box-shadow: 0 8px 28px rgba(225,29,72,0.35) !important;
     }
     .pel-card.pel-selected {
-      box-shadow: 0 8px 32px rgba(234,179,8,0.2), 0 0 0 2.5px #CA8A04 !important;
+      box-shadow: 0 10px 36px rgba(217,119,6,0.4), 0 0 0 3px #B45309 !important;
+      transform: translateY(-2px) scale(1.02) !important;
     }
+    /* White text on gradient pel cards */
+    .pel-card.pel-active .table-number,
+    .pel-card.pel-unpaid .table-number { color: #FFFFFF !important; text-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+    .pel-card.pel-active .table-status,
+    .pel-card.pel-unpaid .table-status { color: rgba(255,255,255,0.92) !important; }
+    .pel-card.pel-active .table-icon,
+    .pel-card.pel-unpaid .table-icon { background: rgba(255,255,255,0.2) !important; }
+    .pel-card.pel-active .table-icon i,
+    .pel-card.pel-unpaid .table-icon i { color: #FFFFFF !important; }
+    .pel-card.pel-active .table-customer-badge,
+    .pel-card.pel-unpaid .table-customer-badge { background: rgba(255,255,255,0.22) !important; color: white !important; }
+    .pel-card.pel-active .edit-btn i,
+    .pel-card.pel-unpaid .edit-btn i { color: rgba(255,255,255,0.5) !important; }
 
-    /* ----- MODERN BUTTONS ----- */
+    /* --- BOLD BUTTONS --- */
     #pos-app button[class*="bg-sky-700"],
     #pos-app button[class*="bg-sky-800"] {
       background: linear-gradient(135deg, #0369A1 0%, #0284C7 100%) !important;
-      box-shadow: 0 2px 10px rgba(3,105,161,0.2);
-      transition: all 0.3s cubic-bezier(.4,0,.2,1) !important;
+      box-shadow: 0 2px 10px rgba(3,105,161,0.25) !important;
+      transition: all 0.25s cubic-bezier(.4,0,.2,1) !important;
     }
     #pos-app button[class*="bg-sky-700"]:hover,
     #pos-app button[class*="bg-sky-800"]:hover {
-      box-shadow: 0 4px 18px rgba(3,105,161,0.35);
+      box-shadow: 0 4px 18px rgba(3,105,161,0.4) !important;
       transform: translateY(-1px);
     }
-    #pos-app button[class*="bg-sky-700"]:active {
-      transform: translateY(0);
-    }
+    #pos-app button[class*="bg-sky-700"]:active { transform: translateY(0); }
     #pos-app button[class*="bg-green-600"] {
       background: linear-gradient(135deg, #059669, #10B981) !important;
-      box-shadow: 0 2px 10px rgba(5,150,105,0.2);
+      box-shadow: 0 2px 10px rgba(5,150,105,0.25) !important;
     }
     #pos-app button[class*="bg-green-600"]:hover {
-      box-shadow: 0 4px 18px rgba(5,150,105,0.35);
+      box-shadow: 0 4px 18px rgba(5,150,105,0.4) !important;
       transform: translateY(-1px);
     }
 
-    /* ----- MODERN INPUTS ----- */
+    /* --- CRISP INPUTS --- */
     #pos-app input[type="text"],
     #pos-app input[type="email"],
     #pos-app input[type="tel"],
@@ -596,122 +699,118 @@
     #pos-app input[type="date"],
     #pos-app input[type="month"],
     #pos-app textarea {
-      background: rgba(248,250,252,0.8) !important;
+      background: #F8FAFC !important;
       border: 1.5px solid #E2E8F0 !important;
-      border-radius: 0.85rem !important;
-      padding: 0.7rem 1rem !important;
-      transition: all 0.25s cubic-bezier(.4,0,.2,1) !important;
+      border-radius: 0.75rem !important;
+      padding: 0.65rem 0.9rem !important;
+      transition: all 0.2s ease !important;
       font-size: 0.875rem !important;
       color: #1E293B;
+      box-shadow: none !important;
     }
     #pos-app input:focus,
     #pos-app textarea:focus {
       background: #FFFFFF !important;
       border-color: #0EA5E9 !important;
-      box-shadow: 0 0 0 3px rgba(14,165,233,0.1) !important;
+      box-shadow: 0 0 0 3px rgba(14,165,233,0.12) !important;
       outline: none;
     }
     #pos-app input::placeholder,
-    #pos-app textarea::placeholder {
-      color: #94A3B8 !important;
-    }
+    #pos-app textarea::placeholder { color: #94A3B8 !important; }
 
-    /* ----- MODERN ORDER MODE TABS ----- */
+    /* --- ORDER MODE TABS --- */
     .order-mode-tab {
-      border-radius: 0.85rem !important;
-      letter-spacing: 0.01em;
+      position: relative !important;
+      overflow: hidden !important;
+      transition: all 0.25s cubic-bezier(.4,0,.2,1) !important;
+      border-radius: 0.875rem !important;
     }
     .order-mode-tab.active-mode {
       background: linear-gradient(135deg, #0369A1, #0EA5E9) !important;
-      box-shadow: 0 4px 16px rgba(3,105,161,0.3);
+      color: white !important;
+      border-color: transparent !important;
+      box-shadow: 0 4px 16px rgba(3,105,161,0.3) !important;
     }
     .order-mode-tab:not(.active-mode) {
-      background: rgba(255,255,255,0.7) !important;
+      background: #FFFFFF !important;
       border: 1.5px solid #E2E8F0 !important;
+      box-shadow: none !important;
     }
 
-    /* ----- MODERN CATEGORY CHIPS ----- */
-    .tab-btn {
-      border-radius: 2rem !important;
-      letter-spacing: 0.01em;
-    }
+    /* --- CATEGORY CHIPS --- */
+    .tab-btn { border-radius: 2rem !important; letter-spacing: 0.01em; }
 
-    /* ----- MODERN REPORT TABS ----- */
+    /* --- REPORT TABS --- */
     .report-tab.active-tab {
       background: linear-gradient(135deg, #0369A1, #0284C7) !important;
       box-shadow: 0 4px 14px rgba(3,105,161,0.3) !important;
+      border-color: transparent !important;
     }
 
-    /* ----- MODERN MODAL OVERLAY ----- */
+    /* --- MODAL OVERLAY --- */
     .modal-overlay {
-      background: rgba(12, 74, 110, 0.4) !important;
-      backdrop-filter: blur(12px) !important;
-      -webkit-backdrop-filter: blur(12px) !important;
+      background: rgba(12, 74, 110, 0.45) !important;
+      backdrop-filter: blur(10px) !important;
+      -webkit-backdrop-filter: blur(10px) !important;
     }
 
-    /* ----- MODERN MODAL CARDS ----- */
+    /* --- MODAL CARDS --- */
     #pos-app [id$="-modal"] > div:last-child,
     #payment-modal > div:last-child:not(.modal-overlay),
     #receipt-modal > div:last-child:not(.modal-overlay),
     #menu-edit-modal > div:last-child:not(.modal-overlay),
     #trx-detail-modal > div:last-child:not(.modal-overlay) {
-      border-radius: 1.5rem !important;
+      border-radius: 1.25rem !important;
       overflow: hidden;
-      box-shadow: 0 25px 60px rgba(0,0,0,0.15), 0 0 0 1px rgba(255,255,255,0.1);
+      box-shadow: 0 25px 60px rgba(0,0,0,0.18) !important;
+      background: #FFFFFF !important;
     }
 
-    /* ----- MODAL HEADERS ----- */
+    /* --- MODAL HEADERS --- */
     #pos-app [id$="-modal"] [class*="bg-sky-700"][class*="rounded-t"] {
       background: linear-gradient(135deg, #0C4A6E 0%, #0369A1 40%, #0EA5E9 100%) !important;
-      padding: 1.1rem 1.25rem !important;
+      padding: 1rem 1.25rem !important;
     }
 
-    /* ----- MODERN SECTION HEADINGS ----- */
-    #pos-app h2[class*="font-bold"] {
-      font-size: 1.15rem !important;
-      letter-spacing: -0.01em;
-    }
-    #pos-app h3[class*="font-bold"] {
-      letter-spacing: -0.01em;
-    }
+    /* --- SECTION HEADINGS --- */
+    #pos-app h2[class*="font-bold"] { font-size: 1.15rem !important; letter-spacing: -0.01em; }
+    #pos-app h3[class*="font-bold"] { letter-spacing: -0.01em; }
 
-    /* ----- MOBILE PANEL ----- */
+    /* --- MOBILE PANEL --- */
     #mobile-panel > div:last-child {
-      background: rgba(255,255,255,0.95) !important;
-      backdrop-filter: blur(24px) !important;
-      -webkit-backdrop-filter: blur(24px) !important;
+      background: #FFFFFF !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
       box-shadow: 0 -8px 40px rgba(0,0,0,0.12) !important;
     }
 
-    /* ----- DESKTOP ORDER PANEL ----- */
-    #pos-app .hidden.lg\\:block > div[class*="rounded-2xl"] {
-      background: rgba(255,255,255,0.72) !important;
-      backdrop-filter: blur(20px) !important;
-      -webkit-backdrop-filter: blur(20px) !important;
+    /* --- DESKTOP ORDER PANEL --- */
+    #pos-app .hidden.lg\:block > div[class*="rounded-2xl"] {
+      background: #FFFFFF !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
     }
 
-    /* ----- SUBTLE PAGE TRANSITION ----- */
+    /* --- PAGE TRANSITION --- */
     .page { animation: fadeIn 0.3s cubic-bezier(.4,0,.2,1); }
 
-    /* ----- MODERN SEARCH BAR ----- */
+    /* --- SEARCH BAR --- */
     #pos-app #menu-search {
-      background: rgba(255,255,255,0.8) !important;
+      background: #F8FAFC !important;
       border: 1.5px solid #E2E8F0 !important;
-      border-radius: 0.85rem !important;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.02);
-      padding: 0.75rem 1rem 0.75rem 2.75rem !important;
-      transition: all 0.25s ease !important;
+      border-radius: 0.875rem !important;
+      box-shadow: none !important;
+      padding: 0.7rem 1rem 0.7rem 2.75rem !important;
+      transition: all 0.2s ease !important;
     }
     #pos-app #menu-search:focus {
       background: #FFFFFF !important;
       border-color: #0EA5E9 !important;
-      box-shadow: 0 0 0 3px rgba(14,165,233,0.1), 0 4px 12px rgba(14,165,233,0.08) !important;
+      box-shadow: 0 0 0 3px rgba(14,165,233,0.12) !important;
     }
 
-    /* ----- PAYMENT METHOD BUTTONS ----- */
-    .pay-method-btn {
-      transition: all 0.25s cubic-bezier(.4,0,.2,1) !important;
-    }
+    /* --- PAYMENT METHOD BUTTONS --- */
+    .pay-method-btn { transition: all 0.25s cubic-bezier(.4,0,.2,1) !important; }
     .pay-method-btn[class*="bg-sky-700"] {
       background: linear-gradient(135deg, #0369A1, #0EA5E9) !important;
       box-shadow: 0 2px 8px rgba(3,105,161,0.25);
@@ -719,6 +818,32 @@
     .pay-method-btn:not([class*="bg-sky-700"]):hover {
       border-color: #0EA5E9 !important;
       background: #F0F9FF !important;
+    }
+
+    /* --- BOLD TABLE/PEL NUMBER SIZING --- */
+    .table-card .table-number {
+      font-size: 1.65rem !important;
+      font-weight: 900 !important;
+      line-height: 1 !important;
+    }
+    .table-card .table-icon {
+      width: 2.5rem !important;
+      height: 2.5rem !important;
+      border-radius: 0.75rem !important;
+      font-size: 1.1rem !important;
+      margin-bottom: 0.35rem !important;
+    }
+    .pel-card .table-number {
+      font-size: 1.65rem !important;
+      font-weight: 900 !important;
+      line-height: 1 !important;
+    }
+    .pel-card .table-icon {
+      width: 2.5rem !important;
+      height: 2.5rem !important;
+      border-radius: 0.75rem !important;
+      font-size: 1.1rem !important;
+      margin-bottom: 0.35rem !important;
     }
   </style>
 </head>
@@ -744,7 +869,7 @@
     <!-- Form Area -->
     <div class="auth-form-area animate-fade-in">
       <div id="login-error" class="hidden bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl p-3 mb-4">
-        <i class="fas fa-exclamation-circle mr-1"></i><span id="login-error-text"></span>
+        <i class="fas fa-circle-exclamation mr-1"></i><span id="login-error-text"></span>
       </div>
       <div class="space-y-3 mb-4">
         <div>
@@ -762,7 +887,7 @@
           </div>
         </div>
         <button onclick="doLogin()" id="login-btn" class="auth-btn-primary">
-          <i class="fas fa-sign-in-alt mr-2"></i> Masuk
+          <i class="fas fa-right-to-bracket mr-2"></i> Masuk
         </button>
       </div>
       <div class="text-center space-y-2">
@@ -792,7 +917,7 @@
     <!-- Form Area -->
     <div class="auth-form-area animate-fade-in" style="justify-content:flex-start;">
       <div id="register-error" class="hidden bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl p-3 mb-3">
-        <i class="fas fa-exclamation-circle mr-1"></i><span id="register-error-text"></span>
+        <i class="fas fa-circle-exclamation mr-1"></i><span id="register-error-text"></span>
       </div>
       <div class="space-y-3 mb-3">
         <div>
@@ -805,7 +930,7 @@
         <div>
           <label class="auth-label">Nama Toko</label>
           <div class="relative auth-input-wrapper">
-            <i class="fas fa-store auth-input-icon"></i>
+            <i class="fas fa-shop auth-input-icon"></i>
             <input type="text" id="reg-shop" placeholder="Nama toko Anda" class="auth-input-field">
           </div>
         </div>
@@ -864,10 +989,10 @@
     <!-- Form Area -->
     <div class="auth-form-area animate-fade-in">
       <div id="forgot-error" class="hidden bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl p-3 mb-4">
-        <i class="fas fa-exclamation-circle mr-1"></i><span id="forgot-error-text"></span>
+        <i class="fas fa-circle-exclamation mr-1"></i><span id="forgot-error-text"></span>
       </div>
       <div id="forgot-success" class="hidden bg-green-50 border border-green-200 text-green-700 text-sm rounded-xl p-3 mb-4">
-        <i class="fas fa-check-circle mr-1"></i><span id="forgot-success-text"></span>
+        <i class="fas fa-circle-check mr-1"></i><span id="forgot-success-text"></span>
       </div>
       <div class="space-y-3 mb-4">
         <div>
@@ -955,14 +1080,14 @@
 
       <!-- Refresh Button -->
       <button onclick="refreshActivationStatus()" id="refresh-activation-btn" class="auth-btn-primary mb-3">
-        <i class="fas fa-sync-alt mr-2"></i> Cek Status Aktivasi
+        <i class="fas fa-rotate mr-2"></i> Cek Status Aktivasi
       </button>
 
       <!-- Demo Code Input -->
       <div class="border-t border-slate-200 pt-4 mt-3">
         <div class="flex items-center gap-2 mb-2">
           <span class="w-6 h-6 bg-purple-100 flex items-center justify-center rounded-full">
-            <i class="fas fa-play-circle text-purple-600 text-xs"></i>
+            <i class="fas fa-circle-play text-purple-600 text-xs"></i>
           </span>
           <p class="text-sm font-bold text-slate-700">Coba Demo 24 Jam?</p>
         </div>
@@ -976,12 +1101,12 @@
           </button>
         </div>
         <div id="demo-code-error" class="hidden bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl p-2 mt-2">
-          <i class="fas fa-exclamation-circle mr-1"></i><span id="demo-code-error-text"></span>
+          <i class="fas fa-circle-exclamation mr-1"></i><span id="demo-code-error-text"></span>
         </div>
       </div>
 
       <button onclick="doLogout()" class="w-full px-6 py-2.5 bg-slate-200 text-slate-700 rounded-xl font-semibold hover:bg-slate-300 transition mt-4">
-        <i class="fas fa-sign-out-alt mr-2"></i> Keluar
+        <i class="fas fa-right-from-bracket mr-2"></i> Keluar
       </button>
     </div>
   </div>
@@ -1004,11 +1129,11 @@
     <div class="auth-form-area animate-fade-in">
       <div class="text-center">
         <div class="w-20 h-20 bg-red-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-          <i class="fas fa-times-circle text-4xl text-red-500"></i>
+          <i class="fas fa-xmark-circle text-4xl text-red-500"></i>
         </div>
         <p class="text-slate-600 mb-6">Akun Anda ditolak. Silakan hubungi admin untuk informasi lebih lanjut.</p>
         <button onclick="doLogout()" class="w-full px-6 py-2.5 bg-slate-200 text-slate-700 rounded-xl font-semibold hover:bg-slate-300 transition">
-          <i class="fas fa-sign-out-alt mr-2"></i> Keluar
+          <i class="fas fa-right-from-bracket mr-2"></i> Keluar
         </button>
       </div>
     </div>
@@ -1047,7 +1172,7 @@
         </div>
       </div>
       <button onclick="doLogout()" class="w-full px-6 py-2.5 bg-slate-200 text-slate-700 rounded-xl font-semibold hover:bg-slate-300 transition">
-        <i class="fas fa-sign-out-alt mr-2"></i> Keluar
+        <i class="fas fa-right-from-bracket mr-2"></i> Keluar
       </button>
     </div>
   </div>
@@ -1086,7 +1211,7 @@
             <div id="header-daily-count" class="text-gray-400 text-[10px]">0 transaksi</div>
           </div>
           <button onclick="doLogout()" class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center hover:bg-red-50 hover:text-red-500 text-gray-400 transition" title="Keluar">
-            <i class="fas fa-sign-out-alt text-xs"></i>
+            <i class="fas fa-right-from-bracket text-xs"></i>
           </button>
         </div>
       </div>
@@ -1113,10 +1238,10 @@
           <!-- ORDER MODE TABS -->
           <div class="flex gap-2 mb-4">
             <button onclick="switchOrderMode('dine-in')" id="mode-dinein" class="order-mode-tab flex-1 py-3 rounded-xl font-bold text-sm bg-sky-600 text-white shadow-md active-mode">
-              <i class="fas fa-chair mr-2"></i> Di Tempat
+              <i class="fas fa-couch mr-2"></i> Di Tempat
             </button>
             <button onclick="switchOrderMode('takeaway')" id="mode-takeaway" class="order-mode-tab flex-1 py-3 rounded-xl font-bold text-sm bg-white text-gray-500 border-2 border-gray-200">
-              <i class="fas fa-shopping-bag mr-2"></i> Bungkus (Take Away)
+              <i class="fas fa-bag-shopping mr-2"></i> Bungkus (Take Away)
             </button>
           </div>
 
@@ -1127,7 +1252,7 @@
               <div id="section-dinein">
                 <div class="mb-4">
                   <div class="flex items-center justify-between mb-2">
-                    <h3 class="text-sm font-bold text-sky-700"><i class="fas fa-chair mr-1 text-sky-500"></i> Daftar Meja</h3>
+                    <h3 class="text-sm font-bold text-sky-700"><i class="fas fa-couch mr-1 text-sky-500"></i> Daftar Meja</h3>
                     <div class="flex items-center gap-2">
                       <button onclick="changeTableCount(-1)" class="w-7 h-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition text-xs font-bold" title="Kurangi meja"><i class="fas fa-minus"></i></button>
                       <span id="table-count-display" class="text-sm font-bold text-sky-800 min-w-[24px] text-center">30</span>
@@ -1141,7 +1266,7 @@
               <!-- TAKE AWAY SECTION -->
               <div id="section-takeaway" class="hidden mb-4">
                 <div class="flex items-center justify-between mb-2">
-                  <h3 class="text-sm font-bold text-yellow-700"><i class="fas fa-shopping-bag mr-1 text-yellow-500"></i> Daftar Bungkus</h3>
+                  <h3 class="text-sm font-bold text-yellow-700"><i class="fas fa-bag-shopping mr-1 text-yellow-500"></i> Daftar Bungkus</h3>
                   <div class="flex items-center gap-2">
                     <button onclick="changeTakeawayCount(-1)" class="w-7 h-7 rounded-lg bg-red-50 hover:bg-red-100 text-red-600 flex items-center justify-center transition text-xs font-bold" title="Kurangi"><i class="fas fa-minus"></i></button>
                     <span id="takeaway-count-display" class="text-sm font-bold text-yellow-800 min-w-[24px] text-center">5</span>
@@ -1154,7 +1279,7 @@
               <!-- MENU SECTION (shared) -->
               <div class="mb-4">
                 <div class="relative mb-3">
-                  <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-sky-400"></i>
+                  <i class="fas fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-sky-400"></i>
                   <input type="text" id="menu-search" placeholder="Cari menu..." class="w-full pl-10 pr-4 py-2.5 bg-white border border-sky-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400" oninput="renderMenuGrid()">
                 </div>
                 <div class="flex gap-2">
@@ -1178,7 +1303,7 @@
             <div class="flex items-center justify-between p-4 border-b border-sky-100">
               <h3 class="font-bold text-sky-800"><i class="fas fa-receipt mr-2 text-sky-500"></i>Pesanan</h3>
               <button onclick="closeMobilePanel()" class="w-8 h-8 rounded-full bg-sky-100 flex items-center justify-center text-sky-600">
-                <i class="fas fa-times"></i>
+                <i class="fas fa-xmark"></i>
               </button>
             </div>
             <div class="overflow-y-auto flex-1 p-4" id="panel-content-mobile"></div>
@@ -1190,25 +1315,25 @@
       <div id="page-riwayat" class="page">
         <div class="max-w-4xl mx-auto p-4">
           <h2 class="text-lg font-bold text-sky-800 mb-4 flex items-center gap-2">
-            <i class="fas fa-history text-sky-500"></i> Riwayat Penjualan
+            <i class="fas fa-clock-rotate-left text-sky-500"></i> Riwayat Penjualan
           </h2>
           <div class="flex gap-2 mb-4">
             <button onclick="switchReportTab('daily')" id="tab-daily" class="report-tab flex-1 py-2.5 rounded-xl text-sm font-semibold bg-sky-700 text-white shadow-sm active-tab">
-              <i class="fas fa-calendar-day mr-1"></i> Harian
+              <i class="fas fa-calendar-days mr-1"></i> Harian
             </button>
             <button onclick="switchReportTab('monthly')" id="tab-monthly" class="report-tab flex-1 py-2.5 rounded-xl text-sm font-semibold bg-white text-sky-600 border-2 border-sky-200">
-              <i class="fas fa-calendar-alt mr-1"></i> Bulanan
+              <i class="fas fa-calendar mr-1"></i> Bulanan
             </button>
             <button onclick="switchReportTab('custom')" id="tab-custom" class="report-tab flex-1 py-2.5 rounded-xl text-sm font-semibold bg-white text-sky-600 border-2 border-sky-200">
-              <i class="fas fa-sliders-h mr-1"></i> Kustom
+              <i class="fas fa-sliders mr-1"></i> Kustom
             </button>
           </div>
           <div id="panel-daily" class="report-panel">
             <div class="bg-white rounded-2xl p-4 shadow-sm border border-sky-100 mb-4">
-              <h2 class="text-base font-bold text-sky-800 mb-3"><i class="fas fa-chart-line mr-2 text-sky-400"></i>Laporan Penjualan Hari Ini</h2>
+              <h2 class="text-base font-bold text-sky-800 mb-3"><i class="fas fa-chart-column mr-2 text-sky-400"></i>Laporan Penjualan Hari Ini</h2>
               <div class="flex items-center gap-3">
                 <input type="date" id="daily-date" class="flex-1 px-3 py-2 border border-sky-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-400" onchange="loadHistory('daily')">
-                <button onclick="loadHistory('daily')" class="px-4 py-2 bg-sky-700 text-white rounded-xl text-sm font-semibold hover:bg-sky-800 transition"><i class="fas fa-search mr-1"></i> Cari</button>
+                <button onclick="loadHistory('daily')" class="px-4 py-2 bg-sky-700 text-white rounded-xl text-sm font-semibold hover:bg-sky-800 transition"><i class="fas fa-magnifying-glass mr-1"></i> Cari</button>
               </div>
             </div>
           </div>
@@ -1217,7 +1342,7 @@
               <h2 class="text-base font-bold text-sky-800 mb-3"><i class="fas fa-chart-bar mr-2 text-sky-400"></i>Laporan Penjualan Bulan Ini</h2>
               <div class="flex items-center gap-3">
                 <input type="month" id="monthly-picker" class="flex-1 px-3 py-2 border border-sky-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-400" onchange="loadHistory('monthly')">
-                <button onclick="loadHistory('monthly')" class="px-4 py-2 bg-sky-700 text-white rounded-xl text-sm font-semibold hover:bg-sky-800 transition"><i class="fas fa-search mr-1"></i> Cari</button>
+                <button onclick="loadHistory('monthly')" class="px-4 py-2 bg-sky-700 text-white rounded-xl text-sm font-semibold hover:bg-sky-800 transition"><i class="fas fa-magnifying-glass mr-1"></i> Cari</button>
               </div>
             </div>
           </div>
@@ -1227,7 +1352,7 @@
               <div class="flex flex-col sm:flex-row gap-3">
                 <input type="date" id="history-start" class="flex-1 px-3 py-2 border border-sky-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-400">
                 <input type="date" id="history-end" class="flex-1 px-3 py-2 border border-sky-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-400">
-                <button onclick="loadHistory('custom')" class="px-4 py-2 bg-sky-700 text-white rounded-xl text-sm font-semibold hover:bg-sky-800 transition whitespace-nowrap"><i class="fas fa-search mr-1"></i> Cari</button>
+                <button onclick="loadHistory('custom')" class="px-4 py-2 bg-sky-700 text-white rounded-xl text-sm font-semibold hover:bg-sky-800 transition whitespace-nowrap"><i class="fas fa-magnifying-glass mr-1"></i> Cari</button>
               </div>
             </div>
           </div>
@@ -1275,7 +1400,7 @@
       <!-- PAGE: TOKO -->
       <div id="page-toko" class="page">
         <div class="max-w-lg mx-auto p-4">
-          <h2 class="text-lg font-bold text-sky-800 mb-4 flex items-center gap-2"><i class="fas fa-store text-sky-500"></i> Pengaturan Toko</h2>
+          <h2 class="text-lg font-bold text-sky-800 mb-4 flex items-center gap-2"><i class="fas fa-shop text-sky-500"></i> Pengaturan Toko</h2>
           <div class="bg-white rounded-2xl p-5 shadow-sm border border-sky-100 space-y-5">
             <div class="text-center">
               <label for="shop-photo-input" class="inline-block cursor-pointer">
@@ -1308,7 +1433,7 @@
               <input type="text" id="setting-cashier-name" placeholder="Admin" class="w-full px-4 py-2.5 border border-sky-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-400">
             </div>
             <button onclick="saveShopSettings()" id="save-settings-btn" class="w-full py-3 bg-sky-700 text-white rounded-xl font-semibold hover:bg-sky-800 transition shadow-sm">
-              <i class="fas fa-save mr-2"></i> Simpan Pengaturan
+              <i class="fas fa-floppy-disk mr-2"></i> Simpan Pengaturan
             </button>
           </div>
 
@@ -1336,13 +1461,13 @@
             </div>
 
             <button onclick="confirmClearData()" class="w-full mt-3 py-2 bg-red-50 text-red-600 border border-red-200 rounded-xl text-xs font-semibold hover:bg-red-100 transition">
-              <i class="fas fa-trash mr-1"></i> Hapus Semua Data Lokal
+              <i class="fas fa-trash-can mr-1"></i> Hapus Semua Data Lokal
             </button>
           </div>
 
           <div class="mt-4">
             <button onclick="doLogout()" class="w-full py-3 bg-red-50 text-red-600 border border-red-200 rounded-xl font-semibold hover:bg-red-100 transition">
-              <i class="fas fa-sign-out-alt mr-2"></i> Keluar dari Akun
+              <i class="fas fa-right-from-bracket mr-2"></i> Keluar dari Akun
             </button>
           </div>
         </div>
@@ -1354,16 +1479,16 @@
     <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200 z-40 no-print">
       <div class="max-w-lg mx-auto flex">
         <button onclick="switchPage('kasir')" id="nav-kasir" class="nav-btn flex-1 py-3 flex flex-col items-center gap-0.5 text-sky-600 bg-sky-50 border-t-2 border-sky-600">
-          <i class="fas fa-cash-register text-lg"></i><span class="text-xs font-semibold">Kasir</span>
+          <i class="fas fa-calculator text-lg"></i><span class="text-xs font-semibold">Kasir</span>
         </button>
         <button onclick="switchPage('riwayat')" id="nav-riwayat" class="nav-btn flex-1 py-3 flex flex-col items-center gap-0.5 text-gray-400">
-          <i class="fas fa-chart-line text-lg"></i><span class="text-xs font-medium">Riwayat</span>
+          <i class="fas fa-chart-column text-lg"></i><span class="text-xs font-medium">Riwayat</span>
         </button>
         <button onclick="switchPage('menu')" id="nav-menu" class="nav-btn flex-1 py-3 flex flex-col items-center gap-0.5 text-gray-400">
           <i class="fas fa-utensils text-lg"></i><span class="text-xs font-medium">Menu</span>
         </button>
         <button onclick="switchPage('toko')" id="nav-toko" class="nav-btn flex-1 py-3 flex flex-col items-center gap-0.5 text-gray-400">
-          <i class="fas fa-cog text-lg"></i><span class="text-xs font-medium">Toko</span>
+          <i class="fas fa-gear text-lg"></i><span class="text-xs font-medium">Toko</span>
         </button>
       </div>
     </nav>
@@ -1374,7 +1499,7 @@
       <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto relative z-10">
         <div class="bg-sky-700 text-white p-4 rounded-t-2xl flex items-center justify-between">
           <h3 class="font-bold text-lg"><i class="fas fa-wallet mr-2"></i>Pembayaran</h3>
-          <button onclick="closePaymentModal()" class="w-8 h-8 rounded-full bg-sky-600 flex items-center justify-center hover:bg-sky-500"><i class="fas fa-times"></i></button>
+          <button onclick="closePaymentModal()" class="w-8 h-8 rounded-full bg-sky-600 flex items-center justify-center hover:bg-sky-500"><i class="fas fa-xmark"></i></button>
         </div>
         <div class="p-5 space-y-4">
           <div class="bg-sky-50 rounded-xl p-3">
@@ -1392,9 +1517,9 @@
           <div>
             <label class="block text-sm font-semibold text-sky-700 mb-2">Metode Pembayaran</label>
             <div class="grid grid-cols-3 gap-2">
-              <button onclick="selectPayMethod('Tunai')" id="pm-Tunai" class="pay-method-btn py-2.5 rounded-xl text-sm font-semibold bg-sky-700 text-white border-2 border-sky-700 transition"><i class="fas fa-money-bill-wave mr-1"></i> Tunai</button>
+              <button onclick="selectPayMethod('Tunai')" id="pm-Tunai" class="pay-method-btn py-2.5 rounded-xl text-sm font-semibold bg-sky-700 text-white border-2 border-sky-700 transition"><i class="fas fa-money-bills mr-1"></i> Tunai</button>
               <button onclick="selectPayMethod('QRIS')" id="pm-QRIS" class="pay-method-btn py-2.5 rounded-xl text-sm font-semibold bg-white text-sky-600 border-2 border-sky-200 transition hover:border-sky-400"><i class="fas fa-qrcode mr-1"></i> QRIS</button>
-              <button onclick="selectPayMethod('Transfer')" id="pm-Transfer" class="pay-method-btn py-2.5 rounded-xl text-sm font-semibold bg-white text-sky-600 border-2 border-sky-200 transition hover:border-sky-400"><i class="fas fa-mobile-alt mr-1"></i> Transfer</button>
+              <button onclick="selectPayMethod('Transfer')" id="pm-Transfer" class="pay-method-btn py-2.5 rounded-xl text-sm font-semibold bg-white text-sky-600 border-2 border-sky-200 transition hover:border-sky-400"><i class="fas fa-mobile-screen mr-1"></i> Transfer</button>
             </div>
           </div>
           <div id="cash-input-section">
@@ -1406,7 +1531,7 @@
             </div>
           </div>
           <button onclick="confirmPayment()" id="confirm-pay-btn" class="w-full py-3 bg-green-600 text-white rounded-xl font-bold text-lg hover:bg-green-700 transition shadow-md">
-            <i class="fas fa-check-circle mr-2"></i> Konfirmasi Pembayaran
+            <i class="fas fa-circle-check mr-2"></i> Konfirmasi Pembayaran
           </button>
         </div>
       </div>
@@ -1430,7 +1555,7 @@
       <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md relative z-10">
         <div class="bg-sky-700 text-white p-4 rounded-t-2xl flex items-center justify-between">
           <h3 id="menu-modal-title" class="font-bold text-lg"><i class="fas fa-utensils mr-2"></i>Tambah Menu</h3>
-          <button onclick="closeMenuModal()" class="w-8 h-8 rounded-full bg-sky-600 flex items-center justify-center hover:bg-sky-500"><i class="fas fa-times"></i></button>
+          <button onclick="closeMenuModal()" class="w-8 h-8 rounded-full bg-sky-600 flex items-center justify-center hover:bg-sky-500"><i class="fas fa-xmark"></i></button>
         </div>
         <div class="p-5 space-y-4">
           <input type="hidden" id="menu-edit-id">
@@ -1449,7 +1574,7 @@
               <button onclick="selectMenuKategori('Makanan')" id="mk-Makanan" class="flex-1 py-2 rounded-xl text-sm font-semibold bg-white text-sky-600 border-2 border-sky-200 transition">🍽 Makanan</button>
             </div>
           </div>
-          <button onclick="saveMenuFormItem()" id="save-menu-btn" class="w-full py-3 bg-sky-700 text-white rounded-xl font-bold hover:bg-sky-800 transition"><i class="fas fa-save mr-2"></i> Simpan</button>
+          <button onclick="saveMenuFormItem()" id="save-menu-btn" class="w-full py-3 bg-sky-700 text-white rounded-xl font-bold hover:bg-sky-800 transition"><i class="fas fa-floppy-disk mr-2"></i> Simpan</button>
         </div>
       </div>
     </div>
@@ -1460,7 +1585,7 @@
       <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto relative z-10">
         <div class="bg-sky-700 text-white p-4 rounded-t-2xl flex items-center justify-between">
           <h3 class="font-bold"><i class="fas fa-receipt mr-2"></i>Detail Transaksi</h3>
-          <button onclick="closeTrxDetailModal()" class="w-8 h-8 rounded-full bg-sky-600 flex items-center justify-center hover:bg-sky-500"><i class="fas fa-times"></i></button>
+          <button onclick="closeTrxDetailModal()" class="w-8 h-8 rounded-full bg-sky-600 flex items-center justify-center hover:bg-sky-500"><i class="fas fa-xmark"></i></button>
         </div>
         <div id="trx-detail-content" class="p-5"></div>
       </div>
@@ -1480,7 +1605,7 @@
       <div class="relative bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full animate-scale-in">
         <div class="text-center mb-4">
           <div class="w-12 h-12 rounded-full bg-amber-100 mx-auto mb-3 flex items-center justify-center">
-            <i class="fas fa-exclamation-triangle text-amber-600 text-xl"></i>
+            <i class="fas fa-triangle-exclamation text-amber-600 text-xl"></i>
           </div>
           <p id="custom-confirm-msg" class="text-sm text-gray-700 leading-relaxed whitespace-pre-line"></p>
         </div>
@@ -1497,7 +1622,7 @@
       <div class="relative bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full animate-scale-in">
         <div class="text-center mb-4">
           <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-sky-400 to-sky-600 mx-auto mb-3 flex items-center justify-center shadow-md">
-            <i class="fas fa-user-edit text-white text-xl"></i>
+            <i class="fas fa-user-pen text-white text-xl"></i>
           </div>
           <h3 id="cust-modal-title" class="font-display text-lg font-bold text-gray-900">Nama Pelanggan</h3>
           <p id="cust-modal-desc" class="text-xs text-gray-400 mt-1">Tulis nama pelanggan meja ini</p>
@@ -2088,7 +2213,7 @@
             }
           } catch (e) { /* ignore */ }
         }
-        btn.innerHTML = '<i class="fas fa-sync-alt mr-2"></i> Cek Status Aktivasi';
+        btn.innerHTML = '<i class="fas fa-rotate mr-2"></i> Cek Status Aktivasi';
         btn.disabled = false;
         showToast('Akun belum diaktifkan. Silakan hubungi admin.', 'error');
       });
@@ -2559,15 +2684,15 @@
           statusText = 'Belum Bayar'; statusColor = 'text-red-700';
           numberColor = 'text-red-800';
         } else if (isActive && isSelected) {
-          iconClass = 'fas fa-check-circle'; iconColor = 'text-emerald-600'; iconBg = 'bg-emerald-100';
+          iconClass = 'fas fa-circle-check'; iconColor = 'text-emerald-600'; iconBg = 'bg-emerald-100';
           statusText = itemCount + ' item'; statusColor = 'text-emerald-700';
           numberColor = 'text-emerald-800';
         } else if (isActive) {
-          iconClass = 'fas fa-coffee'; iconColor = 'text-sky-700'; iconBg = 'bg-sky-100';
+          iconClass = 'fas fa-mug-hot'; iconColor = 'text-sky-700'; iconBg = 'bg-sky-100';
           statusText = itemCount + ' item'; statusColor = 'text-sky-700';
           numberColor = 'text-sky-800';
         } else {
-          iconClass = 'fas fa-chair'; iconColor = 'text-gray-300'; iconBg = 'bg-gray-50';
+          iconClass = 'fas fa-couch'; iconColor = 'text-gray-300'; iconBg = 'bg-gray-50';
           statusText = 'Kosong'; statusColor = 'text-gray-400';
           numberColor = 'text-gray-500';
         }
@@ -2594,7 +2719,7 @@
             '<div class="table-number ' + numberColor + '">' + i + '</div>' +
             nameHtml +
             (isActive && !isUnpaid ? '<div class="table-status mt-1 ' + statusColor + '">' + statusText + '</div>' : '') +
-            (isUnpaid ? '<div class="table-status mt-1 font-extrabold tracking-wide ' + statusColor + '"><i class="fas fa-exclamation-triangle mr-0.5"></i>' + statusText + '</div>' : '') +
+            (isUnpaid ? '<div class="table-status mt-1 font-extrabold tracking-wide ' + statusColor + '"><i class="fas fa-triangle-exclamation mr-0.5"></i>' + statusText + '</div>' : '') +
             itemPillHtml +
             '<div class="edit-btn mt-1" onclick="event.stopPropagation();editCustomerName(' + i + ')"><i class="fas fa-pen text-[9px] text-gray-400 hover:text-sky-500 cursor-pointer" title="Nama pelanggan"></i></div>' +
           '</div>' +
@@ -2719,19 +2844,19 @@
 
         let iconClass, iconColor, iconBg, statusText, statusColor, numberColor;
         if (isUnpaid) {
-          iconClass = 'fas fa-shopping-bag'; iconColor = 'text-red-600'; iconBg = 'bg-red-100';
+          iconClass = 'fas fa-bag-shopping'; iconColor = 'text-red-600'; iconBg = 'bg-red-100';
           statusText = 'Belum Bayar'; statusColor = 'text-red-700';
           numberColor = 'text-red-800';
         } else if (isActive && isSelected) {
-          iconClass = 'fas fa-check-circle'; iconColor = 'text-amber-600'; iconBg = 'bg-yellow-100';
+          iconClass = 'fas fa-circle-check'; iconColor = 'text-amber-600'; iconBg = 'bg-yellow-100';
           statusText = itemCount + ' item'; statusColor = 'text-yellow-700';
           numberColor = 'text-amber-800';
         } else if (isActive) {
-          iconClass = 'fas fa-shopping-bag'; iconColor = 'text-amber-600'; iconBg = 'bg-yellow-100';
+          iconClass = 'fas fa-bag-shopping'; iconColor = 'text-amber-600'; iconBg = 'bg-yellow-100';
           statusText = itemCount + ' item'; statusColor = 'text-yellow-700';
           numberColor = 'text-amber-800';
         } else {
-          iconClass = 'fas fa-shopping-bag'; iconColor = 'text-gray-300'; iconBg = 'bg-gray-50';
+          iconClass = 'fas fa-bag-shopping'; iconColor = 'text-gray-300'; iconBg = 'bg-gray-50';
           statusText = 'Kosong'; statusColor = 'text-gray-400';
           numberColor = 'text-gray-500';
         }
@@ -2761,7 +2886,7 @@
             '<div class="table-number ' + numberColor + '">Pel ' + i + '</div>' +
             nameHtml +
             (isActive && !isUnpaid ? '<div class="table-status mt-1 ' + statusColor + '">' + statusText + '</div>' : '') +
-            (isUnpaid ? '<div class="table-status mt-1 font-extrabold tracking-wide ' + statusColor + '"><i class="fas fa-exclamation-triangle mr-0.5"></i>' + statusText + '</div>' : '') +
+            (isUnpaid ? '<div class="table-status mt-1 font-extrabold tracking-wide ' + statusColor + '"><i class="fas fa-triangle-exclamation mr-0.5"></i>' + statusText + '</div>' : '') +
             itemPillHtml +
             '<div class="edit-btn mt-1" onclick="event.stopPropagation();editTakeawayName(' + i + ')"><i class="fas fa-pen text-[9px] text-gray-400 hover:text-amber-500 cursor-pointer" title="Nama pelanggan"></i></div>' +
           '</div>' +
@@ -2826,7 +2951,7 @@
       if (search) items = items.filter(m => m.nama_menu.toLowerCase().includes(search));
 
       if (items.length === 0) {
-        grid.innerHTML = '<div class="col-span-full text-center py-8 text-slate-400"><i class="fas fa-search text-3xl mb-2"></i><p class="text-sm">Menu tidak ditemukan</p></div>';
+        grid.innerHTML = '<div class="col-span-full text-center py-8 text-slate-400"><i class="fas fa-magnifying-glass text-3xl mb-2"></i><p class="text-sm">Menu tidak ditemukan</p></div>';
         return;
       }
       grid.innerHTML = items.map(item => {
@@ -2913,7 +3038,7 @@
       const custName = tableCustomerNames[currentTableId] || '';
       panel.innerHTML = '<div class="flex items-center justify-between mb-3">' +
         '<h3 class="font-bold text-sky-800"><i class="fas fa-' + headerIcon + ' mr-2"></i>' + headerLabel + '</h3>' +
-        (totalItems > 0 ? '<button onclick="resetOrder()" class="text-xs text-red-500 hover:text-red-700"><i class="fas fa-trash mr-1"></i>Reset</button>' : '') +
+        (totalItems > 0 ? '<button onclick="resetOrder()" class="text-xs text-red-500 hover:text-red-700"><i class="fas fa-trash-can mr-1"></i>Reset</button>' : '') +
         '</div>' +
         (items.length === 0 ?
           '<div class="flex-1 flex flex-col items-center justify-center py-8 text-slate-400"><i class="fas fa-clipboard-list text-3xl mb-2"></i><p class="text-sm">Belum ada pesanan</p></div>' :
@@ -2929,7 +3054,7 @@
                 '<button onclick="updateQty(\'' + item.id + '\', 1)" class="w-7 h-7 rounded-lg bg-sky-700 flex items-center justify-center text-white hover:bg-sky-800 transition text-xs"><i class="fas fa-plus"></i></button>' +
               '</div>' +
               '<div class="text-right min-w-[70px]"><div class="text-sm font-bold text-sky-800">' + formatIDR(item.harga * item.qty) + '</div></div>' +
-              '<button onclick="removeItem(\'' + item.id + '\')" class="text-red-400 hover:text-red-600 ml-1"><i class="fas fa-times text-xs"></i></button>' +
+              '<button onclick="removeItem(\'' + item.id + '\')" class="text-red-400 hover:text-red-600 ml-1"><i class="fas fa-xmark text-xs"></i></button>' +
             '</div>'
           ).join('') + '</div>' +
           '<div class="border-t border-sky-200 pt-3">' +
@@ -3069,7 +3194,7 @@
       }
 
       confirmBtn.disabled = false;
-      confirmBtn.innerHTML = '<i class="fas fa-check-circle mr-2"></i> Konfirmasi Pembayaran';
+      confirmBtn.innerHTML = '<i class="fas fa-circle-check mr-2"></i> Konfirmasi Pembayaran';
     }
 
     // ===== RECEIPT =====
@@ -3090,7 +3215,7 @@
         '<div class="space-y-1 text-sm mb-3">' +
         '<div class="flex justify-between"><span class="text-sky-500">No</span><span class="font-medium">' + trx.id + '</span></div>' +
         '<div class="flex justify-between"><span class="text-sky-500">Tanggal</span><span class="font-medium">' + formatDateTime(trx.date) + '</span></div>' +
-        '<div class="flex justify-between"><span class="text-sky-500">' + (trx.table === 'Bungkus' ? 'Jenis' : 'Meja') + '</span><span class="font-medium">' + (trx.table === 'Bungkus' ? '<i class="fas fa-shopping-bag text-amber-500 mr-1"></i>Bungkus (Take Away)' : 'Meja ' + trx.table) + '</span></div>' +
+        '<div class="flex justify-between"><span class="text-sky-500">' + (trx.table === 'Bungkus' ? 'Jenis' : 'Meja') + '</span><span class="font-medium">' + (trx.table === 'Bungkus' ? '<i class="fas fa-bag-shopping text-amber-500 mr-1"></i>Bungkus (Take Away)' : 'Meja ' + trx.table) + '</span></div>' +
         (trx.customerName ? '<div class="flex justify-between"><span class="text-sky-500">Pelanggan</span><span class="font-medium">' + trx.customerName + '</span></div>' : '') +
         '<div class="flex justify-between"><span class="text-sky-500">Kasir</span><span class="font-medium">' + cashier + '</span></div>' +
         '</div>' +
@@ -3276,7 +3401,7 @@
       const nameBadge = trx.customerName ? '<span class="bg-sky-50 text-sky-700 text-xs font-semibold px-2 py-0.5 rounded-lg"><i class="fas fa-user text-[9px] mr-1"></i>' + trx.customerName + '</span>' : '';
       return '<div class="bg-white rounded-2xl p-4 shadow-sm border border-sky-100 cursor-pointer hover:shadow-md transition" onclick="showTrxDetail(\'' + trx.id + '\')">' +
         '<div class="flex items-center justify-between mb-2">' +
-          '<div class="flex items-center gap-2"><span class="' + (trx.table === 'Bungkus' ? 'bg-amber-100 text-amber-700' : 'bg-sky-100 text-sky-700') + ' text-xs font-bold px-2 py-0.5 rounded-lg">' + (trx.table === 'Bungkus' ? '<i class="fas fa-shopping-bag mr-1"></i>Bungkus' : 'Meja ' + trx.table) + '</span>' +
+          '<div class="flex items-center gap-2"><span class="' + (trx.table === 'Bungkus' ? 'bg-amber-100 text-amber-700' : 'bg-sky-100 text-sky-700') + ' text-xs font-bold px-2 py-0.5 rounded-lg">' + (trx.table === 'Bungkus' ? '<i class="fas fa-bag-shopping mr-1"></i>Bungkus' : 'Meja ' + trx.table) + '</span>' +
           nameBadge +
           '<span class="text-xs text-slate-400">' + formatDateTime(trx.date) + '</span></div>' +
           '<span class="text-sm font-bold text-sky-800">' + formatIDR(trx.total) + '</span>' +
@@ -3351,7 +3476,7 @@
       reportEl.innerHTML = trxs.map(trx =>
         '<div class="bg-white rounded-2xl p-4 shadow-sm border border-sky-100 cursor-pointer hover:shadow-md transition" onclick="showTrxDetail(\'' + trx.id + '\')">' +
           '<div class="flex items-center justify-between mb-2">' +
-            '<div class="flex items-center gap-2"><span class="' + (trx.table === 'Bungkus' ? 'bg-amber-100 text-amber-700' : 'bg-sky-100 text-sky-700') + ' text-xs font-bold px-2 py-0.5 rounded-lg">' + (trx.table === 'Bungkus' ? '<i class="fas fa-shopping-bag mr-1"></i>Bungkus' : 'Meja ' + trx.table) + '</span>' +
+            '<div class="flex items-center gap-2"><span class="' + (trx.table === 'Bungkus' ? 'bg-amber-100 text-amber-700' : 'bg-sky-100 text-sky-700') + ' text-xs font-bold px-2 py-0.5 rounded-lg">' + (trx.table === 'Bungkus' ? '<i class="fas fa-bag-shopping mr-1"></i>Bungkus' : 'Meja ' + trx.table) + '</span>' +
             '<span class="text-xs text-slate-400">' + formatDateTime(trx.date) + '</span></div>' +
             '<span class="text-sm font-bold text-sky-800">' + formatIDR(trx.total) + '</span>' +
           '</div>' +
@@ -3493,7 +3618,7 @@
       document.getElementById('csv-copy-data').addEventListener('click', function() {
         var btn = document.getElementById('csv-copy-data');
         navigator.clipboard.writeText(window._csvData).then(function() {
-          btn.innerHTML = '<i class="fas fa-check-circle" style="margin-right:6px;"></i>Data Tersalin!';
+          btn.innerHTML = '<i class="fas fa-circle-check" style="margin-right:6px;"></i>Data Tersalin!';
           btn.style.background = 'linear-gradient(135deg,#22c55e,#16a34a)';
           showToast('Data CSV tersalin! Buka Excel/Google Sheets lalu tempel.', 'success');
           setTimeout(function() {
@@ -3566,8 +3691,8 @@
             '<span class="text-xs px-2 py-0.5 rounded-full ' + (item.kategori === 'Minuman' ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700') + ' font-medium">' + item.kategori + '</span></div>' +
           '</div>' +
           '<div class="flex gap-1 flex-shrink-0">' +
-            '<button onclick="editMenuItem(\'' + item.id + '\')" class="w-9 h-9 rounded-xl bg-sky-100 flex items-center justify-center text-sky-600 hover:bg-sky-200 transition"><i class="fas fa-edit text-sm"></i></button>' +
-            '<button onclick="deleteMenuItemConfirm(\'' + item.id + '\', \'' + item.nama_menu.replace(/'/g, "\\'") + '\')" class="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center text-red-500 hover:bg-red-100 transition"><i class="fas fa-trash text-sm"></i></button>' +
+            '<button onclick="editMenuItem(\'' + item.id + '\')" class="w-9 h-9 rounded-xl bg-sky-100 flex items-center justify-center text-sky-600 hover:bg-sky-200 transition"><i class="fas fa-pen-to-square text-sm"></i></button>' +
+            '<button onclick="deleteMenuItemConfirm(\'' + item.id + '\', \'' + item.nama_menu.replace(/'/g, "\\'") + '\')" class="w-9 h-9 rounded-xl bg-red-50 flex items-center justify-center text-red-500 hover:bg-red-100 transition"><i class="fas fa-trash-can text-sm"></i></button>' +
           '</div></div>';
       }).join('');
     }
@@ -3603,7 +3728,7 @@
       document.getElementById('menu-edit-price').value = item.harga;
       selectedMenuKategori = item.kategori;
       selectMenuKategori(item.kategori);
-      document.getElementById('menu-modal-title').innerHTML = '<i class="fas fa-edit mr-2"></i>Edit Menu';
+      document.getElementById('menu-modal-title').innerHTML = '<i class="fas fa-pen-to-square mr-2"></i>Edit Menu';
       document.getElementById('menu-edit-modal').classList.remove('hidden');
     }
 
@@ -3640,7 +3765,7 @@
       }
 
       saveBtn.disabled = false;
-      saveBtn.innerHTML = '<i class="fas fa-save mr-2"></i> Simpan';
+      saveBtn.innerHTML = '<i class="fas fa-floppy-disk mr-2"></i> Simpan';
     }
 
     function deleteMenuItemConfirm(docId, nama) {
@@ -3736,13 +3861,13 @@
       const address = document.getElementById('setting-shop-address').value.trim();
       const cashierName = document.getElementById('setting-cashier-name').value.trim();
 
-      if (!shopName) { showToast('Nama toko wajib diisi', 'error'); saveBtn.disabled = false; saveBtn.innerHTML = '<i class="fas fa-save mr-2"></i> Simpan Pengaturan'; return; }
+      if (!shopName) { showToast('Nama toko wajib diisi', 'error'); saveBtn.disabled = false; saveBtn.innerHTML = '<i class="fas fa-floppy-disk mr-2"></i> Simpan Pengaturan'; return; }
 
       // Validasi currentShop
       if (!currentShop || !currentShop.id) {
         showToast('Error: Data toko belum dimuat. Coba logout lalu login kembali.', 'error');
         saveBtn.disabled = false;
-        saveBtn.innerHTML = '<i class="fas fa-save mr-2"></i> Simpan Pengaturan';
+        saveBtn.innerHTML = '<i class="fas fa-floppy-disk mr-2"></i> Simpan Pengaturan';
         return;
       }
 
@@ -3760,7 +3885,7 @@
       if (!saved) {
         showToast('Gagal menyimpan ke penyimpanan lokal. Mungkin penyimpanan penuh.', 'error');
         saveBtn.disabled = false;
-        saveBtn.innerHTML = '<i class="fas fa-save mr-2"></i> Simpan Pengaturan';
+        saveBtn.innerHTML = '<i class="fas fa-floppy-disk mr-2"></i> Simpan Pengaturan';
         return;
       }
 
@@ -3784,7 +3909,7 @@
 
       showToast('Pengaturan berhasil disimpan!');
       saveBtn.disabled = false;
-      saveBtn.innerHTML = '<i class="fas fa-save mr-2"></i> Simpan Pengaturan';
+      saveBtn.innerHTML = '<i class="fas fa-floppy-disk mr-2"></i> Simpan Pengaturan';
 
       // 5. Save photo to IndexedDB if exists
       if (shopSettings.shopPhoto && currentShop.id) {
