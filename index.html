@@ -56,18 +56,24 @@
       position: relative;
       overflow: hidden;
       border-radius: 0.875rem;
-      border: 2px solid #E2E8F0;
-      background: #FFFFFF;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+      border: 2px solid transparent;
+      background: linear-gradient(145deg, #EFF6FF, #DBEAFE);
+      box-shadow: 0 2px 8px rgba(14,165,233,0.08);
       cursor: pointer;
     }
     .table-card:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(14,165,233,0.1);
-      border-color: #BAE6FD;
+      box-shadow: 0 6px 20px rgba(14,165,233,0.15);
     }
+    /* Empty table text colors */
+    .table-card .table-number { color: #1D4ED8 !important; }
+    .table-card .table-icon { background: #BFDBFE !important; }
+    .table-card .table-icon i { color: #2563EB !important; }
+    .table-card .table-status { color: #3B82F6 !important; }
+    .table-card .edit-btn i { color: #93C5FD !important; }
+    .table-card:hover .edit-btn i { color: #3B82F6 !important; }
+    /* Active (has orders, not selected) */
     .table-card.active-table {
-      border-color: transparent;
       background: linear-gradient(145deg, #0EA5E9, #0284C7);
       box-shadow: 0 8px 28px rgba(2,132,199,0.35);
     }
@@ -75,8 +81,14 @@
       box-shadow: 0 12px 36px rgba(2,132,199,0.45);
       transform: translateY(-3px);
     }
+    .table-card.active-table .table-number { color: #FFFFFF !important; text-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+    .table-card.active-table .table-status { color: rgba(255,255,255,0.9) !important; }
+    .table-card.active-table .table-icon { background: rgba(255,255,255,0.2) !important; }
+    .table-card.active-table .table-icon i { color: #FFFFFF !important; }
+    .table-card.active-table .customer-badge { background: rgba(255,255,255,0.22) !important; color: white !important; }
+    .table-card.active-table .edit-btn i { color: rgba(255,255,255,0.5) !important; }
+    /* Unpaid (urgent) */
     .table-card.unpaid-table {
-      border-color: transparent;
       background: linear-gradient(145deg, #FB7185, #E11D48);
       box-shadow: 0 8px 28px rgba(225,29,72,0.35);
       animation: unpaid-pulse 2s ease-in-out infinite;
@@ -85,21 +97,21 @@
       box-shadow: 0 12px 36px rgba(225,29,72,0.45);
       transform: translateY(-3px);
     }
+    .table-card.unpaid-table .table-number { color: #FFFFFF !important; text-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+    .table-card.unpaid-table .table-status { color: rgba(255,255,255,0.9) !important; }
+    .table-card.unpaid-table .table-icon { background: rgba(255,255,255,0.2) !important; }
+    .table-card.unpaid-table .table-icon i { color: #FFFFFF !important; }
+    .table-card.unpaid-table .customer-badge { background: rgba(255,255,255,0.22) !important; color: white !important; }
+    .table-card.unpaid-table .edit-btn i { color: rgba(255,255,255,0.5) !important; }
+    .table-card.unpaid-table .pulse-dot { background: #FFFFFF; }
     @keyframes unpaid-pulse {
       0%, 100% { box-shadow: 0 8px 28px rgba(225,29,72,0.35); }
       50% { box-shadow: 0 8px 34px rgba(225,29,72,0.5); }
     }
     .table-card .pulse-dot {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
+      position: absolute; top: 8px; right: 8px;
+      width: 10px; height: 10px; border-radius: 50%;
       box-shadow: 0 0 6px rgba(239,68,68,0.6);
-    }
-    .table-card .pulse-dot.unpaid {
-      background: #FFFFFF;
       animation: pulse-dot 1.5s ease-in-out infinite;
     }
     @keyframes pulse-dot {
@@ -107,51 +119,39 @@
       50% { opacity: 0.4; transform: scale(1.5); }
     }
     .table-card .table-number {
-      font-size: 1.65rem;
-      font-weight: 900;
-      line-height: 1;
+      font-size: 1.65rem; font-weight: 900; line-height: 1;
     }
     .table-card .table-icon {
-      font-size: 1.1rem;
-      margin-bottom: 0.35rem;
+      font-size: 1.1rem; margin-bottom: 0.35rem;
     }
     .table-card .table-status {
-      font-size: 0.65rem;
-      font-weight: 700;
-      letter-spacing: 0.03em;
-      text-transform: uppercase;
+      font-size: 0.65rem; font-weight: 700;
+      letter-spacing: 0.03em; text-transform: uppercase;
     }
     .table-card .customer-badge {
-      font-size: 0.65rem;
-      font-weight: 700;
-      padding: 2px 8px;
-      border-radius: 9999px;
+      font-size: 0.65rem; font-weight: 700;
+      padding: 2px 8px; border-radius: 9999px;
       letter-spacing: 0.01em;
     }
     .table-card .edit-btn {
-      opacity: 0;
-      transition: opacity 0.2s;
+      opacity: 1 !important;
+      transition: all 0.2s;
     }
-    .table-card:hover .edit-btn {
-      opacity: 1;
+    .table-card .edit-btn i {
+      font-size: 11px !important;
+      padding: 3px;
+      border-radius: 4px;
+      background: rgba(59,130,246,0.08);
+      transition: all 0.2s;
+    }
+    .table-card:hover .edit-btn i {
+      background: rgba(59,130,246,0.15);
+      transform: scale(1.15);
     }
     .table-card.selected-table {
       box-shadow: 0 10px 36px rgba(2,132,199,0.4), 0 0 0 3px #0369A1;
       transform: translateY(-2px) scale(1.02);
     }
-    /* White text overrides for colored cards */
-    .table-card.active-table .table-number,
-    .table-card.unpaid-table .table-number { color: #FFFFFF !important; text-shadow: 0 1px 3px rgba(0,0,0,0.15); }
-    .table-card.active-table .table-status,
-    .table-card.unpaid-table .table-status { color: rgba(255,255,255,0.9) !important; }
-    .table-card.active-table .table-icon,
-    .table-card.unpaid-table .table-icon { background: rgba(255,255,255,0.2) !important; }
-    .table-card.active-table .table-icon i,
-    .table-card.unpaid-table .table-icon i { color: #FFFFFF !important; }
-    .table-card.active-table .customer-badge,
-    .table-card.unpaid-table .customer-badge { background: rgba(255,255,255,0.22) !important; color: white !important; }
-    .table-card.active-table .edit-btn i,
-    .table-card.unpaid-table .edit-btn i { color: rgba(255,255,255,0.5) !important; }
     /* ===== ORDER MODE TABS ===== */
     .order-mode-tab {
       transition: all 0.25s cubic-bezier(.4,0,.2,1);
@@ -182,18 +182,24 @@
       position: relative;
       overflow: hidden;
       border-radius: 0.875rem;
-      border: 2px solid #E2E8F0;
-      background: #FFFFFF;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+      border: 2px solid transparent;
+      background: linear-gradient(145deg, #FFFBEB, #FEF3C7);
+      box-shadow: 0 2px 8px rgba(234,179,8,0.08);
       cursor: pointer;
     }
     .pel-card:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(234,179,8,0.1);
-      border-color: #FDE68A;
+      box-shadow: 0 6px 20px rgba(234,179,8,0.15);
     }
+    /* Empty pel text colors */
+    .pel-card .table-number { color: #B45309 !important; }
+    .pel-card .table-icon { background: #FDE68A !important; }
+    .pel-card .table-icon i { color: #D97706 !important; }
+    .pel-card .table-status { color: #CA8A04 !important; }
+    .pel-card .edit-btn i { color: #FCD34D !important; }
+    .pel-card:hover .edit-btn i { color: #D97706 !important; }
+    /* Active pel */
     .pel-card.pel-active {
-      border-color: transparent;
       background: linear-gradient(145deg, #FBBF24, #D97706);
       box-shadow: 0 8px 28px rgba(217,119,6,0.35);
     }
@@ -201,12 +207,24 @@
       box-shadow: 0 12px 36px rgba(217,119,6,0.45);
       transform: translateY(-3px);
     }
+    .pel-card.pel-active .table-number { color: #FFFFFF !important; text-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+    .pel-card.pel-active .table-status { color: rgba(255,255,255,0.9) !important; }
+    .pel-card.pel-active .table-icon { background: rgba(255,255,255,0.2) !important; }
+    .pel-card.pel-active .table-icon i { color: #FFFFFF !important; }
+    .pel-card.pel-active .table-customer-badge { background: rgba(255,255,255,0.22) !important; color: white !important; }
+    .pel-card.pel-active .edit-btn i { color: rgba(255,255,255,0.5) !important; }
+    /* Unpaid pel */
     .pel-card.pel-unpaid {
-      border-color: transparent;
       background: linear-gradient(145deg, #FB7185, #E11D48);
       box-shadow: 0 8px 28px rgba(225,29,72,0.35);
       animation: pel-unpaid-glow 2s ease-in-out infinite;
     }
+    .pel-card.pel-unpaid .table-number { color: #FFFFFF !important; text-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+    .pel-card.pel-unpaid .table-status { color: rgba(255,255,255,0.9) !important; }
+    .pel-card.pel-unpaid .table-icon { background: rgba(255,255,255,0.2) !important; }
+    .pel-card.pel-unpaid .table-icon i { color: #FFFFFF !important; }
+    .pel-card.pel-unpaid .table-customer-badge { background: rgba(255,255,255,0.22) !important; color: white !important; }
+    .pel-card.pel-unpaid .edit-btn i { color: rgba(255,255,255,0.5) !important; }
     @keyframes pel-unpaid-glow {
       0%, 100% { box-shadow: 0 8px 28px rgba(225,29,72,0.35); }
       50% { box-shadow: 0 8px 34px rgba(225,29,72,0.5); }
@@ -216,29 +234,27 @@
       transform: translateY(-2px) scale(1.02);
     }
     .pel-card .pel-dot {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
+      position: absolute; top: 8px; right: 8px;
+      width: 10px; height: 10px; border-radius: 50%;
       box-shadow: 0 0 6px rgba(239,68,68,0.6);
       background: #FFFFFF;
       animation: pulse-dot 1.5s ease-in-out infinite;
     }
-    /* White text overrides for colored pel cards */
-    .pel-card.pel-active .table-number,
-    .pel-card.pel-unpaid .table-number { color: #FFFFFF !important; text-shadow: 0 1px 3px rgba(0,0,0,0.15); }
-    .pel-card.pel-active .table-status,
-    .pel-card.pel-unpaid .table-status { color: rgba(255,255,255,0.9) !important; }
-    .pel-card.pel-active .table-icon,
-    .pel-card.pel-unpaid .table-icon { background: rgba(255,255,255,0.2) !important; }
-    .pel-card.pel-active .table-icon i,
-    .pel-card.pel-unpaid .table-icon i { color: #FFFFFF !important; }
-    .pel-card.pel-active .table-customer-badge,
-    .pel-card.pel-unpaid .table-customer-badge { background: rgba(255,255,255,0.22) !important; color: white !important; }
-    .pel-card.pel-active .edit-btn i,
-    .pel-card.pel-unpaid .edit-btn i { color: rgba(255,255,255,0.5) !important; }
+    .pel-card .edit-btn {
+      opacity: 1 !important;
+      transition: all 0.2s;
+    }
+    .pel-card .edit-btn i {
+      font-size: 11px !important;
+      padding: 3px;
+      border-radius: 4px;
+      background: rgba(217,119,6,0.08);
+      transition: all 0.2s;
+    }
+    .pel-card:hover .edit-btn i {
+      background: rgba(217,119,6,0.15);
+      transform: scale(1.15);
+    }
     .tab-btn { transition: all 0.25s cubic-bezier(.4,0,.2,1); }
     .tab-btn:hover { transform: translateY(-1px); }
     .toast-enter { animation: slideUp 0.4s cubic-bezier(.4,0,.2,1); }
@@ -563,110 +579,6 @@
       backdrop-filter: none !important;
       -webkit-backdrop-filter: none !important;
     }
-
-    /* --- TABLE CARDS: Bold Solid Design --- */
-    .table-card {
-      border-radius: 0.875rem !important;
-      background: #FFFFFF !important;
-      border: 2px solid #E2E8F0 !important;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.04) !important;
-      backdrop-filter: none !important;
-      -webkit-backdrop-filter: none !important;
-      transition: all 0.25s cubic-bezier(.4,0,.2,1) !important;
-    }
-    .table-card:hover {
-      border-color: #BAE6FD !important;
-      box-shadow: 0 6px 20px rgba(14,165,233,0.1) !important;
-      transform: translateY(-2px) !important;
-    }
-    .table-card.active-table {
-      background: linear-gradient(145deg, #0EA5E9, #0284C7) !important;
-      border-color: transparent !important;
-      box-shadow: 0 8px 28px rgba(2,132,199,0.35) !important;
-    }
-    .table-card.active-table:hover {
-      box-shadow: 0 12px 36px rgba(2,132,199,0.45) !important;
-      transform: translateY(-3px) !important;
-    }
-    .table-card.unpaid-table {
-      background: linear-gradient(145deg, #FB7185, #E11D48) !important;
-      border-color: transparent !important;
-      box-shadow: 0 8px 28px rgba(225,29,72,0.35) !important;
-      animation: unpaid-pulse 2s ease-in-out infinite !important;
-    }
-    .table-card.unpaid-table:hover {
-      box-shadow: 0 12px 36px rgba(225,29,72,0.45) !important;
-      transform: translateY(-3px) !important;
-    }
-    @keyframes unpaid-pulse {
-      0%, 100% { box-shadow: 0 8px 28px rgba(225,29,72,0.35); }
-      50% { box-shadow: 0 8px 34px rgba(225,29,72,0.5); }
-    }
-    .table-card.selected-table {
-      box-shadow: 0 10px 36px rgba(2,132,199,0.4), 0 0 0 3px #0369A1 !important;
-      transform: translateY(-2px) scale(1.02) !important;
-    }
-    /* White text on gradient table cards */
-    .table-card.active-table .table-number,
-    .table-card.unpaid-table .table-number { color: #FFFFFF !important; text-shadow: 0 1px 3px rgba(0,0,0,0.15); }
-    .table-card.active-table .table-status,
-    .table-card.unpaid-table .table-status { color: rgba(255,255,255,0.92) !important; }
-    .table-card.active-table .table-icon,
-    .table-card.unpaid-table .table-icon { background: rgba(255,255,255,0.2) !important; }
-    .table-card.active-table .table-icon i,
-    .table-card.unpaid-table .table-icon i { color: #FFFFFF !important; }
-    .table-card.active-table .customer-badge,
-    .table-card.unpaid-table .customer-badge { background: rgba(255,255,255,0.22) !important; color: white !important; }
-    .table-card.active-table .edit-btn i,
-    .table-card.unpaid-table .edit-btn i { color: rgba(255,255,255,0.5) !important; }
-
-    /* --- PEL CARDS: Bold Solid Design --- */
-    .pel-card {
-      border-radius: 0.875rem !important;
-      background: #FFFFFF !important;
-      border: 2px solid #E2E8F0 !important;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.04) !important;
-      backdrop-filter: none !important;
-      -webkit-backdrop-filter: none !important;
-      cursor: pointer;
-      transition: all 0.25s cubic-bezier(.4,0,.2,1) !important;
-    }
-    .pel-card:hover {
-      border-color: #FDE68A !important;
-      box-shadow: 0 6px 20px rgba(234,179,8,0.1) !important;
-      transform: translateY(-2px) !important;
-    }
-    .pel-card.pel-active {
-      background: linear-gradient(145deg, #FBBF24, #D97706) !important;
-      border-color: transparent !important;
-      box-shadow: 0 8px 28px rgba(217,119,6,0.35) !important;
-    }
-    .pel-card.pel-active:hover {
-      box-shadow: 0 12px 36px rgba(217,119,6,0.45) !important;
-      transform: translateY(-3px) !important;
-    }
-    .pel-card.pel-unpaid {
-      background: linear-gradient(145deg, #FB7185, #E11D48) !important;
-      border-color: transparent !important;
-      box-shadow: 0 8px 28px rgba(225,29,72,0.35) !important;
-    }
-    .pel-card.pel-selected {
-      box-shadow: 0 10px 36px rgba(217,119,6,0.4), 0 0 0 3px #B45309 !important;
-      transform: translateY(-2px) scale(1.02) !important;
-    }
-    /* White text on gradient pel cards */
-    .pel-card.pel-active .table-number,
-    .pel-card.pel-unpaid .table-number { color: #FFFFFF !important; text-shadow: 0 1px 3px rgba(0,0,0,0.15); }
-    .pel-card.pel-active .table-status,
-    .pel-card.pel-unpaid .table-status { color: rgba(255,255,255,0.92) !important; }
-    .pel-card.pel-active .table-icon,
-    .pel-card.pel-unpaid .table-icon { background: rgba(255,255,255,0.2) !important; }
-    .pel-card.pel-active .table-icon i,
-    .pel-card.pel-unpaid .table-icon i { color: #FFFFFF !important; }
-    .pel-card.pel-active .table-customer-badge,
-    .pel-card.pel-unpaid .table-customer-badge { background: rgba(255,255,255,0.22) !important; color: white !important; }
-    .pel-card.pel-active .edit-btn i,
-    .pel-card.pel-unpaid .edit-btn i { color: rgba(255,255,255,0.5) !important; }
 
     /* --- BOLD BUTTONS --- */
     #pos-app button[class*="bg-sky-700"],
@@ -2684,26 +2596,26 @@
           statusText = 'Belum Bayar'; statusColor = 'text-red-700';
           numberColor = 'text-red-800';
         } else if (isActive && isSelected) {
-          iconClass = 'fas fa-circle-check'; iconColor = 'text-emerald-600'; iconBg = 'bg-emerald-100';
-          statusText = itemCount + ' item'; statusColor = 'text-emerald-700';
-          numberColor = 'text-emerald-800';
+          iconClass = 'fas fa-circle-check'; iconColor = 'text-sky-100'; iconBg = 'bg-white/20';
+          statusText = itemCount + ' item'; statusColor = 'text-sky-100';
+          numberColor = 'text-white';
         } else if (isActive) {
-          iconClass = 'fas fa-mug-hot'; iconColor = 'text-sky-700'; iconBg = 'bg-sky-100';
-          statusText = itemCount + ' item'; statusColor = 'text-sky-700';
-          numberColor = 'text-sky-800';
+          iconClass = 'fas fa-mug-hot'; iconColor = 'text-sky-100'; iconBg = 'bg-white/20';
+          statusText = itemCount + ' item'; statusColor = 'text-sky-100';
+          numberColor = 'text-white';
         } else {
-          iconClass = 'fas fa-couch'; iconColor = 'text-gray-300'; iconBg = 'bg-gray-50';
-          statusText = 'Kosong'; statusColor = 'text-gray-400';
-          numberColor = 'text-gray-500';
+          iconClass = 'fas fa-couch'; iconColor = 'text-blue-600'; iconBg = 'bg-blue-100';
+          statusText = 'Kosong'; statusColor = 'text-blue-500';
+          numberColor = 'text-blue-700';
         }
         // Customer name badge
         let nameHtml = '';
         if (custName) {
           const nameShort = custName.length > 8 ? custName.substring(0, 8) + '..' : custName;
           let nameBg, nameText;
-          if (isUnpaid) { nameBg = 'bg-red-500'; nameText = 'text-white'; }
-          else if (isActive) { nameBg = 'bg-sky-600'; nameText = 'text-white'; }
-          else { nameBg = 'bg-gray-600'; nameText = 'text-white'; }
+          if (isUnpaid) { nameBg = 'bg-white/25'; nameText = 'text-white'; }
+          else if (isActive) { nameBg = 'bg-white/25'; nameText = 'text-white'; }
+          else { nameBg = 'bg-blue-600'; nameText = 'text-white'; }
           nameHtml = '<div class="customer-badge inline-block mt-1.5 truncate max-w-full ' + nameBg + ' ' + nameText + '" title="' + custName.replace(/"/g, '&quot;') + '"><i class="fas fa-user mr-1 text-[9px]"></i>' + nameShort + '</div>';
         }
         // Item count pill
@@ -2721,7 +2633,7 @@
             (isActive && !isUnpaid ? '<div class="table-status mt-1 ' + statusColor + '">' + statusText + '</div>' : '') +
             (isUnpaid ? '<div class="table-status mt-1 font-extrabold tracking-wide ' + statusColor + '"><i class="fas fa-triangle-exclamation mr-0.5"></i>' + statusText + '</div>' : '') +
             itemPillHtml +
-            '<div class="edit-btn mt-1" onclick="event.stopPropagation();editCustomerName(' + i + ')"><i class="fas fa-pen text-[9px] text-gray-400 hover:text-sky-500 cursor-pointer" title="Nama pelanggan"></i></div>' +
+            '<div class="edit-btn mt-1" onclick="event.stopPropagation();editCustomerName(' + i + ')"><i class="fas fa-pen-to-square text-[10px] text-blue-400 hover:text-blue-600 cursor-pointer" title="Nama pelanggan"></i></div>' +
           '</div>' +
           '</div>';
       }
@@ -2848,17 +2760,17 @@
           statusText = 'Belum Bayar'; statusColor = 'text-red-700';
           numberColor = 'text-red-800';
         } else if (isActive && isSelected) {
-          iconClass = 'fas fa-circle-check'; iconColor = 'text-amber-600'; iconBg = 'bg-yellow-100';
-          statusText = itemCount + ' item'; statusColor = 'text-yellow-700';
-          numberColor = 'text-amber-800';
+          iconClass = 'fas fa-circle-check'; iconColor = 'text-yellow-100'; iconBg = 'bg-white/20';
+          statusText = itemCount + ' item'; statusColor = 'text-yellow-100';
+          numberColor = 'text-white';
         } else if (isActive) {
-          iconClass = 'fas fa-bag-shopping'; iconColor = 'text-amber-600'; iconBg = 'bg-yellow-100';
-          statusText = itemCount + ' item'; statusColor = 'text-yellow-700';
-          numberColor = 'text-amber-800';
+          iconClass = 'fas fa-bag-shopping'; iconColor = 'text-yellow-100'; iconBg = 'bg-white/20';
+          statusText = itemCount + ' item'; statusColor = 'text-yellow-100';
+          numberColor = 'text-white';
         } else {
-          iconClass = 'fas fa-bag-shopping'; iconColor = 'text-gray-300'; iconBg = 'bg-gray-50';
-          statusText = 'Kosong'; statusColor = 'text-gray-400';
-          numberColor = 'text-gray-500';
+          iconClass = 'fas fa-bag-shopping'; iconColor = 'text-amber-600'; iconBg = 'bg-amber-100';
+          statusText = 'Kosong'; statusColor = 'text-amber-500';
+          numberColor = 'text-amber-700';
         }
 
         // Customer name badge
@@ -2866,9 +2778,9 @@
         if (custName) {
           const nameShort = custName.length > 8 ? custName.substring(0, 8) + '..' : custName;
           let nameBg, nameText;
-          if (isUnpaid) { nameBg = 'bg-red-500'; nameText = 'text-white'; }
-          else if (isActive) { nameBg = 'bg-yellow-500'; nameText = 'text-white'; }
-          else { nameBg = 'bg-gray-600'; nameText = 'text-white'; }
+          if (isUnpaid) { nameBg = 'bg-white/25'; nameText = 'text-white'; }
+          else if (isActive) { nameBg = 'bg-white/25'; nameText = 'text-white'; }
+          else { nameBg = 'bg-amber-600'; nameText = 'text-white'; }
           nameHtml = '<div class="table-customer-badge inline-block mt-1.5 truncate max-w-full ' + nameBg + ' ' + nameText + ' text-[10px] font-bold px-2 py-0.5 rounded-full" title="' + custName.replace(/"/g, '&quot;') + '"><i class="fas fa-user mr-1 text-[8px]"></i>' + nameShort + '</div>';
         }
 
@@ -2888,7 +2800,7 @@
             (isActive && !isUnpaid ? '<div class="table-status mt-1 ' + statusColor + '">' + statusText + '</div>' : '') +
             (isUnpaid ? '<div class="table-status mt-1 font-extrabold tracking-wide ' + statusColor + '"><i class="fas fa-triangle-exclamation mr-0.5"></i>' + statusText + '</div>' : '') +
             itemPillHtml +
-            '<div class="edit-btn mt-1" onclick="event.stopPropagation();editTakeawayName(' + i + ')"><i class="fas fa-pen text-[9px] text-gray-400 hover:text-amber-500 cursor-pointer" title="Nama pelanggan"></i></div>' +
+            '<div class="edit-btn mt-1" onclick="event.stopPropagation();editTakeawayName(' + i + ')"><i class="fas fa-pen-to-square text-[10px] text-amber-400 hover:text-amber-600 cursor-pointer" title="Nama pelanggan"></i></div>' +
           '</div>' +
           '</div>';
       }
