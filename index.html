@@ -3585,8 +3585,49 @@
 
     function closeTrxDetailModal() { document.getElementById('trx-detail-modal').classList.add('hidden'); }
 
-    // ===== EXPORT CSV (PWA-Compatible) =====
-    // Fallback chain: Share file → Download file → Overlay dengan semua opsi
+    // ===== EXPORT CSV (PWA + APK/TWA Compatible) =====
+    // v20: Deteksi environment (APK/TWA vs Browser/PWA)
+    //     dan gunakan chain export yang sesuai
+    function isTWAorAPK() {
+      // Cek apakah berjalan di dalam TWA (Trusted Web Activity / APK)
+      // 1. Cek document.referrer — di TWA referrer kosong atau berisi paket Android
+      // 2. Cek display-mode — standalone bisa jadi PWA atau TWA
+      // 3. Cek user-agent untuk tanda TWA/WebView
+      var ua = navigator.userAgent || '';
+      var referrer = document.referrer || '';
+      var displayMode = window.matchMedia('(display-mode: standalone)').matches ||
+                         window.navigator.standalone === true;
+
+      // TWA biasanya punya referrer dari android-app://
+      if (referrer.indexOf('android-app://') === 0) return true;
+
+      // WebView / Chrome di APK punya tanda khusus
+      if (ua.indexOf('wv') !== -1 && ua.indexOf('Chrome') !== -1) return true;
+
+      // jika standalone TAPI user agent mengandung tanda TWA
+      if (displayMode && /Trident|Edge|Edg\//.test(ua) === false &&
+          ua.indexOf('Mobile') !== -1 && ua.indexOf('Android') !== -1) {
+        // Kemungkinan besar APK — cek apakah ada TWA-specific API
+        if (window.getInstalledRelatedApps) return true;
+      }
+
+      // Fallback: cek apakah standalone dan bukan di Chrome (bisa jadi custom tab)
+      if (displayMode && navigator.share) {
+        // Berada di standalone mode — bisa PWA atau APK
+        // Tidak bisa dipastikan 100%, jadi kita treat sebagai mungkin APK
+        // dan gunakan metode yang aman untuk keduanya
+      }
+
+      return false;
+    }
+
+    // Simpan status environment saat pertama kali dipanggil
+    var _isAPKEnv = null;
+    function getIsAPKEnv() {
+      if (_isAPKEnv === null) _isAPKEnv = isTWAorAPK();
+      return _isAPKEnv;
+    }
+
     function doExportCSV(evt) {
       if (!currentFilteredTransactions || currentFilteredTransactions.length === 0) {
         showToast('Tidak ada data untuk diexport', 'error');
@@ -3606,39 +3647,82 @@
       window._csvShopName = shopName;
       window._csvFilename = filename;
 
-      // === CHAIN 1: Web Share API dengan File (paling baik untuk PWA) ===
-      if (navigator.share && navigator.canShare) {
-        var file = new File(['\uFEFF' + csv], filename, { type: 'text/csv;charset=utf-8' });
-        var shareData = { files: [file], title: 'Laporan ' + shopName };
-        if (navigator.canShare(shareData)) {
-          navigator.share(shareData)
-            .then(function() { showToast('Berhasil dibagikan', 'success'); })
-            .catch(function(err) {
-              if (err.name === 'AbortError') return; // User batal
-              // File share gagal → coba download langsung
-              csvDirectDownload(csv, filename);
-            });
-          return;
+      var isAPK = getIsAPKEnv();
+      console.log('[CSV] Environment:', isAPK ? 'APK/TWA' : 'Browser/PWA');
+
+      // === CHAIN 1: Web Share API dengan File (paling aman untuk APK + PWA) ===
+      // navigator.share() adalah cara PALING RELIABLE di APK/TWA
+      // karena bypass download system dan langsung ke share sheet Android
+      if (navigator.share) {
+        try {
+          var file = new File(['\uFEFF' + csv], filename, { type: 'text/csv;charset=utf-8' });
+          var shareData = { files: [file], title: 'Laporan ' + shopName };
+          if (navigator.canShare && navigator.canShare(shareData)) {
+            navigator.share(shareData)
+              .then(function() { showToast('Berhasil dibagikan', 'success'); })
+              .catch(function(err) {
+                if (err.name === 'AbortError') return;
+                // Share gagal → lanjut ke download chain
+                csvExportDownloadChain(csv, filename, isAPK);
+              });
+            return;
+          }
+        } catch(e) {
+          console.warn('[CSV] Share API error:', e);
         }
       }
 
-      // === CHAIN 2: Direct Download via Blob (fallback untuk PWA) ===
-      var downloaded = csvDirectDownload(csv, filename);
-      if (downloaded) {
-        showToast('File CSV berhasil diunduh!', 'success');
-        return;
-      }
+      // === CHAIN 2: Download chain (berbeda untuk APK vs Browser) ===
+      csvExportDownloadChain(csv, filename, isAPK);
+    }
 
-      // === CHAIN 3: Overlay dengan semua opsi (fallback terakhir) ===
-      showExportOverlay();
+    // Download chain yang menyesuaikan dengan environment
+    function csvExportDownloadChain(csv, filename, isAPK) {
+      if (isAPK) {
+        // === APK/TWA Download Chain ===
+        // Di APK, <a download> sering gagal. Gunakan strategi berbeda:
+        // 1. Coba <a download> dulu (kadang bisa di Android 12+)
+        // 2. Jika gagal → window.open blob URL (buka di Chrome)
+        // 3. Jika gagal → Share API dengan text
+        // 4. Fallback → overlay
+        console.log('[CSV] Menggunakan APK download chain');
+
+        var downloadOK = csvDirectDownload(csv, filename);
+        if (downloadOK) {
+          // Beri waktu 2 detik, cek apakah download benar-benar terjadi
+          // Di APK, <a download>.click() TIDAK throw error — tapi juga tidak download
+          // Jadi kita selalu lanjut ke overlay sebagai backup
+          showToast('Menyimpan file...', 'info');
+        }
+
+        // Selalu tampilkan overlay di APK sebagai backup
+        // Karena <a download> bisa "berhasil" tapi sebenarnya tidak ter-download
+        setTimeout(function() {
+          showExportOverlay();
+        }, 800);
+
+      } else {
+        // === Browser/PWA Download Chain ===
+        // Di browser normal, <a download> bekerja reliable
+        console.log('[CSV] Menggunakan browser download chain');
+
+        var downloadOK = csvDirectDownload(csv, filename);
+        if (downloadOK) {
+          showToast('File CSV berhasil diunduh!', 'success');
+          return;
+        }
+
+        // Download gagal → overlay
+        showExportOverlay();
+      }
     }
 
     // --- Direct download via Blob + createObjectURL ---
-    // Bekerja di browser normal. Di PWA standalone, ini bisa jadi gagal —
-    // tapi kita coba dulu sebelum fallback ke overlay.
+    // Bekerja di browser normal. Di PWA/APK, ini bisa jadi gagal diam-diam.
+    // Di APK/TWA: <a download>.click() TIDAK throw error tapi file TIDAK ter-download.
     function csvDirectDownload(csv, filename) {
       try {
-        var BOM = '\uFEFF'; // UTF-8 BOM agar Excel baca UTF-8 dengan benar
+        var BOM = '\uFEFF';
         var blob = new Blob([BOM + csv], { type: 'text/csv;charset=utf-8' });
         var url = URL.createObjectURL(blob);
 
@@ -3651,13 +3735,85 @@
 
         // Cleanup setelah delay
         setTimeout(function() {
-          document.body.removeChild(a);
+          if (a.parentNode) document.body.removeChild(a);
           URL.revokeObjectURL(url);
-        }, 500);
+        }, 3000); // Diperpanjang dari 500ms ke 3 detik untuk APK
 
         return true;
       } catch(e) {
         console.warn('[CSV] Direct download gagal:', e);
+        return false;
+      }
+    }
+
+    // --- APK/TWA Specific: Download via iframe ---
+    // Metode ini kadang bekerja di TWA ketika <a download> gagal.
+    // Membuat hidden iframe yang memuat blob URL, memicu download dialog.
+    function csvIframeDownload(csv, filename) {
+      try {
+        var BOM = '\uFEFF';
+        var blob = new Blob([BOM + csv], { type: 'text/csv;charset=utf-8' });
+        var url = URL.createObjectURL(blob);
+
+        var iframe = document.createElement('iframe');
+        iframe.style.cssText = 'position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;opacity:0;';
+        document.body.appendChild(iframe);
+
+        // Coba 2 pendekatan dalam iframe
+        // Pendekatan A: set src langsung
+        iframe.src = url;
+
+        // Pendekatan B: tulis content ke iframe
+        try {
+          var iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+          iframeDoc.open();
+          iframeDoc.write('<html><head><meta charset="utf-8"></head><body>' +
+            '<script>window.parent.postMessage("download-ready","*");<\/script>' +
+            '</body></html>');
+          iframeDoc.close();
+        } catch(ie) {
+          // Cross-origin, abaikan
+        }
+
+        setTimeout(function() {
+          if (iframe.parentNode) document.body.removeChild(iframe);
+          URL.revokeObjectURL(url);
+        }, 5000);
+
+        return true;
+      } catch(e) {
+        console.warn('[CSV] Iframe download gagal:', e);
+        return false;
+      }
+    }
+
+    // --- APK/TWA Specific: Open in external browser ---
+    // Membuka blob URL di Chrome/external browser.
+    // Di TWA, ini bisa membuka Chrome di mana download normal.
+    function csvOpenExternal(csv, filename) {
+      try {
+        var BOM = '\uFEFF';
+        var blob = new Blob([BOM + csv], { type: 'text/csv;charset=utf-8' });
+        var url = URL.createObjectURL(blob);
+
+        // Coba buka di tab baru (di TWA, ini bisa membuka Chrome)
+        window.open(url, '_blank', 'noopener');
+
+        // Jika window.open gagal di TWA, coba intent URL untuk Android
+        // ini membuka Chrome langsung dari APK
+        if (getIsAPKEnv()) {
+          try {
+            var intentUrl = 'intent:' + url + '#Intent;scheme=chrome;package=com.android.chrome;end';
+            window.location.href = intentUrl;
+          } catch(e) {
+            // abaikan
+          }
+        }
+
+        setTimeout(function() { URL.revokeObjectURL(url); }, 15000);
+        return true;
+      } catch(e) {
+        console.warn('[CSV] Open external gagal:', e);
         return false;
       }
     }
@@ -3702,7 +3858,7 @@
         '<p style="font-size:10px;color:#9ca3af;margin:0 0 14px;text-align:center;line-height:1.5;">Jika download gagal, salin data lalu tempel di Excel.</p>' +
 
         // Kirim ke
-        '<div style="display:flex;gap:8px;margin-bottom:10px;">' +
+        '<div style="display:flex;gap:8px;margin-bottom:8px;">' +
           '<button id="csv-wa-btn" style="flex:1;padding:12px;background:#dcfce7;color:#166534;border:none;border-radius:12px;font-weight:600;font-size:12px;cursor:pointer;">' +
             '<i class="fab fa-whatsapp" style="margin-right:5px;font-size:14px;"></i>Kirim WA' +
           '</button>' +
@@ -3712,8 +3868,13 @@
         '</div>' +
 
         // Bagikan
-        '<button id="csv-share-btn" style="width:100%;padding:12px;background:#fef3c7;color:#92400e;border:1px solid #fde68a;border-radius:12px;font-weight:600;font-size:12px;cursor:pointer;margin-bottom:14px;">' +
+        '<button id="csv-share-btn" style="width:100%;padding:12px;background:#fef3c7;color:#92400e;border:1px solid #fde68a;border-radius:12px;font-weight:600;font-size:12px;cursor:pointer;margin-bottom:8px;">' +
           '<i class="fas fa-share-alt" style="margin-right:5px;"></i>Bagikan (WhatsApp, Save Files, dll)' +
+        '</button>' +
+
+        // v20: Tombol Buka di Chrome (khusus APK/TWA)
+        '<button id="csv-open-chrome-btn" style="width:100%;padding:12px;background:#ede9fe;color:#5b21b6;border:1px solid #c4b5fd;border-radius:12px;font-weight:600;font-size:12px;cursor:pointer;margin-bottom:14px;">' +
+          '<i class="fab fa-chrome" style="margin-right:5px;font-size:13px;"></i>Buka di Chrome (Download dari browser)' +
         '</button>' +
 
         // Preview data
@@ -3728,10 +3889,18 @@
       document.body.appendChild(overlay);
 
       // --- Download File CSV (utama) ---
+      // v20: Multi-strategy download yang bekerja di APK + PWA
       document.getElementById('csv-download-btn').addEventListener('click', function() {
         var btn = document.getElementById('csv-download-btn');
-        var success = csvDirectDownload(window._csvData, window._csvFilename);
-        if (success) {
+        var isAPK = getIsAPKEnv();
+        var csvData = window._csvData;
+        var csvFile = window._csvFilename;
+
+        // Strategy 1: Direct download via <a download>
+        var success = csvDirectDownload(csvData, csvFile);
+
+        if (success && !isAPK) {
+          // Di browser/PWA, download biasanya langsung berhasil
           btn.innerHTML = '<i class="fas fa-circle-check" style="margin-right:6px;"></i>Download Berhasil!';
           btn.style.background = 'linear-gradient(135deg,#22c55e,#16a34a)';
           showToast('File CSV berhasil diunduh!', 'success');
@@ -3739,17 +3908,43 @@
             btn.innerHTML = '<i class="fas fa-download" style="margin-right:6px;"></i>Download File CSV';
             btn.style.background = 'linear-gradient(135deg,#16a34a,#15803d)';
           }, 4000);
-        } else {
-          // Download gagal → buka tab baru dengan data CSV
-          showToast('Download gagal, membuka tab baru...', 'error');
-          try {
-            var blob = new Blob(['\uFEFF' + window._csvData], { type: 'text/csv;charset=utf-8' });
-            var url = URL.createObjectURL(blob);
-            window.open(url, '_blank');
-            setTimeout(function() { URL.revokeObjectURL(url); }, 10000);
-          } catch(e) {
-            showToast('Gagal membuka file. Gunakan Salin Data.', 'error');
-          }
+          return;
+        }
+
+        if (isAPK) {
+          // Di APK, download mungkin gagal diam-diam.
+          // Coba backup strategies secara berantai.
+          btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:6px;"></i>Mencoba download...';
+
+          // Strategy 2: Iframe download
+          setTimeout(function() {
+            csvIframeDownload(csvData, csvFile);
+          }, 500);
+
+          // Strategy 3: Open in external browser
+          setTimeout(function() {
+            csvOpenExternal(csvData, csvFile);
+          }, 2000);
+
+          // Setelah semua strategi, tampilkan status
+          setTimeout(function() {
+            btn.innerHTML = '<i class="fas fa-download" style="margin-right:6px;"></i>Coba Lagi / Buka di Chrome';
+            btn.style.background = 'linear-gradient(135deg,#f59e0b,#d97706)';
+            showToast('Jika file tidak terdownload, gunakan "Buka di Chrome" atau "Bagikan"', 'info');
+          }, 3000);
+
+          return;
+        }
+
+        // Browser fallback: buka tab baru dengan blob
+        showToast('Download gagal, membuka tab baru...', 'error');
+        try {
+          var blob = new Blob(['\uFEFF' + csvData], { type: 'text/csv;charset=utf-8' });
+          var url = URL.createObjectURL(blob);
+          window.open(url, '_blank');
+          setTimeout(function() { URL.revokeObjectURL(url); }, 10000);
+        } catch(e) {
+          showToast('Gagal membuka file. Gunakan Salin Data.', 'error');
         }
       });
 
@@ -3790,13 +3985,47 @@
           var file = new File(['\uFEFF' + csv], filename, { type: 'text/csv;charset=utf-8' });
           var shareData = { files: [file], title: 'Laporan ' + shopName };
           if (navigator.canShare && navigator.canShare(shareData)) {
-            navigator.share(shareData).catch(function() {});
+            navigator.share(shareData)
+              .then(function() { showToast('Berhasil dibagikan!', 'success'); })
+              .catch(function(err) {
+                if (err.name !== 'AbortError') {
+                  // File share gagal, coba share text saja
+                  navigator.share({ title: 'Laporan ' + shopName, text: csv }).catch(function() {});
+                }
+              });
           } else {
             navigator.share({ title: 'Laporan ' + shopName, text: csv }).catch(function() {});
           }
         } else {
           showToast('Browser tidak mendukung share', 'error');
         }
+      });
+
+      // v20: Buka di Chrome (khusus APK/TWA)
+      document.getElementById('csv-open-chrome-btn').addEventListener('click', function() {
+        var btn = document.getElementById('csv-open-chrome-btn');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right:5px;"></i>Membuka Chrome...';
+
+        var BOM = '\uFEFF';
+        var blob = new Blob([BOM + csv], { type: 'text/csv;charset=utf-8' });
+        var blobUrl = URL.createObjectURL(blob);
+
+        // Buka blob URL di tab baru
+        // Di TWA, window.open bisa membuka Chrome
+        var opened = window.open(blobUrl, '_blank', 'noopener,noreferrer');
+
+        if (!opened || opened.closed) {
+          // window.open diblok → gunakan share
+          btn.innerHTML = '<i class="fas fa-share-alt" style="margin-right:5px;font-size:13px;"></i>Gunakan Bagikan';
+          showToast('Tidak bisa buka Chrome. Gunakan tombol Bagikan.', 'error');
+        } else {
+          btn.innerHTML = '<i class="fas fa-circle-check" style="margin-right:5px;font-size:13px;"></i>Chrome Terbuka!';
+          btn.style.background = '#dcfce7';
+          btn.style.color = '#166534';
+          showToast('File dibuka di Chrome. Download dari sana.', 'success');
+        }
+
+        setTimeout(function() { URL.revokeObjectURL(blobUrl); }, 30000);
       });
 
       // Tutup
