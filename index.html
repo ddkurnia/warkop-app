@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Warung Kopi POS</title>
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#0f766e">
@@ -496,6 +496,82 @@
 
     /* Body - subtle gradient texture */
     body { background: linear-gradient(160deg, #f0f9ff 0%, #f8fafc 40%, #f0f4ff 100%) !important; }
+
+    /* ===== RESPONSIVE: Desktop & Tablet Scaling ===== */
+    #pos-app {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+    }
+    #pos-app > .pb-20 {
+      flex: 1;
+    }
+    /* Bottom nav: expand on larger screens */
+    @media (min-width: 640px) {
+      #pos-app > nav.no-print > div {
+        max-width: 600px !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+      }
+    }
+    @media (min-width: 1024px) {
+      #pos-app > nav.no-print > div {
+        max-width: 700px !important;
+      }
+    }
+    /* Mobile panel: better sizing on tablets/desktop */
+    @media (min-width: 768px) {
+      #mobile-panel > div:last-child {
+        max-width: 560px !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        max-height: 90vh !important;
+      }
+    }
+    /* Toko page: wider on desktop */
+    @media (min-width: 768px) {
+      #page-toko > div {
+        max-width: 640px !important;
+      }
+    }
+    @media (min-width: 1024px) {
+      #page-toko > div {
+        max-width: 720px !important;
+      }
+    }
+    /* Menu mgmt: wider on desktop */
+    @media (min-width: 1024px) {
+      #page-menu > div {
+        max-width: 960px !important;
+      }
+    }
+    /* Riwayat page: wider on desktop */
+    @media (min-width: 1024px) {
+      #page-riwayat > div {
+        max-width: 960px !important;
+      }
+    }
+    /* Auth screens: scale up on desktop */
+    @media (min-width: 768px) {
+      .auth-form-area {
+        max-width: 440px !important;
+      }
+      .auth-card {
+        max-width: 440px !important;
+      }
+    }
+    /* Modals: better desktop sizing */
+    @media (min-width: 1024px) {
+      #payment-modal > div:last-child:not(.modal-overlay),
+      #menu-edit-modal > div:last-child:not(.modal-overlay),
+      #trx-detail-modal > div:last-child:not(.modal-overlay) {
+        max-width: 520px !important;
+      }
+      #receipt-modal > div:last-child:not(.modal-overlay) {
+        max-width: 480px !important;
+      }
+    }
 
     /* ----- GLASSMORPHISM HEADER ----- */
     #pos-app > header {
@@ -1204,7 +1280,7 @@
               </div>
               <div id="menu-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 mb-4"></div>
             </div>
-            <div class="hidden lg:block w-96 flex-shrink-0">
+            <div class="hidden lg:block w-96 xl:w-[420px] flex-shrink-0">
               <div class="bg-white rounded-2xl shadow-sm border border-sky-100 p-4 sticky top-20 max-h-[calc(100vh-100px)] flex flex-col">
                 <div id="panel-content-desktop"></div>
               </div>
@@ -1213,7 +1289,7 @@
         </div>
         <div id="mobile-panel" class="hidden fixed inset-0 z-50 lg:hidden">
           <div class="absolute inset-0 modal-overlay" onclick="closeMobilePanel()"></div>
-          <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-2xl max-h-[85vh] flex flex-col">
+          <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl md:rounded-2xl shadow-2xl max-h-[85vh] md:max-h-[90vh] md:max-w-[560px] md:mx-auto md:bottom-auto md:top-1/2 md:-translate-y-1/2 md:relative md:translate-y-0 md:inset-auto flex flex-col">
             <div class="flex items-center justify-between p-4 border-b border-sky-100">
               <h3 class="font-bold text-sky-800"><i class="fas fa-receipt mr-2 text-sky-500"></i>Pesanan</h3>
               <button onclick="closeMobilePanel()" class="w-8 h-8 rounded-full bg-sky-100 flex items-center justify-center text-sky-600">
@@ -1313,7 +1389,7 @@
 
       <!-- PAGE: TOKO -->
       <div id="page-toko" class="page">
-        <div class="max-w-lg mx-auto p-4">
+        <div class="max-w-lg md:max-w-[640px] lg:max-w-[720px] mx-auto p-4">
           <h2 class="text-lg font-bold text-sky-800 mb-4 flex items-center gap-2"><i class="fas fa-shop text-sky-500"></i> Pengaturan Toko</h2>
           <div class="bg-white rounded-2xl p-5 shadow-sm border border-sky-100 space-y-5">
             <div class="text-center">
@@ -1531,7 +1607,7 @@
 
     <!-- BOTTOM NAVIGATION -->
     <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200 z-40 no-print">
-      <div class="max-w-lg mx-auto flex">
+      <div class="max-w-lg sm:max-w-[600px] lg:max-w-[700px] mx-auto flex">
         <button onclick="switchPage('kasir')" id="nav-kasir" class="nav-btn flex-1 py-3 flex flex-col items-center gap-0.5 text-sky-600 bg-sky-50 border-t-2 border-sky-600">
           <i class="fas fa-calculator text-lg"></i><span class="text-xs font-semibold">Kasir</span>
         </button>
@@ -1708,8 +1784,6 @@
       storageBucket: "warkop-app-20449.firebasestorage.app",
       messagingSenderId: "896934754762",
       // CATATAN: appId harus disalin dari Firebase Console
-      // Project Settings > General > Your apps > Web app
-      // Format: "1:896934754762:web:XXXXXXX..."
       appId: "1:896934754762:web:placeholder"
     };
     firebase.initializeApp(firebaseConfig);
@@ -5392,8 +5466,19 @@
     showScreen('loading');
     </script>
   <script>
+    // Service Worker Registration v21
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').catch(function(){});
+      navigator.serviceWorker.register('/sw.js', { scope: '/' })
+        .then(function(reg) {
+          console.log('[SW] Registered v21, scope:', reg.scope);
+          // Cek update setiap 60 detik
+          setInterval(function() {
+            reg.update();
+          }, 60000);
+        })
+        .catch(function(err) {
+          console.warn('[SW] Registration failed:', err);
+        });
     }
   </script>
 </body>
