@@ -14,8 +14,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-  <!-- Google Identity Services for Google Drive OAuth -->
-  <script src="https://accounts.google.com/gsi/client"></script>
   <!-- Firebase CDN (compat) -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -1431,172 +1429,20 @@
             </button>
           </div>
 
-          <!-- Backup & Restore Card -->
-          <div class="bg-white rounded-2xl p-5 shadow-sm border border-sky-100 mt-4">
-            <h3 class="text-sm font-bold text-sky-800 mb-3"><i class="fas fa-database mr-2 text-blue-500"></i>Backup & Restore Data</h3>
-
-            <!-- Data Summary -->
-            <div id="data-summary" class="mb-4 text-xs text-sky-500 space-y-1">
-              <!-- Filled dynamically -->
-            </div>
-
-            <!-- Last Backup Info -->
-            <div id="last-backup-info" class="mb-4 text-xs text-sky-500"></div>
-
-            <!-- Buttons -->
-            <div class="grid grid-cols-2 gap-3">
-              <button onclick="exportBackup()" class="py-2.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-xl text-sm font-semibold hover:bg-blue-100 transition">
-                <i class="fas fa-download mr-1"></i> Export Backup
-              </button>
-              <button onclick="document.getElementById('import-backup-input').click()" class="py-2.5 bg-orange-50 text-orange-700 border border-orange-200 rounded-xl text-sm font-semibold hover:bg-orange-100 transition">
-                <i class="fas fa-upload mr-1"></i> Import Restore
-              </button>
-              <input type="file" id="import-backup-input" accept=".json" class="hidden" onchange="importBackup(event)">
-            </div>
-
-            <button onclick="confirmClearData()" class="w-full mt-3 py-2 bg-red-50 text-red-600 border border-red-200 rounded-xl text-xs font-semibold hover:bg-red-100 transition">
-              <i class="fas fa-trash-can mr-1"></i> Hapus Semua Data Lokal
-            </button>
-          </div>
-
-          <!-- Google Drive Backup Card -->
-          <div class="bg-white rounded-2xl p-5 shadow-sm border border-sky-100 mt-4">
-            <h3 class="text-sm font-bold text-sky-800 mb-1"><i class="fab fa-google-drive mr-2 text-green-600"></i>Backup Google Drive</h3>
-            <p class="text-xs text-slate-400 mb-3">Backup otomatis ke Google Drive. Aman saat ganti perangkat.</p>
-
-            <!-- Client ID Config -->
-            <div id="gdrive-config-section">
-              <label class="block text-xs font-semibold text-sky-700 mb-1">Google OAuth Client ID</label>
-              <input type="text" id="gdrive-client-id" placeholder="xxxx.apps.googleusercontent.com" class="w-full px-3 py-2 border border-sky-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-sky-400 mb-2">
-              <button onclick="gdriveSaveClientId()" class="w-full py-2 bg-sky-50 text-sky-700 border border-sky-200 rounded-xl text-xs font-semibold hover:bg-sky-100 transition mb-3">
-                <i class="fas fa-save mr-1"></i> Simpan Client ID
-              </button>
-              <button onclick="gdriveShowHelp()" class="w-full py-2 bg-amber-50 text-amber-700 border border-amber-200 rounded-xl text-xs font-semibold hover:bg-amber-100 transition mb-3">
-                <i class="fas fa-circle-question mr-1"></i> Cara Mendapatkan Client ID
-              </button>
-            </div>
-
-            <!-- Google Drive Actions (hidden until configured) -->
-            <div id="gdrive-actions" class="hidden">
-              <!-- Connection Status -->
-              <div id="gdrive-status" class="mb-3 p-3 rounded-xl text-xs">
-                <div class="flex items-center gap-2">
-                  <div id="gdrive-status-dot" class="w-2.5 h-2.5 rounded-full bg-slate-300"></div>
-                  <span id="gdrive-status-text" class="text-slate-500">Belum terhubung</span>
-                </div>
-              </div>
-
-              <!-- Last Google Drive Backup -->
-              <div id="gdrive-last-backup" class="mb-3 text-xs text-sky-500"></div>
-
-              <!-- Buttons -->
-              <div class="grid grid-cols-2 gap-3 mb-3">
-                <button onclick="gdriveBackup()" id="gdrive-backup-btn" class="py-2.5 bg-green-50 text-green-700 border border-green-200 rounded-xl text-sm font-semibold hover:bg-green-100 transition">
-                  <i class="fas fa-cloud-arrow-up mr-1"></i> Backup
-                </button>
-                <button onclick="gdriveRestore()" id="gdrive-restore-btn" class="py-2.5 bg-blue-50 text-blue-700 border border-blue-200 rounded-xl text-sm font-semibold hover:bg-blue-100 transition">
-                  <i class="fas fa-cloud-arrow-down mr-1"></i> Restore
-                </button>
-              </div>
-
-              <!-- Auto-backup toggle -->
-              <div class="flex items-center justify-between p-3 bg-slate-50 rounded-xl mb-3">
-                <div>
-                  <p class="text-xs font-semibold text-slate-700">Auto-Backup Saat Login</p>
-                  <p class="text-[10px] text-slate-400">Otomatis backup setiap buka app</p>
-                </div>
-                <label class="relative inline-flex items-center cursor-pointer">
-                  <input type="checkbox" id="gdrive-auto-toggle" class="sr-only peer" onchange="gdriveToggleAuto()">
-                  <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-green-500"></div>
-                </label>
-              </div>
-
-              <button onclick="gdriveShowBackups()" class="w-full py-2 bg-slate-50 text-slate-600 border border-slate-200 rounded-xl text-xs font-semibold hover:bg-slate-100 transition mb-2">
-                <i class="fas fa-list mr-1"></i> Lihat Daftar Backup di Drive
-              </button>
-
-              <button onclick="gdriveDisconnect()" class="w-full py-2 bg-red-50 text-red-500 border border-red-200 rounded-xl text-xs font-semibold hover:bg-red-100 transition">
-                <i class="fas fa-link-slash mr-1"></i> Putuskan Koneksi
-              </button>
-            </div>
-          </div>
-
-          <!-- Google Drive Help Modal -->
-          <div id="gdrive-help-modal" class="fixed inset-0 z-50 hidden">
-            <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="document.getElementById('gdrive-help-modal').classList.add('hidden')"></div>
-            <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl p-5 max-h-[80vh] overflow-y-auto z-10 animate-slide-up">
-              <div class="flex justify-between items-center mb-4">
-                <h3 class="text-base font-bold text-sky-800"><i class="fas fa-circle-question mr-2 text-amber-500"></i>Cara Setup Google Drive Backup</h3>
-                <button onclick="document.getElementById('gdrive-help-modal').classList.add('hidden')" class="text-slate-400 hover:text-slate-600"><i class="fas fa-xmark text-lg"></i></button>
-              </div>
-              <div class="space-y-3 text-xs text-slate-600">
-                <div class="flex gap-3">
-                  <span class="w-6 h-6 bg-sky-100 text-sky-700 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">1</span>
-                  <div><p class="font-semibold text-slate-800 mb-1">Buka Google Cloud Console</p><p class="text-[11px]">Kunjungi <a href="https://console.cloud.google.com/" target="_blank" class="text-sky-600 underline">console.cloud.google.com</a> dan login dengan akun Google yang sama.</p></div>
-                </div>
-                <div class="flex gap-3">
-                  <span class="w-6 h-6 bg-sky-100 text-sky-700 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">2</span>
-                  <div><p class="font-semibold text-slate-800 mb-1">Buat Project Baru atau Pilih yang Ada</p><p class="text-[11px]">Buka project Firebase Anda (warkop-app-20449) atau buat baru.</p></div>
-                </div>
-                <div class="flex gap-3">
-                  <span class="w-6 h-6 bg-sky-100 text-sky-700 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">3</span>
-                  <div><p class="font-semibold text-slate-800 mb-1">Aktifkan Google Drive API</p><p class="text-[11px]">Menu: APIs & Services → Library → cari "Google Drive API" → klik Enable.</p></div>
-                </div>
-                <div class="flex gap-3">
-                  <span class="w-6 h-6 bg-sky-100 text-sky-700 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">4</span>
-                  <div><p class="font-semibold text-slate-800 mb-1">Buat OAuth 2.0 Client ID</p><p class="text-[11px]">Menu: APIs & Services → Credentials → Create Credentials → OAuth client ID<br>Type: <b>Web application</b><br>Nama: WARKOPOS Backup<br>Authorized JavaScript origins: tambahkan URL website Anda (misal: https://yourdomain.com)<br><br>Klik Create → Copy Client ID yang muncul.</p></div>
-                </div>
-                <div class="flex gap-3">
-                  <span class="w-6 h-6 bg-sky-100 text-sky-700 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">5</span>
-                  <div><p class="font-semibold text-slate-800 mb-1">Konfigurasi Consent Screen</p><p class="text-[11px]">Menu: APIs & Services → OAuth consent screen<br>User Type: External<br>Isi App name, User support email, Developer contact email<br>Scope yang dibutuhkan: <code class="bg-slate-100 px-1 rounded">.../auth/drive.appdata</code><br>Publish app (test mode cukup untuk pemakaian sendiri).</p></div>
-                </div>
-                <div class="flex gap-3">
-                  <span class="w-6 h-6 bg-sky-100 text-sky-700 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">6</span>
-                  <div><p class="font-semibold text-slate-800 mb-1">Paste Client ID di Settings</p><p class="text-[11px]">Paste Client ID yang sudah di-copy ke kolom "Google OAuth Client ID" di halaman Settings ini, lalu klik Simpan.</p></div>
-                </div>
-                <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 mt-2">
-                  <p class="font-semibold text-amber-700 text-[11px]"><i class="fas fa-triangle-exclamation mr-1"></i> Penting</p>
-                  <p class="text-[11px] text-amber-600 mt-1">Pastikan URL website Anda ditambahkan di "Authorized JavaScript origins" pada OAuth Client ID, atau Google Drive login tidak akan berfungsi.</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Google Drive Backups List Modal -->
-          <div id="gdrive-backups-modal" class="fixed inset-0 z-50 hidden">
-            <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="document.getElementById('gdrive-backups-modal').classList.add('hidden')"></div>
-            <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl p-5 max-h-[70vh] overflow-y-auto z-10 animate-slide-up">
-              <div class="flex justify-between items-center mb-4">
-                <h3 class="text-base font-bold text-sky-800"><i class="fab fa-google-drive mr-2 text-green-600"></i>Daftar Backup</h3>
-                <button onclick="document.getElementById('gdrive-backups-modal').classList.add('hidden')" class="text-slate-400 hover:text-slate-600"><i class="fas fa-xmark text-lg"></i></button>
-              </div>
-              <div id="gdrive-backups-list" class="space-y-2">
-                <p class="text-xs text-slate-400 text-center py-4">Memuat daftar backup...</p>
-              </div>
-            </div>
-          </div>
-
           <!-- App Version & Update Card -->
           <div class="bg-white rounded-2xl p-5 shadow-sm border border-sky-100 mt-4">
             <div class="flex items-center justify-between mb-3">
               <h3 class="text-sm font-bold text-sky-800"><i class="fas fa-mobile-screen-button mr-2 text-sky-500"></i>Versi Aplikasi</h3>
-              <span id="app-version-badge" class="px-2.5 py-0.5 bg-sky-50 text-sky-600 rounded-full text-[10px] font-bold">v1.0.0</span>
+              <span id="app-version-badge" class="px-2.5 py-0.5 bg-sky-50 text-sky-600 rounded-full text-[10px] font-bold">v2.0.0</span>
             </div>
 
             <div id="app-update-status" class="mb-3 text-xs text-slate-400">
               <p><i class="fas fa-check-circle mr-1 text-green-500"></i> Aplikasi versi terbaru</p>
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
-              <button onclick="appCheckUpdate()" id="app-check-update-btn" class="py-2.5 bg-sky-50 text-sky-700 border border-sky-200 rounded-xl text-sm font-semibold hover:bg-sky-100 transition">
-                <i class="fas fa-magnifying-glass mr-1"></i> Cek Update
-              </button>
-              <button onclick="appForceUpdate()" id="app-force-update-btn" class="py-2.5 bg-green-50 text-green-700 border border-green-200 rounded-xl text-sm font-semibold hover:bg-green-100 transition">
-                <i class="fas fa-arrows-rotate mr-1"></i> Update Sekarang
-              </button>
-            </div>
-
-            <p class="text-[10px] text-slate-400 mt-2 text-center">Update akan mengunduh versi terbaru dari server</p>
+            <button onclick="appCheckUpdate()" id="app-check-update-btn" class="w-full py-2.5 bg-sky-50 text-sky-700 border border-sky-200 rounded-xl text-sm font-semibold hover:bg-sky-100 transition">
+              <i class="fas fa-magnifying-glass mr-1"></i> Cek Update
+            </button>
           </div>
 
           <div class="mt-4">
@@ -2507,13 +2353,9 @@
         updateHeaderTagline();
         updateDailyStats();
 
-        // Initialize Google Drive UI
-        gdriveInitUI();
-        renderDataSummary();
-
         // Initialize app version
         appInitVersion();
-        setTimeout(function() { appAutoCheckUpdate(); }, 5000);
+        appAutoCheckUpdate();
 
         showPOS();
         switchPage('kasir');
@@ -2539,8 +2381,6 @@
         document.getElementById('history-start').value = startDate;
         document.getElementById('history-end').value = endDate;
 
-        // Auto-backup to Google Drive (non-blocking, silent)
-        setTimeout(function() { gdriveAutoBackupOnLogin(); }, 3000);
       } catch (error) {
         console.error('Error loading POS:', error);
         showToast('Gagal memuat data POS.', 'error');
@@ -2792,7 +2632,6 @@
         renderMenuManagement();
       } else if (page === 'toko') {
         loadSettingsForm();
-        renderDataSummary();
       }
     }
 
@@ -5319,7 +5158,7 @@
     }
 
     // ===== APP VERSION & UPDATE =====
-    const APP_VERSION = '1.0.0';
+    const APP_VERSION = '2.0.0';
     const APP_VERSION_KEY = 'warkop_app_version';
     const REMOTE_VERSION_DOC = 'config/appVersion';
 
@@ -5444,26 +5283,73 @@
       });
     }
 
-    // --- Auto-check update on load (silent) ---
+    // --- Auto-check update on load (block old versions) ---
     async function appAutoCheckUpdate() {
       try {
         const doc = await db.collection('config').doc('appVersion').get();
         if (doc.exists) {
           const data = doc.data();
           const latestVersion = data.version;
+          const minVersion = data.minVersion || '';
+          const forceUpdate = data.forceUpdate || false;
+          const downloadUrl = data.downloadUrl || '';
+          const updateNotes = data.notes || '';
+
+          // Cek apakah versi user lebih lama dari minimum yang diizinkan
+          if (minVersion && versionCompare(APP_VERSION, minVersion) < 0) {
+            showForceUpdateModal(latestVersion, updateNotes, downloadUrl);
+            return;
+          }
+
+          // Cek apakah ada pembaruan baru (tampilkan notifikasi)
           if (latestVersion && latestVersion !== APP_VERSION) {
             const statusEl = document.getElementById('app-update-status');
             if (statusEl) {
-              statusEl.innerHTML = '<div class="bg-amber-50 border border-amber-200 rounded-xl p-3">' +
-                '<p class="text-amber-700 font-semibold text-xs"><i class="fas fa-bell mr-1"></i> Update tersedia! (v' + latestVersion + ')</p>' +
-                '<p class="text-[10px] text-amber-600 mt-0.5">Klik "Update Sekarang" untuk memperbarui</p>' +
+              statusEl.innerHTML = '<div class="bg-green-50 border border-green-200 rounded-xl p-3">' +
+                '<p class="text-green-700 font-semibold text-xs"><i class="fas fa-bell mr-1"></i> Update tersedia! (v' + latestVersion + ')</p>' +
+                (updateNotes ? '<p class="text-[10px] text-green-600 mt-0.5">' + updateNotes + '</p>' : '') +
                 '</div>';
             }
           }
         }
       } catch(e) {
-        // Silent fail — don't bother user
+        // Silent fail
       }
+    }
+
+    // --- Force Update Modal (blocks old app versions) ---
+    function showForceUpdateModal(latestVersion, notes, downloadUrl) {
+      const overlay = document.createElement('div');
+      overlay.id = 'force-update-overlay';
+      overlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:1rem;';
+      overlay.innerHTML = '<div style="background:white;border-radius:1.5rem;max-width:400px;width:100%;padding:2rem;text-align:center;box-shadow:0 25px 60px rgba(0,0,0,0.3);">' +
+        '<div style="width:64px;height:64px;background:linear-gradient(135deg,#0369A1,#0EA5E9);border-radius:1rem;display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;"><i class="fas fa-arrow-up-from-bracket" style="color:white;font-size:1.5rem;"></i></div>' +
+        '<h3 style="font-size:1.15rem;font-weight:800;color:#0C4A6E;margin-bottom:0.5rem;">Update Wajib!</h3>' +
+        '<p style="font-size:0.85rem;color:#64748B;margin-bottom:1rem;">Versi aplikasi Anda sudah tidak didukung. Silakan update ke versi terbaru untuk melanjutkan.</p>' +
+        '<div style="background:#F0F9FF;border:1px solid #BAE6FD;border-radius:1rem;padding:1rem;margin-bottom:1.25rem;">' +
+          '<p style="font-size:0.75rem;color:#0369A1;font-weight:700;">Versi terbaru: v' + latestVersion + '</p>' +
+          (notes ? '<p style="font-size:0.7rem;color:#64748B;margin-top:0.25rem;">' + notes + '</p>' : '') +
+        '</div>' +
+        (downloadUrl ?
+          '<a href="' + downloadUrl + '" target="_blank" rel="noopener" style="display:block;width:100%;padding:0.85rem;background:linear-gradient(135deg,#0369A1,#0EA5E9);color:white;border:none;border-radius:0.85rem;font-weight:700;font-size:0.95rem;cursor:pointer;text-decoration:none;box-shadow:0 4px 14px rgba(3,105,161,0.3);"><i class="fas fa-download" style="margin-right:0.5rem;"></i>Download Versi Terbaru</a>' :
+          '<button onclick="appForceUpdate()" style="width:100%;padding:0.85rem;background:linear-gradient(135deg,#0369A1,#0EA5E9);color:white;border:none;border-radius:0.85rem;font-weight:700;font-size:0.95rem;cursor:pointer;box-shadow:0 4px 14px rgba(3,105,161,0.3);"><i class="fas fa-arrows-rotate" style="margin-right:0.5rem;"></i>Update Sekarang</button>'
+        ) +
+        '<p style="font-size:0.7rem;color:#94A3B8;margin-top:0.75rem;">Hubungi admin jika gagal update</p>' +
+      '</div>';
+      document.body.appendChild(overlay);
+    }
+
+    // --- Compare version strings (e.g. "2.0.0" vs "1.5.0") ---
+    function versionCompare(a, b) {
+      var pa = a.split('.').map(Number);
+      var pb = b.split('.').map(Number);
+      for (var i = 0; i < 3; i++) {
+        var na = pa[i] || 0;
+        var nb = pb[i] || 0;
+        if (na > nb) return 1;
+        if (na < nb) return -1;
+      }
+      return 0;
     }
 
     // ===== INITIALIZE =====
