@@ -1,5 +1,5 @@
 // ============================================
-// Service Worker v19 - Warung Kopi POS
+// Service Worker v20 - Warung Kopi POS
 // ============================================
 // CATATAN PENTING:
 // - Service Worker ini TIDAK PERNAH menyentuh IndexedDB atau localStorage
@@ -7,14 +7,17 @@
 // - Semua data user (transaksi, menu, pengaturan) tersimpan di IndexedDB
 //   yang TIDAK AKAN terhapus saat cache diperbarui
 //
-// v19 CHANGES:
-// - Tambah skip untuk Google API calls (Firebase, Google Drive, OAuth)
-// - Tambah skip untuk CDN resources (Tailwind, Font Awesome, Google Fonts, GIS)
-// - Pastikan blob:, data:, dan download-related requests TIDAK diintercept
-// - Skip semua external API calls agar tidak di-cache
+// v20 CHANGES:
+// - Proteksi EKSTRA untuk blob:, data:, dan download requests
+// - Skip SEMUA request yang BUKAN dari domain asli (same-origin)
+// - Skip semua request dengan mode selain 'navigate' dan 'cors'
+//   (except 'basic') untuk mencegah intercept download/blob di TWA/APK
+// - Skip request yang memiliki header 'sec-fetch-dest' = document
+//   saat URL mengandung 'blob:' (download trigger di APK)
+// - Tambah skip untuk Google API calls, CDN resources
 // ============================================
 
-const CACHE_NAME = 'warkop-pos-v19';
+const CACHE_NAME = 'warkop-pos-v20';
 const STATIC_ASSETS = [
   '/',
   '/manifest.json',
@@ -25,6 +28,9 @@ const STATIC_ASSETS = [
 const SKIP_PATTERNS = [
   'blob:',
   'data:',
+  'intent:',
+  'about:blank',
+  'javascript:',
   '/api/',
   // Google APIs
   'googleapis.com',
@@ -69,21 +75,54 @@ self.addEventListener('activate', (event) => {
 });
 
 // Fetch - Network first, fallback to cache
-// IndexedDB TIDAK terpengaruh oleh operasi cache ini
+// ============================================
+// v20: Proteksi SUPER KETAT untuk blob/download requests
+// Ini penting agar export CSV tetap berfungsi di APK (TWA)
+// ============================================
 self.addEventListener('fetch', (event) => {
   const url = event.request.url;
 
-  // Skip semua pattern yang tidak boleh di-cache
+  // === SKIP 1: Semua pattern yang tidak boleh di-cache ===
   for (let i = 0; i < SKIP_PATTERNS.length; i++) {
     if (url.includes(SKIP_PATTERNS[i])) return;
   }
 
-  // Skip non-GET requests (POST, PUT, DELETE, dll)
+  // === SKIP 2: Non-GET requests (POST, PUT, DELETE, dll) ===
   if (event.request.method !== 'GET') return;
 
-  // Skip navigasi ke blob URL atau download triggers
-  if (event.request.mode === 'navigate' && url.startsWith('blob:')) return;
+  // === SKIP 3: Request dengan URL blob:, data:, intent:, dll ===
+  // Meskipun sudah ada di SKIP_PATTERNS, ini double-check untuk keamanan
+  if (url.startsWith('blob:') || url.startsWith('data:') || url.startsWith('intent:')) return;
 
+  // === SKIP 4: Request yang bukan same-origin DAN bukan CORS ===
+  // Hanya cache file dari domain sendiri + file statis yang diketahui
+  try {
+    var reqUrl = new URL(url);
+    var selfUrl = new URL(self.location.origin);
+    // Jika host berbeda dan bukan subdomain yang diketahui, skip
+    if (reqUrl.host !== selfUrl.host) return;
+  } catch(e) {
+    // Jika URL tidak valid, skip
+    return;
+  }
+
+  // === SKIP 5: Download-related requests di APK/TWA ===
+  // Di TWA, ketika user klik <a download>, browser mengirim request
+  // dengan mode 'navigate'. Kita harus memastikan ini tidak di-intercept.
+  // Cek header sec-fetch-dest jika tersedia
+  var dest = event.request.destination;
+  if (dest === 'document' || dest === 'embed' || dest === 'object') {
+    // Navigasi ke document bisa jadi download trigger
+    // Hanya intercept jika ini adalah request ke halaman utama
+    if (url !== self.location.origin + '/' && url !== self.location.origin + '/index.html') {
+      return;
+    }
+  }
+
+  // === SKIP 6: Opaque requests (cross-origin tanpa CORS) ===
+  if (event.request.mode === 'no-cors') return;
+
+  // === LANJUT: Hanya cache request same-origin yang aman ===
   event.respondWith(
     fetch(event.request)
       .then((response) => {
