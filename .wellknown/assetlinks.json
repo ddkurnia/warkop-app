@@ -1,0 +1,10 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.kedaimedia.warkopos",
+    "sha256_cert_fingerprints": [
+      "23:3E:FC:46:76:8D:C9:D5:07:D3:C6:18:38:7F:13:78:09:7F:F6:2F:3E:DF:C0:8D:A7:43:CD:F2:10:B9:F7:4B"
+    ]
+  }
+}]
