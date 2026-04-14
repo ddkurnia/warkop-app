@@ -40,8 +40,11 @@
   <style>
     body { font-family: 'Inter', sans-serif; }
     .font-display { font-family: 'Space Grotesk', sans-serif; }
-    .screen { display: none; }
-    .screen.active { display: flex; }
+    .screen { display: none !important; }
+    .screen.active { display: flex !important; }
+    /* Failsafe: pos-app tersembunyi secara default */
+    #pos-app { display: none !important; }
+    #pos-app.pos-visible { display: flex !important; flex-direction: column; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     @media print {
@@ -496,13 +499,11 @@
     body { background: linear-gradient(160deg, #f0f9ff 0%, #f8fafc 40%, #f0f4ff 100%) !important; }
 
     /* ===== RESPONSIVE: Desktop & Tablet Scaling ===== */
-    #pos-app {
+    #pos-app.pos-visible {
       min-height: 100vh;
       min-height: 100dvh;
-      display: flex;
-      flex-direction: column;
     }
-    #pos-app > .pb-20 {
+    #pos-app.pos-visible > .pb-20 {
       flex: 1;
     }
     /* ===== DESKTOP: Wider layout, bigger fonts, more space ===== */
@@ -573,6 +574,55 @@
       #page-menu > div { max-width: 1100px !important; }
       #page-riwayat > div { max-width: 1100px !important; }
       #menu-grid { grid-template-columns: repeat(5, 1fr) !important; }
+    }
+
+    /* ===== LANDSCAPE ORIENTATION ===== */
+    @media (orientation: landscape) {
+      .auth-bg { flex-direction: row !important; }
+      .auth-hero {
+        min-height: 100vh !important; min-height: 100dvh !important;
+        width: 38% !important; max-width: 480px !important;
+        justify-content: center !important; flex-shrink: 0 !important;
+      }
+      .auth-form-area { max-width: 500px !important; padding: 1.5rem 2rem !important; }
+      .auth-wave { display: none !important; }
+    }
+    html.is-landscape .auth-bg { flex-direction: row !important; }
+    html.is-landscape .auth-hero {
+      min-height: 100vh !important; min-height: 100dvh !important;
+      width: 38% !important; max-width: 480px !important;
+      justify-content: center !important; flex-shrink: 0 !important;
+    }
+    html.is-landscape .auth-wave { display: none !important; }
+
+    @media (orientation: landscape) and (max-width: 767px) {
+      .auth-hero { width: 32% !important; padding: 1rem 0.6rem 0 !important; }
+      .auth-hero h1 { font-size: 1.1rem !important; }
+      .auth-hero p { font-size: 0.6rem !important; }
+      .auth-logo-img { width: 48px !important; height: 48px !important; }
+      .auth-form-area { padding: 0.6rem !important; }
+      #pos-app.pos-visible > header > div { padding-top: 0.3rem !important; padding-bottom: 0.3rem !important; }
+      #header-shop-photo { width: 32px !important; height: 32px !important; }
+      .nav-btn { padding-top: 0.4rem !important; padding-bottom: 0.3rem !important; }
+      .table-card .table-number, .pel-card .table-number { font-size: 1.2rem !important; }
+      .table-card .table-icon, .pel-card .table-icon { width: 1.8rem !important; height: 1.8rem !important; }
+      #page-kasir > div { max-width: 100% !important; padding: 0.5rem !important; }
+      #page-menu > div, #page-riwayat > div, #page-toko > div { max-width: 100% !important; }
+      #menu-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 0.4rem !important; }
+      #mobile-panel > div:last-child { max-height: 100vh !important; border-radius: 0 !important; }
+      #page-kasir .sticky { max-height: calc(100vh - 60px) !important; }
+    }
+    html.is-landscape #page-kasir > div { max-width: 100% !important; }
+    html.is-landscape #page-menu > div, html.is-landscape #page-riwayat > div, html.is-landscape #page-toko > div { max-width: 100% !important; }
+    html.is-landscape #menu-grid { grid-template-columns: repeat(3, 1fr) !important; }
+
+    @media (orientation: landscape) and (min-width: 768px) {
+      .auth-hero { width: 42% !important; max-width: 560px !important; }
+      #menu-grid { grid-template-columns: repeat(4, 1fr) !important; }
+      #pos-app.pos-visible > nav.no-print > div { max-width: 800px !important; }
+    }
+    @media (orientation: landscape) and (min-width: 1280px) {
+      #menu-grid { grid-template-columns: repeat(6, 1fr) !important; }
     }
 
     /* ----- GLASSMORPHISM HEADER ----- */
@@ -1989,16 +2039,39 @@
 
     // ===== SCREEN MANAGEMENT =====
     function showScreen(name) {
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      document.getElementById('screen-' + name).classList.add('active');
-      if (name !== 'loading') {
-        document.getElementById('pos-app').classList.add('hidden');
+      // 1. Sembunyikan pos-app
+      var posApp = document.getElementById('pos-app');
+      if (posApp) {
+        posApp.classList.remove('hidden');
+        posApp.classList.remove('pos-visible');
+        posApp.style.display = 'none';
+      }
+      // 2. Sembunyikan SEMUA screen (class + inline style)
+      document.querySelectorAll('.screen').forEach(function(s) {
+        s.classList.remove('active');
+        s.style.display = 'none';
+      });
+      // 3. Tampilkan screen yang diminta
+      var target = document.getElementById('screen-' + name);
+      if (target) {
+        target.classList.add('active');
+        target.style.display = 'flex';
       }
     }
 
     function showPOS() {
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      document.getElementById('pos-app').classList.remove('hidden');
+      // 1. Sembunyikan SEMUA screen (class + inline style)
+      document.querySelectorAll('.screen').forEach(function(s) {
+        s.classList.remove('active');
+        s.style.display = 'none';
+      });
+      // 2. Tampilkan pos-app
+      var posApp = document.getElementById('pos-app');
+      if (posApp) {
+        posApp.classList.remove('hidden');
+        posApp.classList.add('pos-visible');
+        posApp.style.display = '';
+      }
     }
 
     // ===== AUTH: LOGIN =====
@@ -5356,12 +5429,34 @@
     showScreen('loading');
     </script>
   <script>
-    // Service Worker Registration v21
+    // ===== ORIENTATION DETECTION =====
+    (function() {
+      function updateOrientation() {
+        var w = window.innerWidth;
+        var h = window.innerHeight;
+        if (w > h) {
+          document.documentElement.classList.add('is-landscape');
+          document.documentElement.classList.remove('is-portrait');
+        } else {
+          document.documentElement.classList.remove('is-landscape');
+          document.documentElement.classList.add('is-portrait');
+        }
+      }
+      updateOrientation();
+      window.addEventListener('resize', updateOrientation);
+      window.addEventListener('orientationchange', function() { setTimeout(updateOrientation, 100); });
+      if (screen.orientation) {
+        screen.orientation.addEventListener('change', function() { setTimeout(updateOrientation, 100); });
+      }
+    })();
+  </script>
+  <script>
+    // Service Worker Registration v24
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js', { scope: '/' })
         .then(function(reg) {
-          console.log('[SW] Registered v21, scope:', reg.scope);
-          // Cek update setiap 60 detik
+          console.log('[SW] Registered v24, scope:', reg.scope);
+          reg.update();
           setInterval(function() {
             reg.update();
           }, 60000);
