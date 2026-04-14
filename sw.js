@@ -18,7 +18,7 @@
 // - Network-first strategy untuk reliability
 // ============================================
 
-const CACHE_NAME = 'warkop-pos-v21';
+const CACHE_NAME = 'warkop-pos-v24';
 const STATIC_ASSETS = [
   '/',
   '/manifest.json',
