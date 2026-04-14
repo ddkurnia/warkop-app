@@ -1707,7 +1707,10 @@
       projectId: "warkop-app-20449",
       storageBucket: "warkop-app-20449.firebasestorage.app",
       messagingSenderId: "896934754762",
-      appId: "1:123456789:web:abcdef123456"
+      // CATATAN: appId harus disalin dari Firebase Console
+      // Project Settings > General > Your apps > Web app
+      // Format: "1:896934754762:web:XXXXXXX..."
+      appId: "1:896934754762:web:placeholder"
     };
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
@@ -2122,11 +2125,24 @@
       }
       setLoadingBtn('login-btn', true);
       document.getElementById('login-error').classList.add('hidden');
+      console.log('[AUTH] Mencoba login:', email, 'dari:', window.location.origin);
       auth.signInWithEmailAndPassword(email, password)
-        .then(() => { setLoadingBtn('login-btn', false); })
-        .catch(function(err) {
+        .then(function() {
+          console.log('[AUTH] Login berhasil untuk:', email);
           setLoadingBtn('login-btn', false);
-          showAuthError('login', friendlyError(err.code, 'Login gagal. Periksa email dan password Anda.'));
+        })
+        .catch(function(err) {
+          console.error('[AUTH] Login gagal:', err.code, err.message, err);
+          setLoadingBtn('login-btn', false);
+          var errorMsg = friendlyError(err.code, 'Login gagal. Periksa email dan password Anda.');
+          // Tambah info detail untuk debugging
+          if (err.code === 'auth/unauthorized-domain') {
+            errorMsg += ' Domain ini (' + window.location.hostname + ') belum terdaftar di Firebase Console. Hubungi admin.';
+          }
+          if (err.code === 'auth/operation-not-allowed') {
+            errorMsg += ' Metode Email/Password dinonaktifkan di Firebase Console.';
+          }
+          showAuthError('login', errorMsg);
         });
     }
 
