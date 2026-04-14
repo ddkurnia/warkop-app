@@ -1,5 +1,5 @@
 // ============================================
-// Service Worker v20 - Warung Kopi POS
+// Service Worker v21 - Warung Kopi POS
 // ============================================
 // CATATAN PENTING:
 // - Service Worker ini TIDAK PERNAH menyentuh IndexedDB atau localStorage
@@ -7,17 +7,18 @@
 // - Semua data user (transaksi, menu, pengaturan) tersimpan di IndexedDB
 //   yang TIDAK AKAN terhapus saat cache diperbarui
 //
-// v20 CHANGES:
-// - Proteksi EKSTRA untuk blob:, data:, dan download requests
-// - Skip SEMUA request yang BUKAN dari domain asli (same-origin)
-// - Skip semua request dengan mode selain 'navigate' dan 'cors'
-//   (except 'basic') untuk mencegah intercept download/blob di TWA/APK
-// - Skip request yang memiliki header 'sec-fetch-dest' = document
-//   saat URL mengandung 'blob:' (download trigger di APK)
-// - Tambah skip untuk Google API calls, CDN resources
+// v21 CHANGES:
+// - Skip total untuk blob:, data:, intent: URLs
+// - Skip cross-origin requests (hanya cache same-origin)
+// - Skip non-GET requests (POST, PUT, DELETE, dll)
+// - Skip no-cors dan opaque requests
+// - Skip document/embed/object destinations (kecuali root URL)
+// - Skip Google API, Firebase, CDN resources
+// - Skip share-target URLs
+// - Network-first strategy untuk reliability
 // ============================================
 
-const CACHE_NAME = 'warkop-pos-v20';
+const CACHE_NAME = 'warkop-pos-v21';
 const STATIC_ASSETS = [
   '/',
   '/manifest.json',
@@ -31,8 +32,13 @@ const SKIP_PATTERNS = [
   'intent:',
   'about:blank',
   'javascript:',
+  'tel:',
+  'mailto:',
+  'whatsapp:',
+  'wa.me/',
   '/api/',
-  // Google APIs
+  '/share-target',
+  // Google APIs & Firebase
   'googleapis.com',
   'googleusercontent.com',
   'google.com/',
@@ -42,18 +48,30 @@ const SKIP_PATTERNS = [
   'firebaseapp.com',
   'firebase.google.com',
   '.googleapis.com',
+  'firebase.app',
   // CDN resources (selalu fresh dari server)
   'cdn.tailwindcss.com',
   'cdnjs.cloudflare.com',
   'fonts.googleapis.com',
   'fonts.gstatic.com',
+  // Android intents
+  'android-app://',
+  'play.google.com'
 ];
 
 // Install - cache static assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(STATIC_ASSETS))
+      .then((cache) => {
+        // Cache setiap asset satu per satu, skip yang gagal
+        const promises = STATIC_ASSETS.map(url =>
+          cache.add(url).catch(() => {
+            console.log('[SW v21] Skip cache:', url);
+          })
+        );
+        return Promise.all(promises);
+      })
       .then(() => self.skipWaiting())
   );
 });
@@ -63,10 +81,9 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys()
       .then((names) => {
-        // Hanya hapus cache lama, JANGAN sentuh data user
         const oldCaches = names.filter(n => n !== CACHE_NAME);
         if (oldCaches.length > 0) {
-          console.log('[SW] Menghapus cache lama:', oldCaches);
+          console.log('[SW v21] Menghapus cache lama:', oldCaches);
         }
         return Promise.all(oldCaches.map(n => caches.delete(n)));
       })
@@ -76,8 +93,8 @@ self.addEventListener('activate', (event) => {
 
 // Fetch - Network first, fallback to cache
 // ============================================
-// v20: Proteksi SUPER KETAT untuk blob/download requests
-// Ini penting agar export CSV tetap berfungsi di APK (TWA)
+// v21: Proteksi SUPER KETAT untuk blob/download/share requests
+// Penting agar export CSV dan share tetap berfungsi di APK (TWA)
 // ============================================
 self.addEventListener('fetch', (event) => {
   const url = event.request.url;
@@ -87,47 +104,38 @@ self.addEventListener('fetch', (event) => {
     if (url.includes(SKIP_PATTERNS[i])) return;
   }
 
-  // === SKIP 2: Non-GET requests (POST, PUT, DELETE, dll) ===
+  // === SKIP 2: Non-GET requests ===
   if (event.request.method !== 'GET') return;
 
-  // === SKIP 3: Request dengan URL blob:, data:, intent:, dll ===
-  // Meskipun sudah ada di SKIP_PATTERNS, ini double-check untuk keamanan
-  if (url.startsWith('blob:') || url.startsWith('data:') || url.startsWith('intent:')) return;
+  // === SKIP 3: Blob, data, intent URLs (double-check) ===
+  if (url.startsWith('blob:') || url.startsWith('data:') || 
+      url.startsWith('intent:') || url.startsWith('about:')) return;
 
-  // === SKIP 4: Request yang bukan same-origin DAN bukan CORS ===
-  // Hanya cache file dari domain sendiri + file statis yang diketahui
+  // === SKIP 4: Hanya handle same-origin requests ===
   try {
     var reqUrl = new URL(url);
     var selfUrl = new URL(self.location.origin);
-    // Jika host berbeda dan bukan subdomain yang diketahui, skip
     if (reqUrl.host !== selfUrl.host) return;
   } catch(e) {
-    // Jika URL tidak valid, skip
     return;
   }
 
   // === SKIP 5: Download-related requests di APK/TWA ===
-  // Di TWA, ketika user klik <a download>, browser mengirim request
-  // dengan mode 'navigate'. Kita harus memastikan ini tidak di-intercept.
-  // Cek header sec-fetch-dest jika tersedia
   var dest = event.request.destination;
   if (dest === 'document' || dest === 'embed' || dest === 'object') {
-    // Navigasi ke document bisa jadi download trigger
-    // Hanya intercept jika ini adalah request ke halaman utama
     if (url !== self.location.origin + '/' && url !== self.location.origin + '/index.html') {
       return;
     }
   }
 
-  // === SKIP 6: Opaque requests (cross-origin tanpa CORS) ===
-  if (event.request.mode === 'no-cors') return;
+  // === SKIP 6: Opaque / no-cors requests ===
+  if (event.request.mode === 'no-cors' || event.request.mode === 'opaque') return;
 
-  // === LANJUT: Hanya cache request same-origin yang aman ===
+  // === LANJUT: Network-first untuk same-origin ===
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        if (response.status === 200) {
-          // Cache respons untuk offline access
+        if (response && response.status === 200) {
           const responseToCache = response.clone();
           caches.open(CACHE_NAME).then(cache => {
             cache.put(event.request, responseToCache);
@@ -136,14 +144,14 @@ self.addEventListener('fetch', (event) => {
         return response;
       })
       .catch(() => {
-        // Jika offline, gunakan cache
+        // Offline: fallback ke cache
         return caches.match(event.request)
           .then(r => r || caches.match('/'));
       })
   );
 });
 
-// Message handler - untuk komunikasi dengan main thread
+// Message handler
 self.addEventListener('message', (event) => {
   if (event.data && event.data.type === 'SKIP_WAITING') {
     self.skipWaiting();
