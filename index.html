@@ -507,21 +507,40 @@
     #pos-app > .pb-20 {
       flex: 1;
     }
-    /* Bottom nav: expand on larger screens */
-    @media (min-width: 640px) {
+    /* ===== DESKTOP: Wider layout, bigger fonts, more space ===== */
+    @media (min-width: 768px) {
+      body { font-size: 15px !important; }
+      .auth-hero { min-height: 340px !important; }
+      .auth-logo-img { width: 100px !important; height: 100px !important; }
+      .auth-form-area { max-width: 460px !important; }
+      /* Header bigger on desktop */
+      #pos-app > header > div { padding-left: 1.5rem !important; padding-right: 1.5rem !important; }
+      #header-shop-photo { width: 44px !important; height: 44px !important; }
+      #header-shop-name { font-size: 1rem !important; }
+      #header-daily-total { font-size: 0.9rem !important; }
+      /* Kasir page: use full width */
+      #page-kasir > div { max-width: 100% !important; padding-left: 2rem !important; padding-right: 2rem !important; }
+      /* Table/pel cards bigger on desktop */
+      .table-card .table-number { font-size: 1.9rem !important; }
+      .pel-card .table-number { font-size: 1.9rem !important; }
+      .table-card .table-icon, .pel-card .table-icon { width: 3rem !important; height: 3rem !important; font-size: 1.3rem !important; }
+      /* Menu cards bigger */
+      #menu-grid { gap: 0.75rem !important; }
+      /* Category/order tabs bigger */
+      .order-mode-tab { padding: 1rem !important; font-size: 0.95rem !important; }
+      .cat-btn, .cat-btn-mgmt { padding: 0.6rem !important; font-size: 0.85rem !important; }
+      /* Bottom nav wider */
       #pos-app > nav.no-print > div {
-        max-width: 600px !important;
+        max-width: 640px !important;
         margin-left: auto !important;
         margin-right: auto !important;
       }
-    }
-    @media (min-width: 1024px) {
-      #pos-app > nav.no-print > div {
-        max-width: 700px !important;
-      }
-    }
-    /* Mobile panel: better sizing on tablets/desktop */
-    @media (min-width: 768px) {
+      .nav-btn { padding-top: 0.9rem !important; padding-bottom: 0.9rem !important; }
+      .nav-btn i { font-size: 1.2rem !important; }
+      .nav-btn span { font-size: 0.8rem !important; }
+      /* Toko page wider */
+      #page-toko > div { max-width: 640px !important; }
+      /* Mobile panel desktop sizing */
       #mobile-panel > div:last-child {
         max-width: 560px !important;
         margin-left: auto !important;
@@ -529,40 +548,18 @@
         max-height: 90vh !important;
       }
     }
-    /* Toko page: wider on desktop */
-    @media (min-width: 768px) {
-      #page-toko > div {
-        max-width: 640px !important;
-      }
-    }
     @media (min-width: 1024px) {
-      #page-toko > div {
-        max-width: 720px !important;
-      }
-    }
-    /* Menu mgmt: wider on desktop */
-    @media (min-width: 1024px) {
-      #page-menu > div {
-        max-width: 960px !important;
-      }
-    }
-    /* Riwayat page: wider on desktop */
-    @media (min-width: 1024px) {
-      #page-riwayat > div {
-        max-width: 960px !important;
-      }
-    }
-    /* Auth screens: scale up on desktop */
-    @media (min-width: 768px) {
-      .auth-form-area {
-        max-width: 440px !important;
-      }
-      .auth-card {
-        max-width: 440px !important;
-      }
-    }
-    /* Modals: better desktop sizing */
-    @media (min-width: 1024px) {
+      body { font-size: 16px !important; }
+      /* Bottom nav */
+      #pos-app > nav.no-print > div { max-width: 720px !important; }
+      /* Menu/Riwayat pages wider */
+      #page-menu > div { max-width: 960px !important; }
+      #page-riwayat > div { max-width: 960px !important; }
+      /* Toko page */
+      #page-toko > div { max-width: 720px !important; }
+      /* Menu grid: more columns on desktop */
+      #menu-grid { grid-template-columns: repeat(4, 1fr) !important; }
+      /* Modals wider */
       #payment-modal > div:last-child:not(.modal-overlay),
       #menu-edit-modal > div:last-child:not(.modal-overlay),
       #trx-detail-modal > div:last-child:not(.modal-overlay) {
@@ -571,6 +568,13 @@
       #receipt-modal > div:last-child:not(.modal-overlay) {
         max-width: 480px !important;
       }
+    }
+    @media (min-width: 1280px) {
+      /* Extra large desktop: even more space */
+      #page-kasir > div { max-width: 1400px !important; margin-left: auto !important; margin-right: auto !important; }
+      #page-menu > div { max-width: 1100px !important; }
+      #page-riwayat > div { max-width: 1100px !important; }
+      #menu-grid { grid-template-columns: repeat(5, 1fr) !important; }
     }
 
     /* ----- GLASSMORPHISM HEADER ----- */
