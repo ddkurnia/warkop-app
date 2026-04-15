@@ -47,11 +47,39 @@
     #pos-app.pos-visible { display: flex !important; flex-direction: column; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    /* ===== THERMAL PRINTER STYLES ===== */
+    @page {
+      size: 80mm auto;
+      margin: 0;
+    }
+    .thermal-receipt {
+      font-family: 'Courier New', 'Lucida Console', monospace;
+      font-size: 12px;
+      line-height: 1.4;
+      color: #000;
+      background: #fff;
+      width: 72mm;
+      padding: 2mm;
+      margin: 0 auto;
+    }
+    .thermal-receipt .t-center { text-align: center; }
+    .thermal-receipt .t-bold { font-weight: bold; }
+    .thermal-receipt .t-big { font-size: 16px; font-weight: bold; }
+    .thermal-receipt .t-small { font-size: 10px; color: #555; }
+    .thermal-receipt .t-line { border-top: 1px dashed #000; margin: 4px 0; }
+    .thermal-receipt .t-dline { border-top: 2px dashed #000; margin: 6px 0; }
+    .thermal-receipt .t-row { display: flex; justify-content: space-between; align-items: baseline; }
+    .thermal-receipt .t-item-row { display: flex; justify-content: space-between; }
+    .thermal-receipt .t-item-name { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .thermal-receipt .t-item-qty { width: 30px; text-align: center; flex-shrink: 0; }
+    .thermal-receipt .t-item-price { width: 75px; text-align: right; flex-shrink: 0; }
+    .thermal-receipt .t-total-row { font-size: 14px; font-weight: bold; }
     @media print {
       body * { visibility: hidden; }
       #print-sheet, #print-sheet * { visibility: visible; }
       #print-sheet { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 999999; background: white; overflow-y: auto; }
       .no-print { display: none !important; }
+      .thermal-receipt { width: 76mm; font-size: 11px; }
     }
     /* ===== TABLE CARDS ===== */
     .table-card {
@@ -3285,6 +3313,8 @@
       confirmBtn.disabled = true;
       confirmBtn.innerHTML = '<span class="spinner"></span> Memproses...';
 
+      const cashAmount = selectedPayMethod === 'Tunai' ? (parseInt(document.getElementById('pay-cash').value) || total) : total;
+
       const trx = {
         id: generateTrxId(),
         date: nowLocal(),
@@ -3295,6 +3325,7 @@
         discountPct: discountPct,
         discount: discount,
         total: total,
+        cashPaid: cashAmount,
         paymentMethod: selectedPayMethod,
         cashier: shopSettings.cashierName || 'Admin'
       };
@@ -3343,12 +3374,15 @@
     }
 
     // ===== RECEIPT =====
+    var lastReceiptTrx = null; // simpan data struk terakhir untuk cetak ulang
+
     function showReceipt(trx) {
+      lastReceiptTrx = trx;
       const cashier = shopSettings.cashierName || 'Admin';
       const shopName = currentShop ? currentShop.shopName : 'Warung Kopi';
       const shopAddr = currentShop ? currentShop.address : '';
       const shopPhone = currentShop ? currentShop.phone : '';
-      const cash = trx.paymentMethod === 'Tunai' ? (parseInt(document.getElementById('pay-cash')?.value) || trx.total) : trx.total;
+      const cash = trx.cashPaid || (trx.paymentMethod === 'Tunai' ? (parseInt(document.getElementById('pay-cash')?.value) || trx.total) : trx.total);
       const change = cash - trx.total;
 
       let html = '<div class="text-center mb-4">' +
@@ -3389,13 +3423,107 @@
       document.getElementById('receipt-modal').classList.remove('hidden');
     }
 
+    // ===== THERMAL RECEIPT PRINTER =====
+    function generateThermalReceiptHTML(trx) {
+      var shopName = shopSettings.shopName || (currentShop ? currentShop.shopName : 'Warung Kopi');
+      var shopAddr = shopSettings.shopAddress || (currentShop ? currentShop.address : '');
+      var shopPhone = shopSettings.shopPhone || (currentShop ? currentShop.phone : '');
+      var cashier = shopSettings.cashierName || trx.cashier || 'Admin';
+      var cash = trx._cash || trx.cashPaid || trx.total;
+      var change = cash - trx.total;
+
+      var s = '';
+      s += '<div class="thermal-receipt">';
+
+      // === HEADER ===
+      s += '<div class="t-center t-big">' + shopName + '</div>';
+      if (shopAddr) s += '<div class="t-center t-small">' + shopAddr + '</div>';
+      if (shopPhone) s += '<div class="t-center t-small">Telp: ' + shopPhone + '</div>';
+      s += '<div class="t-dline"></div>';
+
+      // === INFO TRANSAKSI ===
+      s += '<div class="t-row"><span>No</span><span class="t-bold">' + trx.id + '</span></div>';
+      s += '<div class="t-row"><span>Tgl</span><span>' + formatDateTime(trx.date) + '</span></div>';
+      s += '<div class="t-row"><span>' + (trx.table === 'Bungkus' ? 'Jenis' : 'Meja') + '</span><span class="t-bold">' + (trx.table === 'Bungkus' ? 'BUNGKUS' : 'Meja ' + trx.table) + '</span></div>';
+      if (trx.customerName) {
+        s += '<div class="t-row"><span>Plg</span><span>' + trx.customerName + '</span></div>';
+      }
+      s += '<div class="t-row"><span>Kasir</span><span>' + cashier + '</span></div>';
+      s += '<div class="t-line"></div>';
+
+      // === ITEM PEMBELIAN ===
+      s += '<div class="t-center t-bold" style="margin-bottom:4px;">DAFTAR BELANJA</div>';
+      s += '<div class="t-item-row t-bold" style="margin-bottom:2px;"><span class="t-item-name">Item</span><span class="t-item-qty">Qty</span><span class="t-item-price">Harga</span></div>';
+      s += '<div class="t-line"></div>';
+
+      trx.items.forEach(function(item) {
+        var itemTotal = item.harga * item.qty;
+        var name = item.nama_menu;
+        if (name.length > 18) name = name.substring(0, 17) + '~';
+        s += '<div class="t-item-row"><span class="t-item-name">' + name + '</span><span class="t-item-qty">' + item.qty + '</span><span class="t-item-price">' + formatIDR(itemTotal) + '</span></div>';
+      });
+
+      s += '<div class="t-dline"></div>';
+
+      // === TOTAL ===
+      s += '<div class="t-row"><span>Subtotal</span><span>' + formatIDR(trx.subtotal) + '</span></div>';
+      if (trx.discountPct > 0) {
+        s += '<div class="t-row"><span>Diskon (' + trx.discountPct + '%)</span><span>-' + formatIDR(trx.discount) + '</span></div>';
+      }
+      s += '<div class="t-dline"></div>';
+      s += '<div class="t-row t-total-row"><span>TOTAL</span><span>' + formatIDR(trx.total) + '</span></div>';
+      s += '<div class="t-line"></div>';
+      s += '<div class="t-row"><span>' + trx.paymentMethod + '</span><span>' + formatIDR(cash) + '</span></div>';
+      if (trx.paymentMethod === 'Tunai' && change > 0) {
+        s += '<div class="t-row t-bold"><span>Kembalian</span><span>' + formatIDR(change) + '</span></div>';
+      }
+
+      // === FOOTER ===
+      s += '<div class="t-dline"></div>';
+      s += '<div class="t-center t-small" style="margin-top:6px;">Terima kasih atas kunjungan Anda!</div>';
+      s += '<div class="t-center t-small">Barang yang sudah dibeli tidak dapat ditukar</div>';
+
+      s += '</div>';
+      return s;
+    }
+
     function printReceipt() {
-      var content = document.getElementById('receipt-modal-content');
-      if (!content) return;
-      var html = content.innerHTML;
+      if (!lastReceiptTrx) { showToast('Tidak ada struk untuk dicetak', 'error'); return; }
+      // Simpan nilai cash ke trx (karena modal sudah ditutup)
+      if (!lastReceiptTrx._cash) {
+        lastReceiptTrx._cash = lastReceiptTrx.paymentMethod === 'Tunai' ? lastReceiptTrx.total : lastReceiptTrx.total;
+      }
+      var thermalHTML = generateThermalReceiptHTML(lastReceiptTrx);
       closeReceiptModal();
-      showPrintSheet(html);
-      setTimeout(function() { window.print(); }, 400);
+
+      // Tampilkan preview + tombol cetak
+      var sheet = document.getElementById('print-sheet');
+      var container = document.getElementById('print-sheet-content');
+      container.innerHTML = thermalHTML +
+        '<div style="text-align:center;margin:15px 0 20px;display:flex;gap:10px;justify-content:center;" class="no-print">' +
+          '<button onclick="doThermalPrint()" style="padding:14px 32px;background:#0f766e;color:white;border:none;border-radius:12px;font-size:16px;font-weight:bold;cursor:pointer;box-shadow:0 4px 12px rgba(15,118,110,0.3);"><i class="fas fa-print" style="margin-right:8px;"></i>CETAK STRUK</button>' +
+          '<button onclick="closePrintSheet()" style="padding:14px 32px;background:#f0fdfa;color:#0f766e;border:2px solid #0f766e;border-radius:12px;font-size:16px;font-weight:bold;cursor:pointer;">TUTUP</button>' +
+        '</div>';
+      sheet.classList.remove('hidden');
+    }
+
+    function doThermalPrint() {
+      window.print();
+    }
+
+    // Cetak ulang struk terakhir (dari riwayat)
+    function reprintLastReceipt() {
+      if (!lastReceiptTrx) { showToast('Tidak ada struk terakhir', 'error'); return; }
+      if (!lastReceiptTrx._cash) lastReceiptTrx._cash = lastReceiptTrx.total;
+      var thermalHTML = generateThermalReceiptHTML(lastReceiptTrx);
+      var sheet = document.getElementById('print-sheet');
+      var container = document.getElementById('print-sheet-content');
+      container.innerHTML = thermalHTML +
+        '<div style="text-align:center;margin:15px 0 20px;display:flex;gap:10px;justify-content:center;" class="no-print">' +
+          '<button onclick="doThermalPrint()" style="padding:14px 32px;background:#0f766e;color:white;border:none;border-radius:12px;font-size:16px;font-weight:bold;cursor:pointer;box-shadow:0 4px 12px rgba(15,118,110,0.3);"><i class="fas fa-print" style="margin-right:8px;"></i>CETAK ULANG</button>' +
+          '<button onclick="closePrintSheet()" style="padding:14px 32px;background:#f0fdfa;color:#0f766e;border:2px solid #0f766e;border-radius:12px;font-size:16px;font-weight:bold;cursor:pointer;">TUTUP</button>' +
+        '</div>';
+      sheet.classList.remove('hidden');
     }
 
     function printReport() {
