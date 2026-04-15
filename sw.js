@@ -1,5 +1,5 @@
 // ============================================
-// Service Worker v21 - Warung Kopi POS
+// Service Worker v25 - Warung Kopi POS
 // ============================================
 // CATATAN PENTING:
 // - Service Worker ini TIDAK PERNAH menyentuh IndexedDB atau localStorage
@@ -18,7 +18,7 @@
 // - Network-first strategy untuk reliability
 // ============================================
 
-const CACHE_NAME = 'warkop-pos-v24';
+const CACHE_NAME = 'warkop-pos-v25';
 const STATIC_ASSETS = [
   '/',
   '/manifest.json',
