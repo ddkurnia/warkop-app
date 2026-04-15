@@ -1586,6 +1586,25 @@
             </button>
           </div>
 
+          <!-- Informasi Legal -->
+          <div class="bg-white rounded-2xl p-5 shadow-sm border border-sky-100 mt-4">
+            <h3 class="text-sm font-bold text-sky-800 mb-3"><i class="fas fa-shield-halved mr-2 text-sky-500"></i>Informasi Legal</h3>
+            <div class="space-y-2">
+              <button onclick="showLegalPage('privacy')" class="w-full flex items-center justify-between py-2.5 px-3 bg-sky-50 rounded-xl hover:bg-sky-100 transition text-left">
+                <span class="text-sm text-sky-800 font-medium"><i class="fas fa-lock mr-2 text-sky-500"></i>Kebijakan Privasi</span>
+                <i class="fas fa-chevron-right text-sky-400 text-xs"></i>
+              </button>
+              <button onclick="showLegalPage('terms')" class="w-full flex items-center justify-between py-2.5 px-3 bg-sky-50 rounded-xl hover:bg-sky-100 transition text-left">
+                <span class="text-sm text-sky-800 font-medium"><i class="fas fa-file-contract mr-2 text-sky-500"></i>Syarat &amp; Ketentuan</span>
+                <i class="fas fa-chevron-right text-sky-400 text-xs"></i>
+              </button>
+              <button onclick="showLegalPage('faq')" class="w-full flex items-center justify-between py-2.5 px-3 bg-sky-50 rounded-xl hover:bg-sky-100 transition text-left">
+                <span class="text-sm text-sky-800 font-medium"><i class="fas fa-circle-question mr-2 text-sky-500"></i>FAQ (Pertanyaan Umum)</span>
+                <i class="fas fa-chevron-right text-sky-400 text-xs"></i>
+              </button>
+            </div>
+          </div>
+
           <div class="mt-4">
             <button onclick="doLogout()" class="w-full py-3 bg-red-50 text-red-600 border border-red-200 rounded-xl font-semibold hover:bg-red-100 transition">
               <i class="fas fa-right-from-bracket mr-2"></i> Keluar dari Akun
@@ -1727,6 +1746,15 @@
         </div>
         <div id="trx-detail-content" class="p-5"></div>
       </div>
+    </div>
+
+    <!-- LEGAL PAGE MODAL -->
+    <div id="legal-modal" class="hidden fixed inset-0 z-50 flex flex-col">
+      <div class="bg-sky-700 text-white p-4 flex items-center justify-between flex-shrink-0">
+        <h3 id="legal-modal-title" class="font-bold text-base"><i class="fas fa-shield-halved mr-2"></i></h3>
+        <button onclick="closeLegalPage()" class="w-8 h-8 rounded-full bg-sky-600 flex items-center justify-center hover:bg-sky-500"><i class="fas fa-xmark"></i></button>
+      </div>
+      <div id="legal-modal-content" class="flex-1 overflow-y-auto bg-slate-50 p-5"></div>
     </div>
 
     <!-- PRINT SHEET OVERLAY -->
@@ -3629,6 +3657,178 @@
           '<button onclick="closePrintSheet()" style="padding:12px 36px;background:#f0fdfa;color:#0f766e;border:2px solid #0f766e;border-radius:10px;font-size:16px;font-weight:bold;cursor:pointer;">TUTUP</button>' +
         '</div>';
       sheet.classList.remove('hidden');
+    }
+
+    // ===== LEGAL PAGES (Privacy, Terms, FAQ) =====
+    function showLegalPage(type) {
+      var modal = document.getElementById('legal-modal');
+      var title = document.getElementById('legal-modal-title');
+      var content = document.getElementById('legal-modal-content');
+      var data = getLegalContent(type);
+      title.innerHTML = '<i class="fas ' + data.icon + ' mr-2"></i>' + data.title;
+      content.innerHTML = '<div class="max-w-lg mx-auto">' + data.body + '</div>';
+      modal.classList.remove('hidden');
+    }
+    function closeLegalPage() { document.getElementById('legal-modal').classList.add('hidden'); }
+
+    function getLegalContent(type) {
+      if (type === 'privacy') return {
+        icon: 'fa-lock', title: 'Kebijakan Privasi',
+        body: '<div class="bg-white rounded-2xl p-5 shadow-sm border border-sky-100 space-y-4 text-sm text-gray-700 leading-relaxed">' +
+          '<p class="text-xs text-slate-400">Terakhir diperbarui: April 2026</p>' +
+          '<h4 class="text-base font-bold text-sky-800">1. Pendahuluan</h4>' +
+          '<p>Kebijakan Privasi ini menjelaskan bagaimana WARKOPOS mengelola dan melindungi data Anda. Dengan menggunakan aplikasi ini, Anda menyetujui pengelolaan data sebagaimana dijelaskan dalam kebijakan ini. WARKOPOS dikembangkan oleh <strong>KedaiMedia</strong> (kedaimedia.com) sebagai solusi kasir digital untuk usaha kecil dan menengah.</p>' +
+          '<h4 class="text-base font-bold text-sky-800">2. Data yang Dikumpulkan</h4>' +
+          '<p>Aplikasi WARKOPOS mengumpulkan dan menyimpan data berikut secara <strong>lokal di perangkat Anda</strong> (smartphone/tablet):</p>' +
+          '<ul class="list-disc pl-5 space-y-1">' +
+            '<li><strong>Data Akun:</strong> Email dan password yang digunakan untuk login (dikelola oleh Firebase Authentication)</li>' +
+            '<li><strong>Data Toko:</strong> Nama toko, alamat, nomor telepon, nama kasir, dan foto toko</li>' +
+            '<li><strong>Data Menu:</strong> Daftar menu, harga, kategori, dan foto menu</li>' +
+            '<li><strong>Data Transaksi:</strong> Riwayat penjualan, detail pesanan, metode pembayaran, tanggal, dan waktu transaksi</li>' +
+            '<li><strong>Data Pelanggan:</strong> Nama pelanggan yang tercatat pada pesanan</li>' +
+          '</ul>' +
+          '<h4 class="text-base font-bold text-sky-800">3. Tempat Penyimpanan Data</h4>' +
+          '<p><strong>Semua data disimpan secara lokal di perangkat Anda.</strong> Data disimpan menggunakan IndexedDB dan localStorage yang tersedia di browser perangkat. Tidak ada server pusat yang menyimpan data transaksi, menu, atau pengaturan toko Anda.</p>' +
+          '<p>Data akun login dikelola oleh <strong>Firebase Authentication</strong> (layanan milik Google LLC) yang memiliki kebijakan privasi tersendiri di <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" class="text-sky-600 underline">policies.google.com/privacy</a>.</p>' +
+          '<h4 class="text-base font-bold text-sky-800">4. Penggunaan Data</h4>' +
+          '<p>Data yang dikumpulkan <strong>hanya digunakan untuk:</strong></p>' +
+          '<ul class="list-disc pl-5 space-y-1">' +
+            '<li>Mengelola operasional kasir dan penjualan toko Anda</li>' +
+            '<li>Mencatat riwayat transaksi untuk keperluan laporan internal</li>' +
+            '<li>Menampilkan menu dan harga pada aplikasi POS</li>' +
+            '<li>Mencetak struk belanja</li>' +
+          '</ul>' +
+          '<h4 class="text-base font-bold text-sky-800">5. Berbagi Data</h4>' +
+          '<p><strong>Kami TIDAK membagikan, menjual, atau menyewakan data Anda kepada pihak ketiga mana pun.</strong> Data Anda sepenuhnya berada di perangkat Anda dan tidak dikirimkan ke server manapun selain Firebase Authentication untuk keperluan login.</p>' +
+          '<h4 class="text-base font-bold text-sky-800">6. Keamanan Data</h4>' +
+          '<p>Meskipun data disimpan secara lokal, kami menyarankan agar Anda:</p>' +
+          '<ul class="list-disc pl-5 space-y-1">' +
+            '<li>Mengamankan perangkat dengan PIN/sandi/fingerprint</li>' +
+            '<li>Tidak membagikan akun login kepada orang yang tidak berwenang</li>' +
+            '<li>Melakukan backup data secara berkala jika diperlukan</li>' +
+            '<li>Menggunakan password yang kuat (minimal 6 karakter)</li>' +
+          '</ul>' +
+          '<h4 class="text-base font-bold text-sky-800">7. Hak Pengguna</h4>' +
+          '<p>Sebagai pengguna, Anda memiliki hak untuk:</p>' +
+          '<ul class="list-disc pl-5 space-y-1">' +
+            '<li>Mengakses dan melihat seluruh data yang tersimpan di perangkat</li>' +
+            '<li>Mengubah atau menghapus data kapan pun melalui fitur pengaturan aplikasi</li>' +
+            '<li>Menghapus seluruh data melalui fitur "Reset Data Lokal" di pengaturan</li>' +
+            '<li>Menghapus akun secara permanen dengan menghubungi pengembang</li>' +
+          '</ul>' +
+          '<h4 class="text-base font-bold text-sky-800">8. Penghapusan Data</h4>' +
+          '<p>Anda dapat menghapus seluruh data lokal melalui menu "Reset Data Lokal" di halaman Pengaturan Toko. Proses ini tidak dapat dibatalkan. Jika Anda menghapus aplikasi dari perangkat, seluruh data yang tersimpan akan ikut terhapus.</p>' +
+          '<h4 class="text-base font-bold text-sky-800">9. Perubahan Kebijakan</h4>' +
+          '<p>Kami dapat memperbarui Kebijakan Privasi ini dari waktu ke waktu. Perubahan akan tersedia di halaman ini. Penggunaan aplikasi secara berkelanjutan setelah perubahan berarti Anda menyetujui kebijakan yang diperbarui.</p>' +
+          '<h4 class="text-base font-bold text-sky-800">10. Kontak</h4>' +
+          '<p>Jika Anda memiliki pertanyaan terkait kebijakan privasi ini, silakan hubungi:</p>' +
+          '<div class="bg-sky-50 border border-sky-200 rounded-xl p-4">' +
+            '<p class="font-semibold text-sky-800">KedaiMedia - Web App Developer</p>' +
+            '<p>Website: <a href="https://kedaimedia.com" target="_blank" rel="noopener noreferrer" class="text-sky-600 underline">kedaimedia.com</a></p>' +
+            '<p>WhatsApp: 0896-8515-7213</p>' +
+          '</div>' +
+        '</div>'
+      };
+      if (type === 'terms') return {
+        icon: 'fa-file-contract', title: 'Syarat & Ketentuan',
+        body: '<div class="bg-white rounded-2xl p-5 shadow-sm border border-sky-100 space-y-4 text-sm text-gray-700 leading-relaxed">' +
+          '<p class="text-xs text-slate-400">Terakhir diperbarui: April 2026</p>' +
+          '<h4 class="text-base font-bold text-sky-800">1. Penerimaan Syarat</h4>' +
+          '<p>Dengan mengunduh, menginstal, dan menggunakan aplikasi WARKOPOS, Anda menyetujui untuk terikat dengan Syarat dan Ketentuan ini. Jika Anda tidak menyetujui syarat-syarat ini, harap tidak menggunakan aplikasi ini.</p>' +
+          '<h4 class="text-base font-bold text-sky-800">2. Deskripsi Layanan</h4>' +
+          '<p>WARKOPOS adalah aplikasi Point of Sale (POS) berbasis web yang dirancang untuk membantu pengusaha kecil dan menengah dalam mengelola penjualan. Aplikasi ini menyediakan fitur kasir, manajemen menu, pencatatan transaksi, dan laporan penjualan. Aplikasi dikembangkan oleh <strong>KedaiMedia</strong> (kedaimedia.com).</p>' +
+          '<h4 class="text-base font-bold text-sky-800">3. Ketentuan Penggunaan</h4>' +
+          '<p>Anda setuju untuk:</p>' +
+          '<ul class="list-disc pl-5 space-y-1">' +
+            '<li>Menggunakan aplikasi hanya untuk tujuan yang sah dan sesuai hukum yang berlaku</li>' +
+            '<li>Memberikan informasi yang akurat saat pendaftaran akun</li>' +
+            '<li>Menjaga kerahasiaan akun dan password Anda</li>' +
+            '<li>Menanggung seluruh tanggung jawab atas aktivitas yang terjadi di akun Anda</li>' +
+            '<li>Tidak menggunakan aplikasi untuk kegiatan yang melanggar hukum</li>' +
+            '<li>Tidak mereproduksi, mendistribusikan, atau memodifikasi aplikasi tanpa izin</li>' +
+          '</ul>' +
+          '<h4 class="text-base font-bold text-sky-800">4. Penyimpanan Data Lokal</h4>' +
+          '<p>Pengguna memahami dan menyetujui bahwa:</p>' +
+          '<ul class="list-disc pl-5 space-y-1">' +
+            '<li><strong>Seluruh data disimpan secara lokal di perangkat pengguna</strong></li>' +
+            '<li>Pengembang tidak bertanggung jawab atas kehilangan data yang disimpan di perangkat</li>' +
+            '<li>Pengguna bertanggung jawab untuk melakukan backup data jika diperlukan</li>' +
+            '<li>Penghapusan aplikasi atau data dari perangkat bersifat permanen dan tidak dapat dikembalikan</li>' +
+            '<li>Pengembang tidak memiliki akses ke data yang tersimpan di perangkat pengguna</li>' +
+          '</ul>' +
+          '<h4 class="text-base font-bold text-sky-800">5. Batasan Tanggung Jawab</h4>' +
+          '<p>Aplikasi WARKOPOS disediakan <strong>"sebagaimana adanya" (as-is)</strong> tanpa jaminan dalam bentuk apa pun. Pengembang <strong>TIDAK bertanggung jawab</strong> atas:</p>' +
+          '<ul class="list-disc pl-5 space-y-1">' +
+            '<li>Kerugian finansial yang timbul dari kesalahan penggunaan aplikasi</li>' +
+            '<li>Ketidakakuratan perhitungan harga, total, atau kembalian</li>' +
+            '<li>Kehilangan data akibat kerusakan perangkat, penghapusan, atau faktor lain</li>' +
+            '<li>Gangguan layanan karena masalah jaringan internet atau server</li>' +
+            '<li>Kerusakan perangkat yang disebabkan oleh penggunaan aplikasi</li>' +
+            '<li>Kerugian tidak langsung, insidental, atau konsekuensial</li>' +
+          '</ul>' +
+          '<h4 class="text-base font-bold text-sky-800">6. Akurasi Data</h4>' +
+          '<p>Pengguna bertanggung jawab penuh untuk memastikan bahwa harga, menu, dan data lain yang dimasukkan ke dalam aplikasi adalah akurat. Pengembang tidak bertanggung jawab atas kesalahan input data oleh pengguna.</p>' +
+          '<h4 class="text-base font-bold text-sky-800">7. Ketersediaan Layanan</h4>' +
+          '<p>Pengembang berusaha menjaga ketersediaan aplikasi, namun tidak menjamin bahwa aplikasi akan selalu tersedia, bebas dari bug, atau bebas dari gangguan. Pengembang berhak untuk melakukan pemeliharaan, pembaruan, atau modifikasi tanpa pemberitahuan sebelumnya.</p>' +
+          '<h4 class="text-base font-bold text-sky-800">8. Hak Kekayaan Intelektual</h4>' +
+          '<p>Seluruh hak kekayaan intelektual dari aplikasi WARKOPOS, termasuk namun tidak terbatas pada kode sumber, desain, logo, dan merek dagang, adalah milik KedaiMedia. Pengguna tidak diperkenankan melakukan reverse engineering, dekompilasi, atau menciptakan karya turunan dari aplikasi ini.</p>' +
+          '<h4 class="text-base font-bold text-sky-800">9. Penghentian</h4>' +
+          '<p>Pengembang berhak menghentikan atau membatasi akses pengguna ke aplikasi jika pengguna melanggar Syarat dan Ketentuan ini. Pengembang juga berhak menghentikan layanan secara permanen dengan pemberitahuan yang wajar.</p>' +
+          '<h4 class="text-base font-bold text-sky-800">10. Hukum yang Berlaku</h4>' +
+          '<p>Syarat dan Ketentuan ini tunduk pada hukum Republik Indonesia. Setiap perselisihan akan diselesaikan secara musyawarah terlebih dahulu. Jika tidak tercapai kesepakatan, perselisihan akan diselesaikan melalui Pengadilan Negeri yang berwenang.</p>' +
+          '<h4 class="text-base font-bold text-sky-800">11. Kontak</h4>' +
+          '<div class="bg-sky-50 border border-sky-200 rounded-xl p-4">' +
+            '<p class="font-semibold text-sky-800">KedaiMedia - Web App Developer</p>' +
+            '<p>Website: <a href="https://kedaimedia.com" target="_blank" rel="noopener noreferrer" class="text-sky-600 underline">kedaimedia.com</a></p>' +
+            '<p>WhatsApp: 0896-8515-7213</p>' +
+          '</div>' +
+        '</div>'
+      };
+      if (type === 'faq') return {
+        icon: 'fa-circle-question', title: 'FAQ - Pertanyaan Umum',
+        body: '<div class="space-y-3">' +
+          '<p class="text-xs text-slate-400">Terakhir diperbarui: April 2026</p>' +
+          faqItem('Apakah data saya aman?',
+            'Ya, seluruh data (transaksi, menu, pengaturan toko) disimpan secara lokal di perangkat Anda menggunakan IndexedDB. Data tidak dikirim ke server manapun. Namun, kami menyarankan Anda mengamankan perangkat dengan PIN/sandi/fingerprint dan tidak membagikan akun kepada orang lain.') +
+          faqItem('Bagaimana cara backup data?',
+            'Aplikasi menyediakan fitur Export CSV yang dapat digunakan untuk mengekspor data transaksi. Anda dapat menemukan fitur ini di halaman Riwayat Penjualan. Data yang diekspor dapat disimpan sebagai file CSV dan dibagikan ke email atau cloud storage sebagai backup.') +
+          faqItem('Saya ganti HP, data saya hilang?',
+            'Karena data disimpan lokal di perangkat, mengganti HP berarti data di HP lama tidak otomatis pindah. Solusinya: gunakan fitur Export CSV secara berkala untuk menyimpan backup data. Setelah ganti HP, login dengan akun yang sama dan data menu default akan tersedia. Untuk transaksi lama, import dari file CSV backup.') +
+          faqItem('Apakah aplikasi bisa digunakan tanpa internet?',
+            'Secara teknis aplikasi bisa berjalan tanpa internet karena berbasis PWA (Progressive Web App). Namun, untuk login pertama kali dan sinkronisasi akun, diperlukan koneksi internet. Setelah ter-load, aplikasi dapat digunakan offline untuk operasional kasir sehari-hari.') +
+          faqItem('Bagaimana cara mencetak struk?',
+            'Setelah transaksi berhasil, tap tombol "Cetak" pada struk pembayaran. Aplikasi akan menampilkan preview struk dalam format kertas termal 80mm. Hubungkan printer termal Bluetooth/USB/WiFi ke perangkat Anda, lalu pilih printer saat dialog print muncul. Pastikan printer sudah terhubung sebelum mencetak.') +
+          faqItem('Cara menambahkan foto menu?',
+            'Buka halaman Kelola Menu, lalu tap tombol Edit (ikon pensil) pada menu yang ingin ditambahkan foto. Di form edit, tap area foto (kotak putus-putus) untuk memilih foto dari galeri. Foto akan otomatis dikompres ke ukuran kecil (maks 500KB) agar tidak membebani penyimpanan perangkat.') +
+          faqItem('Berapa jumlah meja yang tersedia?',
+            'Secara default tersedia 30 meja. Anda dapat mengubah jumlah meja sesuai kebutuhan melalui halaman Pengaturan Toko. Jumlah meja dapat diatur mulai dari 1 hingga 100 meja.') +
+          faqItem('Apa itu mode Bungkus (Take Away)?',
+            'Mode Bungkus adalah fitur untuk mencatat pesanan yang dibawa pulang oleh pelanggan, bukan makan di tempat. Anda akan melihat 5 slot "Pel" (Pelanggan) yang dapat digunakan untuk pesanan bungkus. Jumlah slot bungkus juga dapat diubah di pengaturan.') +
+          faqItem('Bagaimana cara mengubah nama toko?',
+            'Buka halaman Pengaturan Toko (ikon gerobak di navigasi bawah). Pada bagian atas, Anda dapat mengubah Nama Toko, Tagline, Telepon, Alamat, dan Nama Kasir. Jangan lupa tap "Simpan Pengaturan" setelah selesai mengubah.') +
+          faqItem('Mengapa tombol bayar tidak bisa diklik?',
+            'Pastikan Anda sudah memilih meja (atau Pel untuk bungkus) dan menambahkan minimal 1 item ke pesanan. Jika menggunakan metode pembayaran Tunai, pastikan jumlah uang yang dimasukkan lebih besar atau sama dengan total belanja.') +
+          faqItem('Bagaimana cara mereset semua data?',
+            'Buka halaman Pengaturan Toko, scroll ke bawah, dan temukan fitur "Reset Data Lokal". Perhatian: proses ini akan menghapus SEMUA data termasuk menu, transaksi, dan pengaturan toko secara permanen. Pastikan Anda sudah melakukan backup sebelum mereset.') +
+          faqItem('Apakah ada biaya berlangganan?',
+            'Untuk saat ini, penggunaan aplikasi WARKOPOS gratis. Anda hanya perlu mendaftar akun untuk mulai menggunakan aplikasi. Informasi tentang biaya berlangganan (jika ada di kemudian hari) akan diinformasikan melalui aplikasi dan/atau kontak yang terdaftar.') +
+          faqItem('Cara menghubungi pengembang?',
+            'Jika Anda mengalami masalah atau memiliki pertanyaan, Anda dapat menghubungi pengembang melalui:<br>' +
+            '<div class="bg-sky-50 border border-sky-200 rounded-xl p-3 mt-2">' +
+              '<p class="font-semibold text-sky-800">KedaiMedia</p>' +
+              '<p>Website: <a href="https://kedaimedia.com" target="_blank" rel="noopener noreferrer" class="text-sky-600 underline">kedaimedia.com</a></p>' +
+              '<p>WhatsApp: <a href="https://wa.me/6289685157213" target="_blank" rel="noopener noreferrer" class="text-sky-600 underline">0896-8515-7213</a></p>' +
+            '</div>') +
+          '</div>'
+      };
+      return { icon: 'fa-info-circle', title: 'Informasi', body: '' };
+    }
+
+    function faqItem(q, a) {
+      return '<div class="bg-white rounded-2xl p-4 shadow-sm border border-sky-100">' +
+        '<h5 class="font-bold text-sky-800 text-sm mb-2"><i class="fas fa-circle-question text-sky-400 mr-2"></i>' + q + '</h5>' +
+        '<p class="text-sm text-gray-600 leading-relaxed">' + a + '</p>' +
+      '</div>';
     }
 
     function closePrintSheet() {
