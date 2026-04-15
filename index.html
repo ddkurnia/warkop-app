@@ -81,6 +81,136 @@
       .no-print { display: none !important; }
       .thermal-receipt { width: 76mm; font-size: 11px; }
     }
+    /* ===== DARK MODE ===== */
+    html.dark body { background: #0F172A; color: #E2E8F0; }
+    html.dark #pos-app header { background: #1E293B !important; border-color: #334155 !important; }
+    html.dark #pos-app header h1 { color: #F1F5F9 !important; }
+    html.dark #pos-app header p { color: #94A3B8 !important; }
+    html.dark #header-daily-total { color: #38BDF8 !important; }
+    html.dark #header-daily-count { color: #94A3B8 !important; }
+    html.dark #dark-mode-btn { background: #334155 !important; color: #FBBF24 !important; }
+    html.dark #dark-mode-btn:hover { background: #422006 !important; color: #FBBF24 !important; }
+    html.dark nav.fixed { background: #1E293B/95 !important; border-color: #334155 !important; backdrop-filter: blur(12px); }
+    html.dark nav.fixed button { color: #64748B !important; background: transparent !important; border-color: transparent !important; }
+    html.dark nav.fixed button.nav-btn.text-sky-600 { color: #38BDF8 !important; background: #0C4A6E !important; border-color: #0EA5E9 !important; }
+    html.dark nav.fixed button span { color: inherit !important; }
+
+    /* Pages & Content */
+    html.dark .page { color: #E2E8F0; }
+    html.dark .bg-white { background: #1E293B !important; }
+    html.dark .bg-sky-50 { background: #0C4A6E !important; }
+    html.dark .bg-green-50 { background: #052E16 !important; }
+    html.dark .bg-amber-50 { background: #451A03 !important; }
+    html.dark .bg-purple-50 { background: #2E1065 !important; }
+    html.dark .bg-red-50 { background: #450A0A !important; }
+    html.dark .bg-slate-50 { background: #1E293B !important; }
+    html.dark .bg-gray-50 { background: #1E293B !important; }
+    html.dark .bg-gray-100 { background: #334155 !important; }
+    html.dark .bg-gradient-to-br { background: none !important; }
+
+    /* Borders */
+    html.dark .border-sky-100 { border-color: #1E3A5F !important; }
+    html.dark .border-gray-200 { border-color: #334155 !important; }
+    html.dark .border-sky-200 { border-color: #334155 !important; }
+    html.dark .border-sky-300 { border-color: #0C4A6E !important; }
+    html.dark .border-green-200 { border-color: #166534 !important; }
+    html.dark .border-amber-200 { border-color: #78350F !important; }
+    html.dark .border-purple-200 { border-color: #581C87 !important; }
+
+    /* Shadows */
+    html.dark .shadow-sm { box-shadow: 0 1px 3px rgba(0,0,0,0.3) !important; }
+    html.dark .shadow-md { box-shadow: 0 4px 10px rgba(0,0,0,0.4) !important; }
+    html.dark .shadow-lg { box-shadow: 0 8px 20px rgba(0,0,0,0.5) !important; }
+    html.dark .shadow-2xl { box-shadow: 0 15px 40px rgba(0,0,0,0.6) !important; }
+
+    /* Text colors */
+    html.dark .text-gray-800 { color: #E2E8F0 !important; }
+    html.dark .text-gray-700 { color: #CBD5E1 !important; }
+    html.dark .text-gray-600 { color: #94A3B8 !important; }
+    html.dark .text-gray-500 { color: #94A3B8 !important; }
+    html.dark .text-gray-400 { color: #64748B !important; }
+    html.dark .text-gray-900 { color: #F1F5F9 !important; }
+    html.dark .text-sky-800 { color: #7DD3FC !important; }
+    html.dark .text-sky-700 { color: #38BDF8 !important; }
+    html.dark .text-sky-600 { color: #38BDF8 !important; }
+    html.dark .text-sky-500 { color: #38BDF8 !important; }
+    html.dark .text-sky-400 { color: #7DD3FC !important; }
+    html.dark .text-green-700 { color: #4ADE80 !important; }
+    html.dark .text-green-800 { color: #4ADE80 !important; }
+    html.dark .text-green-600 { color: #4ADE80 !important; }
+    html.dark .text-amber-700 { color: #FCD34D !important; }
+    html.dark .text-amber-800 { color: #FCD34D !important; }
+    html.dark .text-amber-600 { color: #FBBF24 !important; }
+    html.dark .text-amber-500 { color: #FBBF24 !important; }
+    html.dark .text-purple-700 { color: #C084FC !important; }
+    html.dark .text-purple-800 { color: #C084FC !important; }
+    html.dark .text-purple-600 { color: #C084FC !important; }
+    html.dark .text-purple-500 { color: #C084FC !important; }
+    html.dark .text-purple-400 { color: #D8B4FE !important; }
+    html.dark .text-red-700 { color: #FCA5A5 !important; }
+    html.dark .text-red-600 { color: #F87171 !important; }
+    html.dark .text-red-500 { color: #F87171 !important; }
+    html.dark .text-slate-400 { color: #64748B !important; }
+    html.dark .text-slate-500 { color: #64748B !important; }
+    html.dark .text-slate-600 { color: #94A3B8 !important; }
+    html.dark .text-slate-700 { color: #CBD5E1 !important; }
+
+    /* Inputs */
+    html.dark input[type="text"], html.dark input[type="email"], html.dark input[type="password"],
+    html.dark input[type="tel"], html.dark input[type="number"], html.dark input[type="date"],
+    html.dark input[type="month"], html.dark textarea, html.dark select {
+      background: #0F172A !important; border-color: #334155 !important; color: #E2E8F0 !important;
+    }
+    html.dark input::placeholder { color: #475569 !important; }
+    html.dark input:focus, html.dark select:focus, html.dark textarea:focus { ring-color: #0EA5E9 !important; }
+
+    /* Table cards */
+    html.dark .table-card { background: #1E293B !important; border-color: #334155 !important; }
+    html.dark .table-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.4) !important; }
+    html.dark .table-card.active-table { background: linear-gradient(145deg, #0369A1, #0284C7) !important; border-color: #0EA5E9 !important; }
+    html.dark .table-card.unpaid-table { background: linear-gradient(145deg, #DC2626, #EF4444) !important; border-color: #F87171 !important; }
+    html.dark .pel-card { background: #1E293B !important; border-color: #334155 !important; }
+
+    /* Menu cards */
+    html.dark .rounded-xl.border { background: #1E293B !important; border-color: #334155 !important; }
+    html.dark .border-sky-100 { border-color: #1E3A5F !important; }
+    html.dark .border-amber-100 { border-color: #451A03 !important; }
+    html.dark .border-purple-100 { border-color: #2E1065 !important; }
+
+    /* Order panel items */
+    html.dark .bg-sky-50.rounded-xl { background: #0C4A6E !important; }
+    html.dark .border-sky-200.rounded-xl { border-color: #0C4A6E !important; }
+
+    /* Modals */
+    html.dark .modal-overlay { background: rgba(0,0,0,0.7) !important; }
+    html.dark #payment-modal > div:last-child, html.dark #receipt-modal > div:last-child,
+    html.dark #menu-edit-modal > div:last-child, html.dark #trx-detail-modal > div:last-child {
+      background: #1E293B !important;
+    }
+    html.dark #payment-modal .bg-sky-700, html.dark #menu-edit-modal .bg-sky-700,
+    html.dark #trx-detail-modal .bg-sky-700 { background: #0369A1 !important; }
+
+    /* Toast */
+    html.dark #toast-container div { box-shadow: 0 4px 15px rgba(0,0,0,0.5) !important; }
+
+    /* Stats chart bg */
+    html.dark .bg-slate-50.rounded-xl { background: #0F172A !important; }
+
+    /* Demo banner */
+    html.dark #demo-banner { background: linear-gradient(to right, #581C87, #7E22CE) !important; }
+
+    /* Custom confirm */
+    html.dark #custom-confirm > div:last-child { background: #1E293B !important; }
+
+    /* Print sheet (always light) */
+    html.dark #print-sheet { background: white !important; }
+    html.dark #print-sheet * { color: #000 !important; }
+
+    /* Scrollbar dark */
+    html.dark ::-webkit-scrollbar { width: 6px; }
+    html.dark ::-webkit-scrollbar-track { background: #1E293B; }
+    html.dark ::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+
     /* ===== TABLE CARDS ===== */
     .table-card {
       transition: all 0.25s cubic-bezier(.4,0,.2,1);
@@ -1310,6 +1440,9 @@
             <div id="header-daily-total" class="font-bold text-sky-700 text-xs">Rp 0</div>
             <div id="header-daily-count" class="text-gray-400 text-[10px]">0 transaksi</div>
           </div>
+          <button onclick="toggleDarkMode()" id="dark-mode-btn" class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center hover:bg-amber-50 hover:text-amber-500 text-gray-400 transition" title="Dark Mode">
+            <i id="dark-mode-icon" class="fas fa-moon text-xs"></i>
+          </button>
           <button onclick="doLogout()" class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center hover:bg-red-50 hover:text-red-500 text-gray-400 transition" title="Keluar">
             <i class="fas fa-right-from-bracket text-xs"></i>
           </button>
@@ -2155,6 +2288,27 @@
       setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.3s'; }, 2500);
       setTimeout(() => { if (toast.parentNode) container.removeChild(toast); }, 3000);
     }
+
+    // ===== DARK MODE =====
+    function initDarkMode() {
+      var saved = localStorage.getItem('warkop_darkMode');
+      if (saved === 'true') {
+        document.documentElement.classList.add('dark');
+        updateDarkModeIcon(true);
+      }
+    }
+    function toggleDarkMode() {
+      var isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('warkop_darkMode', isDark ? 'true' : 'false');
+      updateDarkModeIcon(isDark);
+    }
+    function updateDarkModeIcon(isDark) {
+      var icon = document.getElementById('dark-mode-icon');
+      if (icon) {
+        icon.className = isDark ? 'fas fa-sun text-xs' : 'fas fa-moon text-xs';
+      }
+    }
+    initDarkMode();
 
     // ===== SCREEN MANAGEMENT =====
     function showScreen(name) {
