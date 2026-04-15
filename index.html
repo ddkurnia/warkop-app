@@ -1749,12 +1749,12 @@
     </div>
 
     <!-- LEGAL PAGE MODAL -->
-    <div id="legal-modal" class="hidden fixed inset-0 z-50 flex flex-col">
-      <div class="bg-sky-700 text-white p-4 flex items-center justify-between flex-shrink-0">
+    <div id="legal-modal" style="position:fixed;inset:0;z-index:50;display:none;flex-direction:column;">
+      <div class="bg-sky-700 text-white p-4 flex items-center justify-between" style="flex-shrink:0;">
         <h3 id="legal-modal-title" class="font-bold text-base"><i class="fas fa-shield-halved mr-2"></i></h3>
         <button onclick="closeLegalPage()" class="w-8 h-8 rounded-full bg-sky-600 flex items-center justify-center hover:bg-sky-500"><i class="fas fa-xmark"></i></button>
       </div>
-      <div id="legal-modal-content" class="flex-1 overflow-y-auto bg-slate-50 p-5"></div>
+      <div id="legal-modal-content" style="flex:1 1 0%;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y;background:#f8fafc;padding:1.25rem;min-height:0;"></div>
     </div>
 
     <!-- PRINT SHEET OVERLAY -->
@@ -3667,9 +3667,13 @@
       var data = getLegalContent(type);
       title.innerHTML = '<i class="fas ' + data.icon + ' mr-2"></i>' + data.title;
       content.innerHTML = '<div class="max-w-lg mx-auto">' + data.body + '</div>';
-      modal.classList.remove('hidden');
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
     }
-    function closeLegalPage() { document.getElementById('legal-modal').classList.add('hidden'); }
+    function closeLegalPage() {
+      document.getElementById('legal-modal').style.display = 'none';
+      document.body.style.overflow = '';
+    }
 
     function getLegalContent(type) {
       if (type === 'privacy') return {
