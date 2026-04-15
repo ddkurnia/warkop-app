@@ -4,7 +4,7 @@
   "description": "Aplikasi Point of Sale untuk mengelola transaksi penjualan di warung kopi Anda",
   "start_url": "/",
   "scope": "/",
-  "display": "standalone",
+  "display": "fullscreen",
   "orientation": "any",
   "theme_color": "#0C4A6E",
   "background_color": "#F8FAFC",
