@@ -2072,7 +2072,48 @@
         posApp.classList.add('pos-visible');
         posApp.style.display = '';
       }
+      // 3. Request fullscreen & unlock orientation (sembunyikan status bar Android)
+      try {
+        if (screen.orientation && screen.orientation.unlock) {
+          screen.orientation.unlock();
+        }
+      } catch(e) {}
+      // Request fullscreen setelah user gesture (delay sedikit agar DOM siap)
+      setTimeout(function() {
+        try {
+          var el = document.documentElement;
+          if (el.requestFullscreen) { el.requestFullscreen(); }
+          else if (el.webkitRequestFullscreen) { el.webkitRequestFullscreen(); }
+          else if (el.msRequestFullscreen) { el.msRequestFullscreen(); }
+        } catch(e) {}
+      }, 300);
     }
+
+    // Fullscreen juga saat user tap/hidupkan layar kembali
+    document.addEventListener('visibilitychange', function() {
+      if (!document.hidden) {
+        var posApp = document.getElementById('pos-app');
+        if (posApp && posApp.classList.contains('pos-visible')) {
+          setTimeout(function() {
+            try {
+              var el = document.documentElement;
+              if (el.requestFullscreen) { el.requestFullscreen(); }
+              else if (el.webkitRequestFullscreen) { el.webkitRequestFullscreen(); }
+            } catch(e) {}
+          }, 200);
+        }
+      }
+    });
+    // Fullscreen saat layar aktif kembali (resume)
+    document.addEventListener('resume', function() {
+      setTimeout(function() {
+        try {
+          var el = document.documentElement;
+          if (el.requestFullscreen) { el.requestFullscreen(); }
+          else if (el.webkitRequestFullscreen) { el.webkitRequestFullscreen(); }
+        } catch(e) {}
+      }, 300);
+    });
 
     // ===== AUTH: LOGIN =====
     function setLoadingBtn(btnId, loading) {
