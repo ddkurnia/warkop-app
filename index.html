@@ -1589,6 +1589,22 @@
         </div>
         <div class="p-5 space-y-4">
           <input type="hidden" id="menu-edit-id">
+          <!-- Photo Upload -->
+          <div>
+            <label class="block text-sm font-semibold text-sky-700 mb-2">Foto Menu</label>
+            <div id="menu-photo-area" onclick="document.getElementById('menu-photo-input').click()" class="relative cursor-pointer rounded-xl border-2 border-dashed border-sky-200 hover:border-sky-400 transition overflow-hidden bg-sky-50/50">
+              <div id="menu-photo-preview" class="hidden">
+                <img id="menu-photo-img" class="w-full h-40 object-cover" alt="Foto Menu">
+                <button type="button" onclick="event.stopPropagation(); removeMenuPhoto()" class="absolute top-2 right-2 w-7 h-7 rounded-full bg-red-500 text-white flex items-center justify-center text-xs shadow-lg hover:bg-red-600 transition"><i class="fas fa-xmark"></i></button>
+              </div>
+              <div id="menu-photo-placeholder" class="flex flex-col items-center justify-center py-5 text-sky-400">
+                <i class="fas fa-camera text-2xl mb-1"></i>
+                <span class="text-xs font-medium">Tap untuk upload foto</span>
+                <span class="text-[10px] text-sky-300 mt-0.5">Maks 500KB (auto kompres)</span>
+              </div>
+            </div>
+            <input type="file" id="menu-photo-input" accept="image/*" class="hidden" onchange="handleMenuPhoto(event)">
+          </div>
           <div>
             <label class="block text-sm font-semibold text-sky-700 mb-1">Nama Menu</label>
             <input type="text" id="menu-edit-name" placeholder="Nama menu..." class="w-full px-4 py-2.5 border border-sky-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-400">
@@ -2456,6 +2472,7 @@
         }
         loadMenuFromLS();
         loadActiveTablesFromLS();
+        loadAllMenuPhotos();
         await loadSettingsFromLS();
 
         // Update header from shopSettings (localStorage), not from Firestore
@@ -3069,11 +3086,27 @@
       grid.innerHTML = items.map(item => {
         const icon = getMenuIcon(item.kategori, item.nama_menu);
         const isMinuman = item.kategori === 'Minuman';
-        const cardBg = isMinuman ? 'bg-gradient-to-br from-sky-50 to-sky-100 border-sky-100 hover:border-sky-300 hover:shadow-sky-100/50' : 'bg-gradient-to-br from-amber-50 to-orange-50 border-amber-100 hover:border-amber-300 hover:shadow-amber-100/50';
-        const iconColor = isMinuman ? 'text-sky-500' : 'text-yellow-500';
-        const priceColor = isMinuman ? 'text-sky-700' : 'text-yellow-700';
+        const cardBg = isMinuman ? 'bg-white border-sky-100 hover:border-sky-300 hover:shadow-sky-100/50' : 'bg-white border-amber-100 hover:border-amber-300 hover:shadow-amber-100/50';
+        const priceColor = isMinuman ? 'text-sky-700' : 'text-amber-700';
+        const catBadge = isMinuman ? 'bg-sky-50 text-sky-600' : 'bg-amber-50 text-amber-600';
+        const catIcon = isMinuman ? 'fa-mug-hot' : 'fa-utensils';
+        const photo = menuPhotoCache[item.id];
+
+        if (photo) {
+          // Card dengan foto
+          return '<div class="rounded-xl border transition cursor-pointer active:scale-95 hover:shadow-lg overflow-hidden ' + cardBg + '" onclick="addToCart(\'' + item.id + '\')">' +
+            '<div class="relative">' +
+              '<img src="' + photo + '" class="w-full h-24 object-cover" alt="' + item.nama_menu + '" loading="lazy">' +
+              '<span class="absolute bottom-1.5 left-1.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full ' + catBadge + ' backdrop-blur-sm"><i class="fas ' + catIcon + ' mr-0.5"></i>' + item.kategori + '</span>' +
+            '</div>' +
+            '<div class="p-2">' +
+              '<div class="text-sm font-semibold text-gray-800 leading-tight mb-0.5 truncate">' + item.nama_menu + '</div>' +
+              '<div class="text-xs font-bold ' + priceColor + '">' + formatIDR(item.harga) + '</div>' +
+            '</div></div>';
+        }
+        // Card tanpa foto (default icon)
         return '<div class="rounded-xl p-3 border transition cursor-pointer active:scale-95 hover:shadow-md ' + cardBg + '" onclick="addToCart(\'' + item.id + '\')">' +
-          '<div class="text-2xl mb-1"><i class="fas ' + icon + ' ' + iconColor + '"></i></div>' +
+          '<div class="text-2xl mb-1"><i class="fas ' + icon + ' ' + (isMinuman ? 'text-sky-400' : 'text-amber-400') + '"></i></div>' +
           '<div class="text-sm font-semibold text-gray-800 leading-tight mb-1 truncate">' + item.nama_menu + '</div>' +
           '<div class="text-xs font-bold ' + priceColor + '">' + formatIDR(item.harga) + '</div></div>';
       }).join('');
@@ -4103,8 +4136,12 @@
 
       list.innerHTML = items.map(item => {
         const icon = getMenuIcon(item.kategori, item.nama_menu);
+        const photo = menuPhotoCache[item.id];
+        const thumbHtml = photo
+          ? '<img src="' + photo + '" class="w-10 h-10 rounded-xl object-cover flex-shrink-0" alt="' + item.nama_menu + '">'
+          : '<div class="w-10 h-10 rounded-xl bg-sky-100 flex items-center justify-center flex-shrink-0"><i class="fas ' + icon + ' text-sky-600"></i></div>';
         return '<div class="bg-white rounded-2xl p-4 shadow-sm border border-sky-100 flex items-center gap-3">' +
-          '<div class="w-10 h-10 rounded-xl bg-sky-100 flex items-center justify-center flex-shrink-0"><i class="fas ' + icon + ' text-sky-600"></i></div>' +
+          thumbHtml +
           '<div class="flex-1 min-w-0">' +
             '<div class="text-sm font-semibold text-sky-800 truncate">' + item.nama_menu + '</div>' +
             '<div class="flex items-center gap-2"><span class="text-xs font-bold text-sky-600">' + formatIDR(item.harga) + '</span>' +
@@ -4117,6 +4154,166 @@
       }).join('');
     }
 
+    // ===== MENU PHOTO =====
+    var currentMenuPhoto = null; // base64 string foto saat ini di modal
+
+    function handleMenuPhoto(event) {
+      var file = event.target.files[0];
+      if (!file) return;
+      if (file.size > 10 * 1024 * 1024) { showToast('File terlalu besar (maks 10MB)', 'error'); return; }
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        compressMenuPhoto(e.target.result, function(compressed) {
+          currentMenuPhoto = compressed;
+          var img = document.getElementById('menu-photo-img');
+          img.src = compressed;
+          document.getElementById('menu-photo-preview').classList.remove('hidden');
+          document.getElementById('menu-photo-placeholder').classList.add('hidden');
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function compressMenuPhoto(base64, callback) {
+      var img = new Image();
+      img.onload = function() {
+        var maxW = 400, maxH = 400;
+        var w = img.width, h = img.height;
+        if (w > maxW || h > maxH) {
+          if (w > h) { h = Math.round(h * maxW / w); w = maxW; }
+          else { w = Math.round(w * maxH / h); h = maxH; }
+        }
+        var canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        var quality = 0.7;
+        var result = canvas.toDataURL('image/jpeg', quality);
+        // Jika masih > 500KB, kurangi quality
+        if (result.length > 500 * 1024 * 1.37) {
+          quality = 0.5;
+          result = canvas.toDataURL('image/jpeg', quality);
+        }
+        if (result.length > 500 * 1024 * 1.37) {
+          quality = 0.3;
+          result = canvas.toDataURL('image/jpeg', quality);
+        }
+        callback(result);
+      };
+      img.src = base64;
+    }
+
+    function removeMenuPhoto() {
+      currentMenuPhoto = null;
+      document.getElementById('menu-photo-input').value = '';
+      document.getElementById('menu-photo-preview').classList.add('hidden');
+      document.getElementById('menu-photo-placeholder').classList.remove('hidden');
+    }
+
+    function saveMenuPhotoToIDB(menuId, base64) {
+      var uid = auth.currentUser ? auth.currentUser.uid : null;
+      if (!uid || !menuId) return Promise.resolve();
+      return new Promise(function(resolve) {
+        try {
+          var req = indexedDB.open('warkop-pos-v2', 2);
+          req.onsuccess = function(e) {
+            var db = e.target.result;
+            try {
+              var tx = db.transaction('menuPhotos', 'readwrite');
+              var store = tx.objectStore('menuPhotos');
+              store.put({ id: menuId, photo: base64 });
+              tx.oncomplete = function() { resolve(); };
+              tx.onerror = function() { resolve(); };
+            } catch(err) { resolve(); }
+          };
+          req.onerror = function() { resolve(); };
+          req.onupgradeneeded = function(e) {
+            var db = e.target.result;
+            if (!db.objectStoreNames.contains('menuPhotos')) {
+              db.createObjectStore('menuPhotos', { keyPath: 'id' });
+            }
+          };
+        } catch(err) { resolve(); }
+      });
+    }
+
+    function getMenuPhotoFromIDB(menuId) {
+      var uid = auth.currentUser ? auth.currentUser.uid : null;
+      if (!uid || !menuId) return Promise.resolve(null);
+      return new Promise(function(resolve) {
+        try {
+          var req = indexedDB.open('warkop-pos-v2', 2);
+          req.onsuccess = function(e) {
+            var db = e.target.result;
+            try {
+              var tx = db.transaction('menuPhotos', 'readonly');
+              var store = tx.objectStore('menuPhotos');
+              var getReq = store.get(menuId);
+              getReq.onsuccess = function() { resolve(getReq.result ? getReq.result.photo : null); };
+              getReq.onerror = function() { resolve(null); };
+            } catch(err) { resolve(null); }
+          };
+          req.onerror = function() { resolve(null); };
+          req.onupgradeneeded = function(e) {
+            var db = e.target.result;
+            if (!db.objectStoreNames.contains('menuPhotos')) {
+              db.createObjectStore('menuPhotos', { keyPath: 'id' });
+            }
+          };
+        } catch(err) { resolve(null); }
+      });
+    }
+
+    function deleteMenuPhotoFromIDB(menuId) {
+      var uid = auth.currentUser ? auth.currentUser.uid : null;
+      if (!uid || !menuId) return Promise.resolve();
+      return new Promise(function(resolve) {
+        try {
+          var req = indexedDB.open('warkop-pos-v2', 2);
+          req.onsuccess = function(e) {
+            var db = e.target.result;
+            try {
+              var tx = db.transaction('menuPhotos', 'readwrite');
+              var store = tx.objectStore('menuPhotos');
+              store.delete(menuId);
+              tx.oncomplete = function() { resolve(); };
+              tx.onerror = function() { resolve(); };
+            } catch(err) { resolve(); }
+          };
+          req.onerror = function() { resolve(); };
+        } catch(err) { resolve(); }
+      });
+    }
+
+    // Load semua foto menu sekaligus (untuk caching)
+    var menuPhotoCache = {};
+    function loadAllMenuPhotos() {
+      var uid = auth.currentUser ? auth.currentUser.uid : null;
+      if (!uid) { menuPhotoCache = {}; return; }
+      try {
+        var req = indexedDB.open('warkop-pos-v2', 2);
+        req.onsuccess = function(e) {
+          var db = e.target.result;
+          try {
+            var tx = db.transaction('menuPhotos', 'readonly');
+            var store = tx.objectStore('menuPhotos');
+            var getAll = store.getAll();
+            getAll.onsuccess = function() {
+              menuPhotoCache = {};
+              getAll.result.forEach(function(r) { menuPhotoCache[r.id] = r.photo; });
+              renderMenuGrid();
+            };
+          } catch(err) {}
+        };
+        req.onupgradeneeded = function(e) {
+          var db = e.target.result;
+          if (!db.objectStoreNames.contains('menuPhotos')) {
+            db.createObjectStore('menuPhotos', { keyPath: 'id' });
+          }
+        };
+      } catch(err) {}
+    }
+
     function openMenuModal(editId) {
       document.getElementById('menu-edit-id').value = editId || '';
       document.getElementById('menu-edit-name').value = '';
@@ -4124,6 +4321,11 @@
       selectedMenuKategori = 'Minuman';
       selectMenuKategori('Minuman');
       document.getElementById('menu-modal-title').innerHTML = '<i class="fas fa-utensils mr-2"></i>' + (editId ? 'Edit Menu' : 'Tambah Menu');
+      // Reset foto
+      currentMenuPhoto = null;
+      document.getElementById('menu-photo-input').value = '';
+      document.getElementById('menu-photo-preview').classList.add('hidden');
+      document.getElementById('menu-photo-placeholder').classList.remove('hidden');
       document.getElementById('menu-edit-modal').classList.remove('hidden');
     }
 
@@ -4149,6 +4351,17 @@
       selectedMenuKategori = item.kategori;
       selectMenuKategori(item.kategori);
       document.getElementById('menu-modal-title').innerHTML = '<i class="fas fa-pen-to-square mr-2"></i>Edit Menu';
+      // Load foto dari cache
+      currentMenuPhoto = menuPhotoCache[docId] || null;
+      if (currentMenuPhoto) {
+        document.getElementById('menu-photo-img').src = currentMenuPhoto;
+        document.getElementById('menu-photo-preview').classList.remove('hidden');
+        document.getElementById('menu-photo-placeholder').classList.add('hidden');
+      } else {
+        document.getElementById('menu-photo-input').value = '';
+        document.getElementById('menu-photo-preview').classList.add('hidden');
+        document.getElementById('menu-photo-placeholder').classList.remove('hidden');
+      }
       document.getElementById('menu-edit-modal').classList.remove('hidden');
     }
 
@@ -4164,17 +4377,31 @@
       saveBtn.disabled = true;
       saveBtn.innerHTML = '<span class="spinner-dark"></span> Menyimpan...';
 
+      var photo = currentMenuPhoto; // simpan reference
+
       try {
+        var savedId;
         if (editId) {
           updateMenuItemInLS(editId, { nama_menu: name, harga: price, kategori: selectedMenuKategori });
           const idx = menuData.findIndex(m => m.id === editId);
           if (idx >= 0) { menuData[idx] = { ...menuData[idx], nama_menu: name, harga: price, kategori: selectedMenuKategori }; }
+          savedId = editId;
           showToast('Menu berhasil diperbarui');
         } else {
           const newId = addMenuItemToLS({ nama_menu: name, harga: price, kategori: selectedMenuKategori });
           menuData.push({ id: newId, nama_menu: name, harga: price, kategori: selectedMenuKategori });
           menuData.sort((a, b) => a.nama_menu.localeCompare(b.nama_menu));
+          savedId = newId;
           showToast('Menu berhasil ditambahkan');
+        }
+        // Simpan foto ke IndexedDB (async, tidak blocking)
+        if (photo) {
+          menuPhotoCache[savedId] = photo;
+          saveMenuPhotoToIDB(savedId, photo);
+        } else if (editId) {
+          // Jika edit dan foto dihapus, hapus dari cache
+          delete menuPhotoCache[editId];
+          deleteMenuPhotoFromIDB(editId);
         }
         closeMenuModal();
         renderMenuManagement();
