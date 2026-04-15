@@ -1383,9 +1383,9 @@
                   <input type="text" id="menu-search" placeholder="Cari menu..." class="w-full pl-10 pr-4 py-2.5 bg-white border border-sky-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400" oninput="renderMenuGrid()">
                 </div>
                 <div class="flex gap-2">
-                  <button onclick="setMenuCategory('Semua')" id="cat-all" class="cat-btn tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-sky-700 text-white">Semua</button>
-                  <button onclick="setMenuCategory('Minuman')" id="cat-Minuman" class="cat-btn tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-white text-sky-600 border border-sky-200">☕ Minuman</button>
+                  <button onclick="setMenuCategory('Minuman')" id="cat-Minuman" class="cat-btn tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-sky-700 text-white">☕ Minuman</button>
                   <button onclick="setMenuCategory('Makanan')" id="cat-Makanan" class="cat-btn tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-white text-sky-600 border border-sky-200">🍽 Makanan</button>
+                  <button onclick="setMenuCategory('Lainnya')" id="cat-Lainnya" class="cat-btn tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-white text-sky-600 border border-sky-200">🥨 Lainnya</button>
                 </div>
               </div>
               <div id="menu-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 mb-4"></div>
@@ -1427,6 +1427,39 @@
             <button onclick="switchReportTab('custom')" id="tab-custom" class="report-tab flex-1 py-2.5 rounded-xl text-sm font-semibold bg-white text-sky-600 border-2 border-sky-200">
               <i class="fas fa-sliders mr-1"></i> Kustom
             </button>
+            <button onclick="switchReportTab('stats')" id="tab-stats" class="report-tab flex-1 py-2.5 rounded-xl text-sm font-semibold bg-white text-sky-600 border-2 border-sky-200">
+              <i class="fas fa-chart-line mr-1"></i> Statistik
+            </button>
+          </div>
+          <div id="panel-stats" class="report-panel hidden">
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-sky-100 mb-4">
+              <h2 class="text-base font-bold text-sky-800 mb-3"><i class="fas fa-chart-line mr-2 text-sky-400"></i>Statistik Penjualan Harian</h2>
+              <div class="flex items-center gap-3 mb-4">
+                <input type="month" id="stats-month" class="flex-1 px-3 py-2 border border-sky-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-sky-400" onchange="loadStatsChart()">
+                <button onclick="loadStatsChart()" class="px-4 py-2 bg-sky-700 text-white rounded-xl text-sm font-semibold hover:bg-sky-800 transition"><i class="fas fa-magnifying-glass mr-1"></i> Tampilkan</button>
+              </div>
+              <!-- Summary Cards -->
+              <div id="stats-summary" class="grid grid-cols-3 gap-2 mb-4"></div>
+              <!-- Bar Chart -->
+              <div class="bg-slate-50 rounded-xl p-3 border border-slate-200">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-xs font-semibold text-slate-600">Grafik Penjualan Harian</span>
+                  <div class="flex items-center gap-3 text-[10px]">
+                    <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-sm bg-sky-500 inline-block"></span> Pendapatan</span>
+                    <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-sm bg-green-500 inline-block"></span> Transaksi</span>
+                  </div>
+                </div>
+                <div id="stats-chart-container" class="relative" style="width:100%;overflow-x:auto;">
+                  <canvas id="stats-chart" width="700" height="280" style="width:100%;height:auto;display:block;"></canvas>
+                </div>
+                <div id="stats-chart-empty" class="hidden text-center py-8 text-slate-400">
+                  <i class="fas fa-chart-bar text-3xl mb-2"></i>
+                  <p class="text-sm">Belum ada data penjualan</p>
+                </div>
+              </div>
+              <!-- Peringkat hari -->
+              <div id="stats-ranking" class="mt-4"></div>
+            </div>
           </div>
           <div id="panel-daily" class="report-panel">
             <div class="bg-white rounded-2xl p-4 shadow-sm border border-sky-100 mb-4">
@@ -1489,9 +1522,9 @@
             <button onclick="openMenuModal()" class="px-4 py-2 bg-sky-700 text-white rounded-xl text-sm font-semibold hover:bg-sky-800 transition shadow-sm"><i class="fas fa-plus mr-1"></i> Tambah</button>
           </div>
           <div class="flex gap-2 mb-4">
-            <button onclick="setMenuMgmtCategory('Semua')" id="mgmt-cat-all" class="cat-btn-mgmt tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-sky-700 text-white">Semua</button>
-            <button onclick="setMenuMgmtCategory('Minuman')" id="mgmt-cat-Minuman" class="cat-btn-mgmt tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-white text-sky-600 border border-sky-200">☕ Minuman</button>
+            <button onclick="setMenuMgmtCategory('Minuman')" id="mgmt-cat-Minuman" class="cat-btn-mgmt tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-sky-700 text-white">☕ Minuman</button>
             <button onclick="setMenuMgmtCategory('Makanan')" id="mgmt-cat-Makanan" class="cat-btn-mgmt tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-white text-sky-600 border border-sky-200">🍽 Makanan</button>
+            <button onclick="setMenuMgmtCategory('Lainnya')" id="mgmt-cat-Lainnya" class="cat-btn-mgmt tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-white text-sky-600 border border-sky-200">🥨 Lainnya</button>
           </div>
           <div id="menu-mgmt-list" class="space-y-2"></div>
         </div>
@@ -1676,6 +1709,7 @@
             <div class="flex gap-2">
               <button onclick="selectMenuKategori('Minuman')" id="mk-Minuman" class="flex-1 py-2 rounded-xl text-sm font-semibold bg-sky-700 text-white border-2 border-sky-700 transition">☕ Minuman</button>
               <button onclick="selectMenuKategori('Makanan')" id="mk-Makanan" class="flex-1 py-2 rounded-xl text-sm font-semibold bg-white text-sky-600 border-2 border-sky-200 transition">🍽 Makanan</button>
+              <button onclick="selectMenuKategori('Lainnya')" id="mk-Lainnya" class="flex-1 py-2 rounded-xl text-sm font-semibold bg-white text-sky-600 border-2 border-sky-200 transition">🥨 Lainnya</button>
             </div>
           </div>
           <button onclick="saveMenuFormItem()" id="save-menu-btn" class="w-full py-3 bg-sky-700 text-white rounded-xl font-bold hover:bg-sky-800 transition"><i class="fas fa-floppy-disk mr-2"></i> Simpan</button>
@@ -1997,8 +2031,8 @@
     let TAKEAWAY_COUNT = 5;
     try { const savedTC2 = JSON.parse(localStorage.getItem('warkop_takeawayCount')); if (savedTC2 && savedTC2 > 0 && savedTC2 <= 50) TAKEAWAY_COUNT = savedTC2; } catch(e) {}
     let currentPage = 'kasir';
-    let currentMenuCategory = 'Semua';
-    let currentMgmtCategory = 'Semua';
+    let currentMenuCategory = 'Minuman';
+    let currentMgmtCategory = 'Minuman';
     let currentReportTab = 'daily';
     let selectedPayMethod = 'Tunai';
     let selectedMenuKategori = 'Minuman';
@@ -2033,6 +2067,10 @@
       { id: 'M18', nama_menu: 'Pisang Goreng', harga: 8000, kategori: 'Makanan' },
       { id: 'M19', nama_menu: 'Kentang Goreng', harga: 12000, kategori: 'Makanan' },
       { id: 'M20', nama_menu: 'Indomie Goreng', harga: 10000, kategori: 'Makanan' },
+      { id: 'M21', nama_menu: 'Kerupuk', harga: 3000, kategori: 'Lainnya' },
+      { id: 'M22', nama_menu: 'Roti Sosis', harga: 10000, kategori: 'Lainnya' },
+      { id: 'M23', nama_menu: 'Pisang Coklat', harga: 8000, kategori: 'Lainnya' },
+      { id: 'M24', nama_menu: 'Macaroni Pedas', harga: 8000, kategori: 'Lainnya' },
     ];
 
     // ===== UTILITY FUNCTIONS =====
@@ -2083,6 +2121,13 @@
         if (n.includes('jeruk')) return 'fa-lemon';
         if (n.includes('air mineral')) return 'fa-bottle-water';
         return 'fa-glass-water';
+      }
+      if (kategori === 'Lainnya') {
+        if (n.includes('kerupuk')) return 'fa-cookie-bite';
+        if (n.includes('roti')) return 'fa-bread-slice';
+        if (n.includes('pisang')) return 'fa-leaf';
+        if (n.includes('macaroni') || n.includes('mie') || n.includes('indomie')) return 'fa-bowl-food';
+        return 'fa-cookie';
       }
       if (n.includes('nasi')) return 'fa-bowl-rice';
       if (n.includes('mie') || n.includes('kwetiau') || n.includes('indomie')) return 'fa-bowl-food';
@@ -3125,7 +3170,7 @@
       document.querySelectorAll('.cat-btn').forEach(btn => {
         btn.className = 'cat-btn tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-white text-sky-600 border border-sky-200';
       });
-      const activeBtn = document.getElementById('cat-' + (cat === 'Semua' ? 'all' : cat));
+      const activeBtn = document.getElementById('cat-' + cat);
       if (activeBtn) activeBtn.className = 'cat-btn tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-sky-700 text-white';
       renderMenuGrid();
     }
@@ -3134,7 +3179,7 @@
       const grid = document.getElementById('menu-grid');
       const search = (document.getElementById('menu-search')?.value || '').toLowerCase();
       let items = menuData;
-      if (currentMenuCategory !== 'Semua') items = items.filter(m => m.kategori === currentMenuCategory);
+      if (currentMenuCategory !== 'Semua' && currentMenuCategory !== '') items = items.filter(m => m.kategori === currentMenuCategory);
       if (search) items = items.filter(m => m.nama_menu.toLowerCase().includes(search));
 
       if (items.length === 0) {
@@ -3144,10 +3189,11 @@
       grid.innerHTML = items.map(item => {
         const icon = getMenuIcon(item.kategori, item.nama_menu);
         const isMinuman = item.kategori === 'Minuman';
-        const cardBg = isMinuman ? 'bg-white border-sky-100 hover:border-sky-300 hover:shadow-sky-100/50' : 'bg-white border-amber-100 hover:border-amber-300 hover:shadow-amber-100/50';
-        const priceColor = isMinuman ? 'text-sky-700' : 'text-amber-700';
-        const catBadge = isMinuman ? 'bg-sky-50 text-sky-600' : 'bg-amber-50 text-amber-600';
-        const catIcon = isMinuman ? 'fa-mug-hot' : 'fa-utensils';
+        const isLainnya = item.kategori === 'Lainnya';
+        const cardBg = isMinuman ? 'bg-white border-sky-100 hover:border-sky-300 hover:shadow-sky-100/50' : isLainnya ? 'bg-white border-purple-100 hover:border-purple-300 hover:shadow-purple-100/50' : 'bg-white border-amber-100 hover:border-amber-300 hover:shadow-amber-100/50';
+        const priceColor = isMinuman ? 'text-sky-700' : isLainnya ? 'text-purple-700' : 'text-amber-700';
+        const catBadge = isMinuman ? 'bg-sky-50 text-sky-600' : isLainnya ? 'bg-purple-50 text-purple-600' : 'bg-amber-50 text-amber-600';
+        const catIcon = isMinuman ? 'fa-mug-hot' : isLainnya ? 'fa-cookie' : 'fa-utensils';
         const photo = menuPhotoCache[item.id];
 
         if (photo) {
@@ -3164,7 +3210,7 @@
         }
         // Card tanpa foto (default icon)
         return '<div class="rounded-xl p-3 border transition cursor-pointer active:scale-95 hover:shadow-md ' + cardBg + '" onclick="addToCart(\'' + item.id + '\')">' +
-          '<div class="text-2xl mb-1"><i class="fas ' + icon + ' ' + (isMinuman ? 'text-sky-400' : 'text-amber-400') + '"></i></div>' +
+          '<div class="text-2xl mb-1"><i class="fas ' + icon + ' ' + (isMinuman ? 'text-sky-400' : isLainnya ? 'text-purple-400' : 'text-amber-400') + '"></i></div>' +
           '<div class="text-sm font-semibold text-gray-800 leading-tight mb-1 truncate">' + item.nama_menu + '</div>' +
           '<div class="text-xs font-bold ' + priceColor + '">' + formatIDR(item.harga) + '</div></div>';
       }).join('');
@@ -3591,6 +3637,273 @@
 
     function closeReceiptModal() { document.getElementById('receipt-modal').classList.add('hidden'); }
 
+    // ===== STATISTIK PENJUALAN HARIAN =====
+    async function loadStatsChart() {
+      var monthInput = document.getElementById('stats-month');
+      var monthVal = monthInput.value || thisMonth();
+      var year = parseInt(monthVal.split('-')[0]);
+      var month = parseInt(monthVal.split('-')[1]);
+      var daysInMonth = new Date(year, month, 0).getDate();
+
+      // Ambil semua transaksi bulan ini
+      var startDate = year + '-' + String(month).padStart(2, '0') + '-01';
+      var endDate = year + '-' + String(month).padStart(2, '0') + '-' + String(daysInMonth).padStart(2, '0');
+      var allTrx = await getTransactionsFiltered(startDate, endDate);
+
+      // Kelompokkan per hari
+      var dailyData = {};
+      for (var d = 1; d <= daysInMonth; d++) {
+        dailyData[d] = { total: 0, count: 0, items: 0 };
+      }
+      allTrx.forEach(function(trx) {
+        if (!trx || !trx.date) return;
+        var day;
+        if (typeof trx.date === 'string') {
+          day = parseInt(trx.date.split('T')[0].split(' ')[0].split('-')[2]);
+        } else {
+          day = new Date(trx.date).getDate();
+        }
+        if (day >= 1 && day <= daysInMonth) {
+          dailyData[day].total += trx.total || 0;
+          dailyData[day].count += 1;
+          if (trx.items) trx.items.forEach(function(it) { dailyData[day].items += it.qty || 1; });
+        }
+      });
+
+      // Hitung summary
+      var totalPendapatan = 0, totalTransaksi = 0, totalItem = 0, hariAktif = 0;
+      var bestDay = 0, bestDayVal = 0, worstDay = 0, worstDayVal = Infinity;
+      for (var d = 1; d <= daysInMonth; d++) {
+        totalPendapatan += dailyData[d].total;
+        totalTransaksi += dailyData[d].count;
+        totalItem += dailyData[d].items;
+        if (dailyData[d].count > 0) {
+          hariAktif++;
+          if (dailyData[d].total > bestDayVal) { bestDayVal = dailyData[d].total; bestDay = d; }
+          if (dailyData[d].total < worstDayVal) { worstDayVal = dailyData[d].total; worstDay = d; }
+        }
+      }
+      if (worstDayVal === Infinity) worstDayVal = 0;
+
+      // Rata-rata
+      var avgPendapatan = hariAktif > 0 ? Math.round(totalPendapatan / hariAktif) : 0;
+      var avgTrx = hariAktif > 0 ? Math.round(totalTransaksi / hariAktif) : 0;
+
+      // Render summary cards
+      var summaryHTML = '' +
+        '<div class="bg-sky-50 border border-sky-200 rounded-xl p-3 text-center">' +
+          '<div class="text-[10px] font-semibold text-sky-600 uppercase">Total Pendapatan</div>' +
+          '<div class="text-sm font-bold text-sky-800 mt-1">' + formatIDR(totalPendapatan) + '</div>' +
+        '</div>' +
+        '<div class="bg-green-50 border border-green-200 rounded-xl p-3 text-center">' +
+          '<div class="text-[10px] font-semibold text-green-600 uppercase">Total Transaksi</div>' +
+          '<div class="text-sm font-bold text-green-800 mt-1">' + totalTransaksi + ' trx</div>' +
+        '</div>' +
+        '<div class="bg-purple-50 border border-purple-200 rounded-xl p-3 text-center">' +
+          '<div class="text-[10px] font-semibold text-purple-600 uppercase">Rata-rata/Hari</div>' +
+          '<div class="text-sm font-bold text-purple-800 mt-1">' + formatIDR(avgPendapatan) + '</div>' +
+          '<div class="text-[10px] text-purple-500">' + avgTrx + ' trx/hari</div>' +
+        '</div>';
+      document.getElementById('stats-summary').innerHTML = summaryHTML;
+
+      // Render ranking
+      var rankHTML = '<div class="bg-white rounded-xl p-4 border border-sky-100 shadow-sm">' +
+        '<h3 class="text-sm font-bold text-sky-800 mb-3"><i class="fas fa-ranking-star mr-2 text-yellow-500"></i>Analisis Bulan Ini</h3>' +
+        '<div class="space-y-2 text-sm">';
+      if (hariAktif > 0) {
+        rankHTML += '<div class="flex justify-between items-center bg-green-50 rounded-lg p-2">' +
+          '<span class="text-green-700"><i class="fas fa-arrow-trend-up mr-2"></i>Hari Terbaik</span>' +
+          '<span class="font-bold text-green-800">Tgl ' + bestDay + ' (' + formatIDR(bestDayVal) + ')</span></div>';
+        if (worstDayVal > 0) {
+          rankHTML += '<div class="flex justify-between items-center bg-red-50 rounded-lg p-2">' +
+            '<span class="text-red-700"><i class="fas fa-arrow-trend-down mr-2"></i>Hari Terendah</span>' +
+            '<span class="font-bold text-red-800">Tgl ' + worstDay + ' (' + formatIDR(worstDayVal) + ')</span></div>';
+        }
+        rankHTML += '<div class="flex justify-between items-center bg-slate-50 rounded-lg p-2">' +
+          '<span class="text-slate-600"><i class="fas fa-calendar-check mr-2"></i>Hari Aktif</span>' +
+          '<span class="font-bold text-slate-800">' + hariAktif + ' dari ' + daysInMonth + ' hari</span></div>';
+        rankHTML += '<div class="flex justify-between items-center bg-amber-50 rounded-lg p-2">' +
+          '<span class="text-amber-700"><i class="fas fa-boxes-stacked mr-2"></i>Total Item Terjual</span>' +
+          '<span class="font-bold text-amber-800">' + totalItem + '</span></div>';
+      } else {
+        rankHTML += '<div class="text-center py-4 text-slate-400">Belum ada data penjualan bulan ini</div>';
+      }
+      rankHTML += '</div></div>';
+      document.getElementById('stats-ranking').innerHTML = rankHTML;
+
+      // Gambar chart
+      drawStatsChart(dailyData, daysInMonth, avgPendapatan);
+
+      // Tampilkan/sembunyikan chart
+      if (hariAktif === 0) {
+        document.getElementById('stats-chart-container').classList.add('hidden');
+        document.getElementById('stats-chart-empty').classList.remove('hidden');
+      } else {
+        document.getElementById('stats-chart-container').classList.remove('hidden');
+        document.getElementById('stats-chart-empty').classList.add('hidden');
+      }
+    }
+
+    function drawStatsChart(dailyData, daysInMonth, avgPendapatan) {
+      var canvas = document.getElementById('stats-chart');
+      var ctx = canvas.getContext('2d');
+      var dpr = window.devicePixelRatio || 1;
+      var displayW = 700, displayH = 280;
+      canvas.width = displayW * dpr;
+      canvas.height = displayH * dpr;
+      canvas.style.width = displayW + 'px';
+      canvas.style.height = displayH + 'px';
+      ctx.scale(dpr, dpr);
+
+      // Warna
+      var bgBar = '#3B82F6'; // sky-500
+      var bgBarLight = '#93C5FD'; // sky-300
+      var lineColor = '#22C55E'; // green-500
+      var textColor = '#64748B';
+      var gridColor = '#E2E8F0';
+      var avgColor = '#F59E0B'; // amber-500
+
+      // Hitung max
+      var maxVal = 0;
+      for (var d = 1; d <= daysInMonth; d++) {
+        if (dailyData[d].total > maxVal) maxVal = dailyData[d].total;
+      }
+      if (maxVal === 0) maxVal = 100000;
+      // Round up max
+      var niceMax = Math.ceil(maxVal / 50000) * 50000;
+      if (niceMax === 0) niceMax = 100000;
+
+      // Area chart
+      var marginLeft = 65, marginRight = 15, marginTop = 20, marginBottom = 35;
+      var chartW = displayW - marginLeft - marginRight;
+      var chartH = displayH - marginTop - marginBottom;
+      var barW = Math.max(8, Math.min(20, (chartW / daysInMonth) - 2));
+      var gap = (chartW - barW * daysInMonth) / (daysInMonth + 1);
+
+      // Clear
+      ctx.clearRect(0, 0, displayW, displayH);
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, displayW, displayH);
+
+      // Grid lines (5 garis)
+      var gridLines = 5;
+      ctx.strokeStyle = gridColor;
+      ctx.lineWidth = 0.5;
+      ctx.font = '10px sans-serif';
+      ctx.fillStyle = textColor;
+      ctx.textAlign = 'right';
+      for (var i = 0; i <= gridLines; i++) {
+        var y = marginTop + chartH - (i / gridLines) * chartH;
+        ctx.beginPath();
+        ctx.moveTo(marginLeft, y);
+        ctx.lineTo(displayW - marginRight, y);
+        ctx.stroke();
+        var val = Math.round((i / gridLines) * niceMax);
+        var label = val >= 1000000 ? (val / 1000000).toFixed(1) + 'jt' : val >= 1000 ? Math.round(val / 1000) + 'rb' : val;
+        ctx.fillText(label, marginLeft - 5, y + 3);
+      }
+
+      // Garis rata-rata
+      if (avgPendapatan > 0) {
+        var avgY = marginTop + chartH - (avgPendapatan / niceMax) * chartH;
+        ctx.strokeStyle = avgColor;
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([6, 4]);
+        ctx.beginPath();
+        ctx.moveTo(marginLeft, avgY);
+        ctx.lineTo(displayW - marginRight, avgY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = avgColor;
+        ctx.font = 'bold 9px sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText('Avg', displayW - marginRight - 25, avgY - 4);
+      }
+
+      // Bar chart + garis tren
+      var barPoints = [];
+      for (var d = 1; d <= daysInMonth; d++) {
+        var x = marginLeft + gap + (d - 1) * (barW + gap);
+        var val = dailyData[d].total;
+        var barH = val > 0 ? Math.max(2, (val / niceMax) * chartH) : 0;
+        var y = marginTop + chartH - barH;
+
+        // Bar
+        var gradient = ctx.createLinearGradient(x, y, x, marginTop + chartH);
+        gradient.addColorStop(0, bgBar);
+        gradient.addColorStop(1, bgBarLight);
+        ctx.fillStyle = gradient;
+        if (barH > 0) {
+          ctx.beginPath();
+          var r = Math.min(3, barW / 2);
+          ctx.moveTo(x + r, y);
+          ctx.lineTo(x + barW - r, y);
+          ctx.quadraticCurveTo(x + barW, y, x + barW, y + r);
+          ctx.lineTo(x + barW, marginTop + chartH);
+          ctx.lineTo(x, marginTop + chartH);
+          ctx.lineTo(x, y + r);
+          ctx.quadraticCurveTo(x, y, x + r, y);
+          ctx.fill();
+        }
+
+        // Label hari (setiap 5 hari atau 1 jika sedikit)
+        if (daysInMonth <= 10 || d === 1 || d % 5 === 0 || d === daysInMonth) {
+          ctx.fillStyle = textColor;
+          ctx.font = '10px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(d, x + barW / 2, marginTop + chartH + 14);
+        }
+
+        // Simpan titik untuk garis tren
+        if (val > 0) {
+          barPoints.push({ x: x + barW / 2, y: y });
+        }
+      }
+
+      // Garis tren (transaksi count)
+      if (barPoints.length > 1) {
+        ctx.strokeStyle = lineColor;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(barPoints[0].x, barPoints[0].y);
+        for (var i = 1; i < barPoints.length; i++) {
+          ctx.lineTo(barPoints[i].x, barPoints[i].y);
+        }
+        ctx.stroke();
+
+        // Dots
+        barPoints.forEach(function(pt) {
+          ctx.fillStyle = lineColor;
+          ctx.beginPath();
+          ctx.arc(pt.x, pt.y, 3, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = '#FFFFFF';
+          ctx.beginPath();
+          ctx.arc(pt.x, pt.y, 1.5, 0, Math.PI * 2);
+          ctx.fill();
+        });
+      }
+
+      // Tooltip terbaik
+      var bestD = 0, bestV = 0;
+      for (var d = 1; d <= daysInMonth; d++) {
+        if (dailyData[d].total > bestV) { bestV = dailyData[d].total; bestD = d; }
+      }
+      if (bestV > 0) {
+        var bx = marginLeft + gap + (bestD - 1) * (barW + gap) + barW / 2;
+        var by = marginTop + chartH - Math.max(2, (bestV / niceMax) * chartH);
+        ctx.fillStyle = '#1E40AF';
+        ctx.font = 'bold 9px sans-serif';
+        ctx.textAlign = 'center';
+        var tLabel = bestV >= 1000000 ? (bestV / 1000000).toFixed(1) + 'jt' : bestV >= 1000 ? Math.round(bestV / 1000) + 'rb' : bestV;
+        ctx.fillText(tLabel, bx, by - 6);
+        // Star icon
+        ctx.fillStyle = '#F59E0B';
+        ctx.font = '11px sans-serif';
+        ctx.fillText('\u2605', bx, by - 16);
+      }
+    }
+
     // ===== RIWAYAT =====
     function switchReportTab(tab) {
       currentReportTab = tab;
@@ -3615,6 +3928,11 @@
       } else if (tab === 'monthly') {
         const monthInput = document.getElementById('monthly-picker');
         if (monthInput && !monthInput.value) monthInput.value = thisMonth();
+      } else if (tab === 'stats') {
+        const statsMonth = document.getElementById('stats-month');
+        if (statsMonth && !statsMonth.value) statsMonth.value = thisMonth();
+        loadStatsChart();
+        return;
       }
 
       loadHistory(tab);
@@ -4277,7 +4595,7 @@
       document.querySelectorAll('.cat-btn-mgmt').forEach(btn => {
         btn.className = 'cat-btn-mgmt tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-white text-sky-600 border border-sky-200';
       });
-      const activeBtn = document.getElementById('mgmt-cat-' + (cat === 'Semua' ? 'all' : cat));
+      const activeBtn = document.getElementById('mgmt-cat-' + cat);
       if (activeBtn) activeBtn.className = 'cat-btn-mgmt tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-sky-700 text-white';
       renderMenuManagement();
     }
@@ -4285,7 +4603,7 @@
     function renderMenuManagement() {
       const list = document.getElementById('menu-mgmt-list');
       let items = menuData;
-      if (currentMgmtCategory !== 'Semua') items = items.filter(m => m.kategori === currentMgmtCategory);
+      if (currentMgmtCategory !== 'Semua' && currentMgmtCategory !== '') items = items.filter(m => m.kategori === currentMgmtCategory);
 
       if (items.length === 0) {
         list.innerHTML = '<div class="text-center py-8 text-slate-400"><i class="fas fa-utensils text-3xl mb-2"></i><p class="text-sm">Tidak ada menu</p></div>';
