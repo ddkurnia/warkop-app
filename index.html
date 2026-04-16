@@ -2683,24 +2683,31 @@
       btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Memeriksa...';
       btn.disabled = true;
 
-      auth.onAuthStateChanged(async function(user) {
-        if (user) {
-          try {
-            const shopDoc = await db.collection('shops').doc(user.uid).get();
-            if (shopDoc.exists) {
-              const shop = shopDoc.data();
-              if (shop.status === 'active' || shop.status === 'demo') {
-                showToast('Akun sudah diaktifkan! Mengalihkan...', 'success');
-                setTimeout(() => location.reload(), 1500);
-                return;
-              }
+      // Gunakan currentUser() langsung, bukan onAuthStateChanged (mencegah duplicate listener)
+      const user = auth.currentUser;
+      if (user) {
+        db.collection('shops').doc(user.uid).get().then(shopDoc => {
+          if (shopDoc.exists) {
+            const shop = shopDoc.data();
+            if (shop.status === 'active' || shop.status === 'demo') {
+              showToast('Akun sudah diaktifkan! Mengalihkan...', 'success');
+              setTimeout(() => location.reload(), 1500);
+              return;
             }
-          } catch (e) { /* ignore */ }
-        }
+          }
+          btn.innerHTML = '<i class="fas fa-rotate mr-2"></i> Cek Status Aktivasi';
+          btn.disabled = false;
+          showToast('Akun belum diaktifkan. Silakan hubungi admin.', 'error');
+        }).catch(() => {
+          btn.innerHTML = '<i class="fas fa-rotate mr-2"></i> Cek Status Aktivasi';
+          btn.disabled = false;
+          showToast('Gagal memeriksa status. Coba lagi.', 'error');
+        });
+      } else {
         btn.innerHTML = '<i class="fas fa-rotate mr-2"></i> Cek Status Aktivasi';
         btn.disabled = false;
-        showToast('Akun belum diaktifkan. Silakan hubungi admin.', 'error');
-      });
+        showToast('Tidak ada sesi login. Silakan login ulang.', 'error');
+      }
     }
 
     function doLogout() {
@@ -3239,8 +3246,13 @@
         tableCustomerNames[_pendingCustomerTableId] = name;
       }
       lsSet(LS_KEYS.customerNames(currentShop.id), tableCustomerNames);
+      const wasTableId = _pendingCustomerTableId;
       closeCustomerNameModal();
-      renderTables();
+      if (wasTableId && wasTableId.startsWith('TA_')) {
+        renderTakeawayGrid();
+      } else {
+        renderTables();
+      }
     }
 
     function closeCustomerNameModal() {
