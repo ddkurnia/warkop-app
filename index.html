@@ -561,9 +561,11 @@
       .auth-form-area { max-width: 460px !important; }
       /* Header bigger on desktop */
       #pos-app > header > div { padding-left: 1.5rem !important; padding-right: 1.5rem !important; }
-      #header-shop-photo { width: 44px !important; height: 44px !important; }
-      #header-shop-name { font-size: 1rem !important; }
-      #header-daily-total { font-size: 0.9rem !important; }
+      #header-shop-photo { width: 52px !important; height: 52px !important; }
+      #header-shop-name { font-size: 1.15rem !important; }
+      #header-shop-tagline { font-size: 0.8rem !important; }
+      #header-daily-total { font-size: 1rem !important; }
+      #header-daily-count { font-size: 0.8rem !important; }
       /* Kasir page: use full width */
       #page-kasir > div { max-width: 100% !important; padding-left: 2rem !important; padding-right: 2rem !important; }
       /* Table/pel cards bigger on desktop */
@@ -710,12 +712,13 @@
       .auth-form-area { padding: 0.6rem !important; }
 
       /* POS App compact landscape */
-      #pos-app.pos-visible > header > div { padding-top: 0.25rem !important; padding-bottom: 0.25rem !important; }
+      #pos-app.pos-visible > header > div { padding-top: 0.35rem !important; padding-bottom: 0.35rem !important; }
       #pos-app.pos-visible > header { position: relative !important; top: auto !important; }
-      #header-shop-photo { width: 28px !important; height: 28px !important; }
-      #header-shop-name { font-size: 0.75rem !important; }
-      #header-daily-total { font-size: 0.65rem !important; }
-      #header-daily-count { font-size: 0.6rem !important; }
+      #header-shop-photo { width: 36px !important; height: 36px !important; }
+      #header-shop-name { font-size: 0.85rem !important; }
+      #header-shop-tagline { font-size: 0.65rem !important; }
+      #header-daily-total { font-size: 0.75rem !important; }
+      #header-daily-count { font-size: 0.65rem !important; }
       .nav-btn { padding-top: 0.3rem !important; padding-bottom: 0.2rem !important; }
       .nav-btn i { font-size: 0.85rem !important; }
       .nav-btn span { font-size: 0.6rem !important; }
@@ -1447,24 +1450,24 @@
   <div id="pos-app" class="hidden">
 
     <!-- HEADER -->
-    <header class="bg-white text-gray-800 px-3 py-2 z-40 shadow-sm border-b border-sky-100 no-print" style="position:relative;top:auto;">
+    <header class="bg-white text-gray-800 px-4 py-3 z-40 shadow-sm border-b border-sky-100 no-print" style="position:relative;top:auto;">
       <div class="max-w-7xl mx-auto flex items-center justify-between">
-        <div class="flex items-center gap-2 min-w-0 flex-1">
-          <div id="header-shop-photo" class="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-500 to-sky-700 flex items-center justify-center overflow-hidden flex-shrink-0 shadow-sm">
-            <i class="fas fa-mug-hot text-white text-sm"></i>
+        <div class="flex items-center gap-3 min-w-0 flex-1">
+          <div id="header-shop-photo" class="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-500 to-sky-700 flex items-center justify-center overflow-hidden flex-shrink-0 shadow-sm">
+            <i class="fas fa-mug-hot text-white text-lg"></i>
           </div>
           <div class="min-w-0">
-            <h1 id="header-shop-name" class="font-display text-sm font-bold leading-tight truncate text-gray-900">Warung Kopi</h1>
-            <p id="header-shop-tagline" class="text-gray-400 text-[10px] truncate leading-tight"></p>
+            <h1 id="header-shop-name" class="font-display text-base font-bold leading-tight truncate text-gray-900">Warung Kopi</h1>
+            <p id="header-shop-tagline" class="text-gray-400 text-xs truncate leading-tight"></p>
           </div>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-3">
           <div class="text-right">
-            <div id="header-daily-total" class="font-bold text-sky-700 text-xs">Rp 0</div>
-            <div id="header-daily-count" class="text-gray-400 text-[10px]">0 transaksi</div>
+            <div id="header-daily-total" class="font-bold text-sky-700 text-sm">Rp 0</div>
+            <div id="header-daily-count" class="text-gray-400 text-xs">0 transaksi</div>
           </div>
-          <button onclick="doLogout()" class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center hover:bg-red-50 hover:text-red-500 text-gray-400 transition" title="Keluar">
-            <i class="fas fa-right-from-bracket text-xs"></i>
+          <button onclick="doLogout()" class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center hover:bg-red-50 hover:text-red-500 text-gray-400 transition" title="Keluar">
+            <i class="fas fa-right-from-bracket text-sm"></i>
           </button>
         </div>
       </div>
@@ -2372,17 +2375,11 @@
         posApp.classList.add('pos-visible');
         posApp.style.display = '';
       }
-      // 3. Lock orientasi ke landscape & request fullscreen jika belum
-      //    Manifest sudah "display: fullscreen" + "orientation: landscape"
-      //    Tapi kita tetap panggil lock() sebagai backup dan untuk tablet yang butuh JS override
+      // 3. Orientasi auto-rotate (portrait & landscape) & fullscreen
       setTimeout(function() {
-        // Lock landscape
+        // Unlock orientasi agar bisa auto-rotate
         try {
-          if (screen.orientation && screen.orientation.lock) {
-            screen.orientation.lock('landscape').catch(function() {
-              try { screen.orientation.unlock(); } catch(e2) {}
-            });
-          } else if (screen.orientation && screen.orientation.unlock) {
+          if (screen.orientation && screen.orientation.unlock) {
             screen.orientation.unlock();
           }
         } catch(e) {}
@@ -2400,38 +2397,15 @@
     }
 
     // ===== FULLSCREEN CHANGE HANDLER =====
-    // Lock ke landscape SETELAH fullscreen aktif & update layout
     function onFullscreenChange() {
       var isFS = !!(document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement);
       document.documentElement.classList.toggle('is-fullscreen', isFS);
-      if (isFS) {
-        // Lock orientasi ke landscape saat fullscreen aktif
-        // unlock() saja tidak cukup di banyak tablet — harus pakai lock('landscape')
-        try {
-          if (screen.orientation && screen.orientation.lock) {
-            screen.orientation.lock('landscape').catch(function() {
-              // Fallback: coba lock 'any' supaya tidak terkunci portrait
-              try {
-                screen.orientation.lock('any').catch(function() {
-                  // Last resort: unlock
-                  try { screen.orientation.unlock(); } catch(e3) {}
-                });
-              } catch(e2) {}
-            });
-          } else if (screen.orientation && screen.orientation.unlock) {
-            screen.orientation.unlock();
-          }
-        } catch(e) {
-          try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch(e2) {}
+      // Unlock orientasi — biar user bebas putar device
+      try {
+        if (screen.orientation && screen.orientation.unlock) {
+          screen.orientation.unlock();
         }
-      } else {
-        // Saat keluar fullscreen, unlock orientasi biar user bisa putar tablet
-        try {
-          if (screen.orientation && screen.orientation.unlock) {
-            screen.orientation.unlock();
-          }
-        } catch(e) {}
-      }
+      } catch(e) {}
       // Trigger orientation update agar layout menyesuaikan
       setTimeout(function() {
         if (typeof updateOrientation === 'function') updateOrientation();
@@ -2447,16 +2421,16 @@
     document.addEventListener('webkitfullscreenchange', onFullscreenChange);
     document.addEventListener('MSFullscreenChange', onFullscreenChange);
 
-    // Kembali fullscreen & lock landscape saat user tap/hidupkan layar kembali
+    // Kembali fullscreen saat user tap/hidupkan layar kembali
     document.addEventListener('visibilitychange', function() {
       if (!document.hidden) {
         var posApp = document.getElementById('pos-app');
         if (posApp && posApp.classList.contains('pos-visible')) {
           setTimeout(function() {
-            // Lock landscape
+            // Orientasi auto-rotate, tidak di-lock
             try {
-              if (screen.orientation && screen.orientation.lock) {
-                screen.orientation.lock('landscape').catch(function() {});
+              if (screen.orientation && screen.orientation.unlock) {
+                screen.orientation.unlock();
               }
             } catch(e) {}
             // Request fullscreen HANYA jika belum
@@ -2472,12 +2446,13 @@
         }
       }
     });
-    // Fullscreen & lock landscape saat layar aktif kembali (resume)
+    // Fullscreen saat layar aktif kembali (resume)
     document.addEventListener('resume', function() {
       setTimeout(function() {
+        // Orientasi auto-rotate, tidak di-lock
         try {
-          if (screen.orientation && screen.orientation.lock) {
-            screen.orientation.lock('landscape').catch(function() {});
+          if (screen.orientation && screen.orientation.unlock) {
+            screen.orientation.unlock();
           }
         } catch(e) {}
         try {
