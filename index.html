@@ -561,7 +561,7 @@
       .auth-form-area { max-width: 460px !important; }
       /* Header bigger on desktop */
       #pos-app > header > div { padding-left: 1.5rem !important; padding-right: 1.5rem !important; }
-      #header-shop-photo { width: 52px !important; height: 52px !important; }
+      #header-shop-photo { width: 52px !important; height: 52px !important; min-width: 52px !important; min-height: 52px !important; max-width: 52px !important; max-height: 52px !important; }
       #header-shop-name { font-size: 1.15rem !important; }
       #header-shop-tagline { font-size: 0.8rem !important; }
       #header-daily-total { font-size: 1rem !important; }
@@ -714,7 +714,7 @@
       /* POS App compact landscape */
       #pos-app.pos-visible > header > div { padding-top: 0.35rem !important; padding-bottom: 0.35rem !important; }
       #pos-app.pos-visible > header { position: relative !important; top: auto !important; }
-      #header-shop-photo { width: 36px !important; height: 36px !important; }
+      #header-shop-photo { width: 36px !important; height: 36px !important; min-width: 36px !important; min-height: 36px !important; max-width: 36px !important; max-height: 36px !important; }
       #header-shop-name { font-size: 0.85rem !important; }
       #header-shop-tagline { font-size: 0.65rem !important; }
       #header-daily-total { font-size: 0.75rem !important; }
@@ -1451,22 +1451,22 @@
 
     <!-- HEADER -->
     <header class="bg-white text-gray-800 px-4 py-3 z-40 shadow-sm border-b border-sky-100 no-print" style="position:relative;top:auto;">
-      <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center justify-between w-full">
         <div class="flex items-center gap-3 min-w-0 flex-1">
-          <div id="header-shop-photo" class="w-12 h-12 rounded-xl bg-gradient-to-br from-sky-500 to-sky-700 flex items-center justify-center overflow-hidden flex-shrink-0 shadow-sm">
+          <div id="header-shop-photo" class="w-12 h-12 min-w-[48px] min-h-[48px] max-w-[48px] max-h-[48px] rounded-xl bg-gradient-to-br from-sky-500 to-sky-700 flex items-center justify-center overflow-hidden flex-shrink-0 shadow-sm">
             <i class="fas fa-mug-hot text-white text-lg"></i>
           </div>
-          <div class="min-w-0">
+          <div class="min-w-0 flex-shrink min-h-0">
             <h1 id="header-shop-name" class="font-display text-base font-bold leading-tight truncate text-gray-900">Warung Kopi</h1>
             <p id="header-shop-tagline" class="text-gray-400 text-xs truncate leading-tight"></p>
           </div>
         </div>
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-3 flex-shrink-0">
           <div class="text-right">
-            <div id="header-daily-total" class="font-bold text-sky-700 text-sm">Rp 0</div>
-            <div id="header-daily-count" class="text-gray-400 text-xs">0 transaksi</div>
+            <div id="header-daily-total" class="font-bold text-sky-700 text-sm whitespace-nowrap">Rp 0</div>
+            <div id="header-daily-count" class="text-gray-400 text-xs whitespace-nowrap">0 transaksi</div>
           </div>
-          <button onclick="doLogout()" class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center hover:bg-red-50 hover:text-red-500 text-gray-400 transition" title="Keluar">
+          <button onclick="doLogout()" class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center hover:bg-red-50 hover:text-red-500 text-gray-400 transition flex-shrink-0" title="Keluar">
             <i class="fas fa-right-from-bracket text-sm"></i>
           </button>
         </div>
