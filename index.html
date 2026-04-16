@@ -44,7 +44,7 @@
     .screen.active { display: flex !important; }
     /* Failsafe: pos-app tersembunyi secara default */
     #pos-app { display: none !important; }
-    #pos-app.pos-visible { display: flex !important; flex-direction: column; }
+    #pos-app.pos-visible { display: flex !important; flex-direction: column !important; height: 100vh; height: 100dvh; height: calc(var(--vh, 1vh) * 100); overflow: hidden; }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     /* ===== THERMAL PRINTER STYLES ===== */
@@ -528,11 +528,30 @@
 
     /* ===== RESPONSIVE: Desktop & Tablet Scaling ===== */
     #pos-app.pos-visible {
-      min-height: 100vh;
-      min-height: 100dvh;
+      height: 100vh;
+      height: 100dvh;
+      height: calc(var(--vh, 1vh) * 100);
+      overflow: hidden;
     }
     #pos-app.pos-visible > .pb-20 {
-      flex: 1;
+      flex: 1 1 0%;
+      min-height: 0;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+    }
+    #pos-app.pos-visible > header {
+      flex-shrink: 0;
+      position: relative !important;
+      top: auto !important;
+    }
+    #pos-app.pos-visible > nav.no-print {
+      flex-shrink: 0;
+      position: relative !important;
+      bottom: auto !important;
+      left: auto !important;
+      right: auto !important;
+      width: 100%;
     }
     /* ===== DESKTOP: Wider layout, bigger fonts, more space ===== */
     @media (min-width: 768px) {
@@ -606,6 +625,7 @@
 
     /* ===== LANDSCAPE ORIENTATION ===== */
     @media (orientation: landscape) {
+      /* Auth screens */
       .auth-bg { flex-direction: row !important; }
       .auth-hero {
         min-height: 100vh !important; min-height: 100dvh !important;
@@ -614,6 +634,37 @@
       }
       .auth-form-area { max-width: 500px !important; padding: 1.5rem 2rem !important; }
       .auth-wave { display: none !important; }
+
+      /* POS App: lock to viewport height & enable inner scroll */
+      html, body { overflow: hidden !important; }
+      #pos-app.pos-visible {
+        height: 100vh !important;
+        height: 100dvh !important;
+        height: calc(var(--vh, 1vh) * 100) !important;
+        min-height: 0 !important;
+        max-height: 100vh !important;
+        max-height: 100dvh !important;
+        width: 100vw !important;
+        width: 100dvw !important;
+        overflow: hidden !important;
+      }
+      #pos-app.pos-visible > header { flex-shrink: 0 !important; position: relative !important; top: auto !important; }
+      #pos-app.pos-visible > .pb-20 {
+        flex: 1 1 0% !important;
+        min-height: 0 !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        overscroll-behavior: contain !important;
+      }
+      #pos-app.pos-visible > nav.no-print {
+        flex-shrink: 0 !important;
+        position: relative !important;
+        bottom: auto !important;
+        left: auto !important;
+        right: auto !important;
+        width: 100% !important;
+      }
+      #pos-app.pos-visible > nav.no-print > div { max-width: 600px !important; margin-left: auto !important; margin-right: auto !important; }
     }
     html.is-landscape .auth-bg { flex-direction: row !important; }
     html.is-landscape .auth-hero {
@@ -622,23 +673,69 @@
       justify-content: center !important; flex-shrink: 0 !important;
     }
     html.is-landscape .auth-wave { display: none !important; }
+    html.is-landscape #pos-app.pos-visible {
+      height: 100vh !important;
+      height: 100dvh !important;
+      height: calc(var(--vh, 1vh) * 100) !important;
+      min-height: 0 !important;
+      max-height: 100vh !important;
+      max-height: 100dvh !important;
+      width: 100vw !important;
+      width: 100dvw !important;
+      overflow: hidden !important;
+    }
+    html.is-landscape #pos-app.pos-visible > header { flex-shrink: 0 !important; position: relative !important; top: auto !important; }
+    html.is-landscape #pos-app.pos-visible > .pb-20 {
+      flex: 1 1 0% !important;
+      min-height: 0 !important;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+      overscroll-behavior: contain !important;
+    }
+    html.is-landscape #pos-app.pos-visible > nav.no-print {
+      flex-shrink: 0 !important;
+      position: relative !important;
+      bottom: auto !important;
+      left: auto !important;
+      right: auto !important;
+      width: 100% !important;
+    }
 
     @media (orientation: landscape) and (max-width: 767px) {
+      /* Auth compact */
       .auth-hero { width: 32% !important; padding: 1rem 0.6rem 0 !important; }
       .auth-hero h1 { font-size: 1.1rem !important; }
       .auth-hero p { font-size: 0.6rem !important; }
       .auth-logo-img { width: 48px !important; height: 48px !important; }
       .auth-form-area { padding: 0.6rem !important; }
-      #pos-app.pos-visible > header > div { padding-top: 0.3rem !important; padding-bottom: 0.3rem !important; }
-      #header-shop-photo { width: 32px !important; height: 32px !important; }
-      .nav-btn { padding-top: 0.4rem !important; padding-bottom: 0.3rem !important; }
-      .table-card .table-number, .pel-card .table-number { font-size: 1.2rem !important; }
-      .table-card .table-icon, .pel-card .table-icon { width: 1.8rem !important; height: 1.8rem !important; }
-      #page-kasir > div { max-width: 100% !important; padding: 0.5rem !important; }
+
+      /* POS App compact landscape */
+      #pos-app.pos-visible > header > div { padding-top: 0.25rem !important; padding-bottom: 0.25rem !important; }
+      #pos-app.pos-visible > header { position: relative !important; top: auto !important; }
+      #header-shop-photo { width: 28px !important; height: 28px !important; }
+      #header-shop-name { font-size: 0.75rem !important; }
+      #header-daily-total { font-size: 0.65rem !important; }
+      #header-daily-count { font-size: 0.6rem !important; }
+      .nav-btn { padding-top: 0.3rem !important; padding-bottom: 0.2rem !important; }
+      .nav-btn i { font-size: 0.85rem !important; }
+      .nav-btn span { font-size: 0.6rem !important; }
+      #pos-app.pos-visible > nav.no-print { padding: 0 0.4rem 0.25rem !important; }
+      #pos-app.pos-visible > nav.no-print > div { padding: 0.15rem !important; border-radius: 0.75rem !important; }
+
+      /* Content compact */
+      .table-card .table-number, .pel-card .table-number { font-size: 1.1rem !important; }
+      .table-card .table-icon, .pel-card .table-icon { width: 1.6rem !important; height: 1.6rem !important; font-size: 0.8rem !important; }
+      .order-mode-tab { padding: 0.5rem !important; font-size: 0.75rem !important; }
+      .cat-btn, .cat-btn-mgmt { padding: 0.35rem !important; font-size: 0.65rem !important; }
+      #page-kasir > div { max-width: 100% !important; padding: 0.35rem !important; }
       #page-menu > div, #page-riwayat > div, #page-toko > div { max-width: 100% !important; }
-      #menu-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 0.4rem !important; }
-      #mobile-panel > div:last-child { max-height: 100vh !important; border-radius: 0 !important; }
-      #page-kasir .sticky { max-height: calc(100vh - 60px) !important; }
+      #page-menu > div, #page-riwayat > div { padding: 0.35rem !important; }
+      #menu-grid { grid-template-columns: repeat(3, 1fr) !important; gap: 0.35rem !important; }
+      #mobile-panel > div:last-child { max-height: 90vh !important; max-height: 90dvh !important; border-radius: 0.5rem !important; }
+      #page-kasir .sticky { max-height: calc(100vh - 50px) !important; max-height: calc(100dvh - 50px) !important; }
+
+      /* Tables grid more columns in landscape */
+      #tables-grid, #takeaway-grid { grid-template-columns: repeat(5, 1fr) !important; gap: 0.3rem !important; }
     }
     html.is-landscape #page-kasir > div { max-width: 100% !important; }
     html.is-landscape #page-menu > div, html.is-landscape #page-riwayat > div, html.is-landscape #page-toko > div { max-width: 100% !important; }
@@ -647,10 +744,66 @@
     @media (orientation: landscape) and (min-width: 768px) {
       .auth-hero { width: 42% !important; max-width: 560px !important; }
       #menu-grid { grid-template-columns: repeat(4, 1fr) !important; }
-      #pos-app.pos-visible > nav.no-print > div { max-width: 800px !important; }
+      #pos-app.pos-visible > nav.no-print > div { max-width: 700px !important; }
+      #tables-grid, #takeaway-grid { grid-template-columns: repeat(6, 1fr) !important; }
     }
     @media (orientation: landscape) and (min-width: 1280px) {
       #menu-grid { grid-template-columns: repeat(6, 1fr) !important; }
+      #tables-grid, #takeaway-grid { grid-template-columns: repeat(8, 1fr) !important; }
+    }
+
+    /* ===== FULLSCREEN SAFE AREA ===== */
+    /* Safe area insets untuk fullscreen / notch devices */
+    #pos-app.pos-visible > header {
+      padding-top: env(safe-area-inset-top, 0px);
+    }
+    #pos-app.pos-visible > nav.no-print {
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+    body {
+      padding-left: env(safe-area-inset-left, 0px);
+      padding-right: env(safe-area-inset-right, 0px);
+    }
+
+    /* ===== :fullscreen & .is-fullscreen LANDSCAPE FIX ===== */
+    /* Pastikan pos-app mengisi penuh viewport saat fullscreen */
+    :fullscreen #pos-app.pos-visible,
+    :-webkit-full-screen #pos-app.pos-visible,
+    html.is-fullscreen #pos-app.pos-visible {
+      height: 100vh !important;
+      height: 100dvh !important;
+      height: calc(var(--vh, 1vh) * 100) !important;
+      width: 100vw !important;
+      width: 100dvw !important;
+      display: flex !important;
+      flex-direction: column !important;
+      overflow: hidden !important;
+    }
+    :fullscreen #pos-app.pos-visible > header,
+    :-webkit-full-screen #pos-app.pos-visible > header,
+    html.is-fullscreen #pos-app.pos-visible > header {
+      flex-shrink: 0 !important;
+      position: relative !important;
+      top: auto !important;
+    }
+    :fullscreen #pos-app.pos-visible > .pb-20,
+    :-webkit-full-screen #pos-app.pos-visible > .pb-20,
+    html.is-fullscreen #pos-app.pos-visible > .pb-20 {
+      flex: 1 1 0% !important;
+      min-height: 0 !important;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch !important;
+      overscroll-behavior: contain !important;
+    }
+    :fullscreen #pos-app.pos-visible > nav.no-print,
+    :-webkit-full-screen #pos-app.pos-visible > nav.no-print,
+    html.is-fullscreen #pos-app.pos-visible > nav.no-print {
+      flex-shrink: 0 !important;
+      position: relative !important;
+      bottom: auto !important;
+      left: auto !important;
+      right: auto !important;
+      width: 100% !important;
     }
 
     /* ----- GLASSMORPHISM HEADER ----- */
@@ -1294,7 +1447,7 @@
   <div id="pos-app" class="hidden">
 
     <!-- HEADER -->
-    <header class="bg-white text-gray-800 px-3 py-2 sticky top-0 z-40 shadow-sm border-b border-sky-100 no-print">
+    <header class="bg-white text-gray-800 px-3 py-2 z-40 shadow-sm border-b border-sky-100 no-print" style="position:relative;top:auto;">
       <div class="max-w-7xl mx-auto flex items-center justify-between">
         <div class="flex items-center gap-2 min-w-0 flex-1">
           <div id="header-shop-photo" class="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-500 to-sky-700 flex items-center justify-center overflow-hidden flex-shrink-0 shadow-sm">
@@ -1616,7 +1769,7 @@
     </div><!-- end pb-20 -->
 
     <!-- BOTTOM NAVIGATION -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200 z-40 no-print">
+    <nav class="bg-white/95 backdrop-blur-md border-t border-gray-200 z-40 no-print" style="position:relative;bottom:auto;left:auto;right:auto;">
       <div class="max-w-lg sm:max-w-[600px] lg:max-w-[700px] mx-auto flex">
         <button onclick="switchPage('kasir')" id="nav-kasir" class="nav-btn flex-1 py-3 flex flex-col items-center gap-0.5 text-sky-600 bg-sky-50 border-t-2 border-sky-600">
           <i class="fas fa-calculator text-lg"></i><span class="text-xs font-semibold">Kasir</span>
@@ -2219,13 +2372,8 @@
         posApp.classList.add('pos-visible');
         posApp.style.display = '';
       }
-      // 3. Request fullscreen & unlock orientation (sembunyikan status bar Android)
-      try {
-        if (screen.orientation && screen.orientation.unlock) {
-          screen.orientation.unlock();
-        }
-      } catch(e) {}
-      // Request fullscreen setelah user gesture (delay sedikit agar DOM siap)
+      // 3. Request fullscreen (sembunyikan status bar Android)
+      //    Orientation unlock dipindah ke fullscreenchange handler (harus SETELAH FS aktif)
       setTimeout(function() {
         try {
           var el = document.documentElement;
@@ -2235,6 +2383,34 @@
         } catch(e) {}
       }, 300);
     }
+
+    // ===== FULLSCREEN CHANGE HANDLER =====
+    // Unlock orientation SETELAH fullscreen aktif & update layout
+    function onFullscreenChange() {
+      var isFS = !!(document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement);
+      document.documentElement.classList.toggle('is-fullscreen', isFS);
+      // Unlock orientation SETELAH fullscreen aktif (harus sesudah FS, bukan sebelumnya)
+      if (isFS) {
+        try {
+          if (screen.orientation && screen.orientation.unlock) {
+            screen.orientation.unlock();
+          }
+        } catch(e) {}
+      }
+      // Trigger orientation update agar layout menyesuaikan
+      setTimeout(function() {
+        if (typeof updateOrientation === 'function') updateOrientation();
+        // Force recalculate pos-app height di fullscreen
+        var posApp = document.getElementById('pos-app');
+        if (posApp && posApp.classList.contains('pos-visible')) {
+          posApp.style.height = window.innerHeight + 'px';
+          setTimeout(function() { posApp.style.height = ''; }, 50);
+        }
+      }, 100);
+    }
+    document.addEventListener('fullscreenchange', onFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', onFullscreenChange);
+    document.addEventListener('MSFullscreenChange', onFullscreenChange);
 
     // Fullscreen juga saat user tap/hidupkan layar kembali
     document.addEventListener('visibilitychange', function() {
@@ -6389,7 +6565,12 @@
           document.documentElement.classList.remove('is-landscape');
           document.documentElement.classList.add('is-portrait');
         }
+        // Update CSS custom property --vh sebagai fallback 100dvh
+        var vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', vh + 'px');
       }
+      // Expose globally untuk fullscreenchange handler
+      window.updateOrientation = updateOrientation;
       updateOrientation();
       window.addEventListener('resize', updateOrientation);
       window.addEventListener('orientationchange', function() { setTimeout(updateOrientation, 100); });
