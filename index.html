@@ -1547,8 +1547,8 @@
               <div id="menu-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 mb-4"></div>
             </div>
             <div class="hidden lg:block w-96 xl:w-[420px] flex-shrink-0">
-              <div class="bg-white rounded-2xl shadow-sm border border-sky-100 p-4 sticky top-20 max-h-[calc(100vh-100px)] flex flex-col">
-                <div id="panel-content-desktop"></div>
+              <div class="bg-white rounded-2xl shadow-sm border border-sky-100 p-4 sticky top-20 max-h-[calc(100vh-100px)] flex flex-col overflow-hidden">
+                <div id="panel-content-desktop" class="overflow-y-auto flex-1 min-h-0"></div>
               </div>
             </div>
           </div>
@@ -3538,7 +3538,7 @@
           '<div class="flex items-center gap-2 mb-2">' +
             (custName ? '<span class="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-lg font-semibold"><i class="fas fa-user mr-1"></i>' + custName + '</span>' : '') +
           '</div>' +
-          '<div class="space-y-2 flex-1 overflow-y-auto mb-3">' + items.map(item =>
+          '<div class="space-y-2 mb-3">' + items.map(item =>
             '<div class="flex items-center gap-2 bg-sky-50 rounded-xl p-2">' +
               '<div class="flex-1 min-w-0"><div class="text-sm font-semibold text-sky-800 truncate">' + item.nama_menu + '</div><div class="text-xs text-sky-500">' + formatIDR(item.harga) + '</div></div>' +
               '<div class="flex items-center gap-1">' +
