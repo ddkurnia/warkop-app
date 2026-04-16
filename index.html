@@ -3063,11 +3063,9 @@
 
     function selectTakeaway(pelNum) {
       const taKey = 'TA_' + pelNum;
+      // Jangan buka apapun jika slot kosong
+      if (!activeTables[taKey] || activeTables[taKey].length === 0) return;
       currentTableId = taKey;
-      if (!activeTables[taKey]) {
-        activeTables[taKey] = [];
-        saveActiveTablesToLS();
-      }
       renderTakeawayGrid();
       renderMenuGrid();
       renderOrderPanel('panel-content-desktop');
@@ -3086,11 +3084,9 @@
     }
 
     function selectTable(tableId) {
+      // Jangan buka apapun jika meja kosong
+      if (!activeTables[tableId] || activeTables[tableId].length === 0) return;
       currentTableId = tableId;
-      if (!activeTables[tableId]) {
-        activeTables[tableId] = [];
-        saveActiveTablesToLS();
-      }
       renderTables();
       renderMenuGrid();
       renderOrderPanel('panel-content-desktop');
