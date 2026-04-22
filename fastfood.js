@@ -1,59 +1,44 @@
 /**
  * ============================================================
- * FAST FOOD MODULE - WARKOPOS
+ * FAST FOOD MODULE v2 - WARKOPOS
  * File: fastfood.js
- * 
- * FITUR: Fried Chicken Take Away Mode
- * - Modul terpisah, TIDAK menyentuh logic dine-in / takeaway
- * - Menggunakan sistem pembayaran yang sudah ada (payment-modal)
- * - Nomor antrian auto increment: FC-001, FC-002, dst
- * - Reset harian
+ *
+ * ARSITEKTUR: 2 MODE UTAMA
+ * - WARUNG (sistem lama: dine-in + takeaway)
+ * - FAST FOOD (sistem baru: antrian, langsung bayar)
+ *
+ * ATURAN KERAS:
+ * - TIDAK menyentuh logic dine-in / takeaway
+ * - Menggunakan sistem pembayaran existing (payment-modal)
+ * - Menggunakan sistem cetak struk existing
+ * - Menggunakan sistem laporan existing (orderType: "fast_food")
+ * - Nomor antrian auto increment: FC-001, FC-002, dst (reset harian)
  * ============================================================
- * 
- * CARA INTEGRASI:
- * 1. Tambahkan tombol ketiga di order-mode-tabs (lihat snippet HTML)
- * 2. Tambahkan section-fastfood di HTML (lihat snippet HTML)
- * 3. Tambahkan <script src="fastfood.js"></script> sebelum </body>
- * 
+ *
  * KETERGANTUNGAN (dari sistem utama):
- * - menuData (array menu)
+ * - menuData (array menu, masing2 punya field 'mode')
  * - formatIDR(amount)
- * - generateTrxId()
- * - generateId()
+ * - generateTrxId(), generateId()
  * - saveTransactionToLS(trx)
  * - showToast(message, type)
  * - updateDailyStats()
- * - currentShop (object)
- * - shopSettings (object)
+ * - currentShop, shopSettings
  * - LS_KEYS, lsGet, lsSet
  * - selectedPayMethod (global)
+ * - selectedMenuKategori (global)
  * ============================================================
  */
 
-// ============================================================
-// FAST FOOD MODULE - Self-contained namespace
-// ============================================================
 var FastFood = (function() {
   'use strict';
 
   // ===== STATE =====
-  var _cart = [];              // Keranjang fast food [{id, nama_menu, harga, kategori, qty}]
-  var _isFFMode = false;       // Apakah sedang di fast food mode
-  var _lastQueueNumber = 0;    // Nomor antrian terakhir hari ini
+  var _cart = [];
+  var _isFFMode = false;
+  var _ffActiveCategory = 'Semua';
+  var _currentMainMode = 'warung'; // 'warung' | 'fast_food'
 
-  // Key localStorage untuk nomor antrian harian
-  function _getQueueKey() {
-    var today = _getTodayStr();
-    return 'warkop_ff_queue_' + (typeof currentShop !== 'undefined' ? currentShop.id : 'default') + '_' + today;
-  }
-
-  // Key localStorage untuk daftar antrian hari ini (untuk display)
-  function _getQueueListKey() {
-    var today = _getTodayStr();
-    return 'warkop_ff_queue_list_' + (typeof currentShop !== 'undefined' ? currentShop.id : 'default') + '_' + today;
-  }
-
-  // ===== UTILITY =====
+  // ===== UTILITY (fallback-safe) =====
   function _getTodayStr() {
     var d = new Date();
     var p = function(n) { return String(n).padStart(2, '0'); };
@@ -61,262 +46,320 @@ var FastFood = (function() {
   }
 
   function _nowLocal() {
+    if (typeof nowLocal === 'function') return nowLocal();
     var d = new Date();
     var p = function(n) { return String(n).padStart(2, '0'); };
     return d.getFullYear() + '-' + p(d.getMonth()+1) + '-' + p(d.getDate()) + 'T' + p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds());
   }
 
-  function _generateId() {
-    if (typeof generateId === 'function') return generateId();
-    return 'M' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substr(2, 4).toUpperCase();
-  }
-
-  function _generateTrxId() {
-    if (typeof generateTrxId === 'function') return generateTrxId();
-    return 'TRX' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substr(2, 3).toUpperCase();
-  }
-
-  function _formatIDR(amount) {
+  function _fmtIDR(amount) {
     if (typeof formatIDR === 'function') return formatIDR(amount);
     return 'Rp ' + Number(amount).toLocaleString('id-ID');
   }
 
-  // ===== NOMOR ANTRIAN =====
-  /**
-   * Generate nomor antrian baru. Format: FC-001, FC-002, dst.
-   * Auto-increment per hari. Reset otomatis setiap hari baru.
-   * 
-   * @returns {string} Nomor antrian, contoh: "FC-001"
-   */
-  function generateQueueNumber() {
-    var key = _getQueueKey();
-    var saved = null;
-    try {
-      saved = JSON.parse(localStorage.getItem(key));
-    } catch(e) { /* ignore */ }
+  function _genId() {
+    if (typeof generateId === 'function') return generateId();
+    return 'M' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substr(2, 4).toUpperCase();
+  }
 
-    // Cek apakah nomor masih valid untuk hari ini
-    if (saved && saved.date === _getTodayStr()) {
-      _lastQueueNumber = saved.lastNumber;
-    } else {
-      _lastQueueNumber = 0; // Reset harian
+  function _genTrxId() {
+    if (typeof generateTrxId === 'function') return generateTrxId();
+    return 'TRX' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substr(2, 3).toUpperCase();
+  }
+
+  function _formatDateTime(dateStr) {
+    if (typeof formatDateTime === 'function') return formatDateTime(dateStr);
+    var d = new Date(dateStr);
+    return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) + ' ' +
+           d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function _showToast(msg, type) {
+    if (typeof showToast === 'function') showToast(msg, type || 'success');
+    else alert(msg);
+  }
+
+  function _showConfirm(msg, cb) {
+    if (typeof customConfirm === 'function') customConfirm(msg, cb);
+    else if (typeof confirm === 'function') cb(confirm(msg));
+  }
+
+  function _getShopId() {
+    return (typeof currentShop !== 'undefined' && currentShop && currentShop.id) ? currentShop.id : 'default';
+  }
+
+  // ===== MAIN MODE SWITCHING (WARUNG / FAST FOOD) =====
+
+  /**
+   * switchMainMode('warung') | switchMainMode('fast_food')
+   * Dipanggil dari tombol utama di UI.
+   */
+  function switchMainMode(mode) {
+    _currentMainMode = mode;
+
+    var warungBtn = document.getElementById('mode-warung');
+    var ffBtn = document.getElementById('mode-fastfood');
+    var warungContent = document.getElementById('warung-content');
+    var ffContent = document.getElementById('fastfood-content');
+
+    if (mode === 'warung') {
+      // Style tombol
+      if (warungBtn) warungBtn.className = 'main-mode-tab flex-1 py-3 rounded-xl font-bold text-sm bg-sky-600 text-white shadow-md active-main-mode';
+      if (ffBtn) ffBtn.className = 'main-mode-tab flex-1 py-3 rounded-xl font-bold text-sm bg-white text-orange-500 border-2 border-orange-200 hover:border-orange-400';
+
+      // Tampilkan warung, sembunyikan fast food
+      if (warungContent) warungContent.classList.remove('hidden');
+      if (ffContent) ffContent.classList.add('hidden');
+
+      // Kembali ke mode order terakhir (dine-in / takeaway)
+      _isFFMode = false;
+      if (typeof currentOrderMode !== 'undefined') {
+        if (typeof switchOrderMode === 'function') {
+          // switchOrderMode sudah dipatch, jadi aman
+          switchOrderMode(currentOrderMode === 'takeaway' ? 'takeaway' : 'dine-in');
+        }
+      }
+
+    } else if (mode === 'fast_food') {
+      // Style tombol
+      if (ffBtn) ffBtn.className = 'main-mode-tab flex-1 py-3 rounded-xl font-bold text-sm bg-orange-500 text-white shadow-md active-main-mode';
+      if (warungBtn) warungBtn.className = 'main-mode-tab flex-1 py-3 rounded-xl font-bold text-sm bg-white text-sky-500 border-2 border-sky-200 hover:border-sky-400';
+
+      // Sembunyikan warung, tampilkan fast food
+      if (warungContent) warungContent.classList.add('hidden');
+      if (ffContent) ffContent.classList.remove('hidden');
+
+      // Tutup mobile panel warung jika terbuka
+      if (typeof closeMobilePanel === 'function') closeMobilePanel();
+
+      // Aktifkan fast food mode
+      _isFFMode = true;
+      _cart = [];
+      _renderAll();
     }
+  }
 
-    _lastQueueNumber++;
-    var queueNumber = 'FC-' + String(_lastQueueNumber).padStart(3, '0');
+  function isFFMode() { return _isFFMode; }
+  function getCurrentMode() { return _currentMainMode; }
 
-    // Simpan ke localStorage
-    try {
-      localStorage.setItem(key, JSON.stringify({
-        date: _getTodayStr(),
-        lastNumber: _lastQueueNumber
-      }));
-    } catch(e) { /* ignore */ }
+  // ===== MENU FILTERING =====
 
-    return queueNumber;
+  /**
+   * Filter menu berdasarkan mode.
+   * - warung: tampilkan menu yang mode !== 'fast_food' (default jika tidak ada field mode)
+   * - fast_food: tampilkan menu yang mode === 'fast_food'
+   */
+  function getMenuByMode(mode) {
+    if (typeof menuData === 'undefined' || !menuData) return [];
+    return menuData.filter(function(item) {
+      if (mode === 'fast_food') {
+        return item.mode === 'fast_food';
+      } else {
+        // warung: tampilkan semua yang BUKAN fast_food
+        // (menu tanpa field 'mode' otomatis masuk warung = backward compatible)
+        return item.mode !== 'fast_food';
+      }
+    });
   }
 
   /**
-   * Ambil nomor antrian terakhir hari ini (tanpa increment)
-   * @returns {number} Nomor terakhir
+   * Filter menu warung berdasarkan kategori dan search.
+   * Digunakan untuk mem-patch renderMenuGrid() agar hanya tampil menu warung.
    */
-  function getLastQueueNumber() {
-    var key = _getQueueKey();
-    try {
-      var saved = JSON.parse(localStorage.getItem(key));
-      if (saved && saved.date === _getTodayStr()) return saved.lastNumber;
-    } catch(e) { /* ignore */ }
-    return 0;
+  function getFilteredWarungMenu() {
+    var items = getMenuByMode('warung');
+    // Filter by kategori
+    var cat = (typeof currentMenuCategory !== 'undefined') ? currentMenuCategory : 'Minuman';
+    var catFiltered = items.filter(function(item) { return item.kategori === cat; });
+    // Filter by search
+    var searchEl = document.getElementById('menu-search');
+    var searchTerm = searchEl ? searchEl.value.toLowerCase().trim() : '';
+    if (searchTerm) {
+      catFiltered = catFiltered.filter(function(item) {
+        return item.nama_menu.toLowerCase().includes(searchTerm);
+      });
+    }
+    return catFiltered;
   }
 
-  // ===== CART MANAGEMENT =====
+  // ===== CART =====
 
-  /**
-   * Tambah item ke keranjang fast food
-   * @param {string} menuId - ID menu dari menuData
-   */
   function addToCart(menuId) {
     if (typeof menuData === 'undefined' || !menuData) {
-      _showToast('Menu belum dimuat!', 'error');
-      return;
+      _showToast('Menu belum dimuat!', 'error'); return;
     }
-
     var menuItem = null;
     for (var i = 0; i < menuData.length; i++) {
-      if (menuData[i].id === menuId) {
-        menuItem = menuData[i];
-        break;
-      }
+      if (menuData[i].id === menuId) { menuItem = menuData[i]; break; }
     }
     if (!menuItem) return;
 
     var existing = null;
     for (var j = 0; j < _cart.length; j++) {
-      if (_cart[j].id === menuId) {
-        existing = _cart[j];
-        break;
-      }
+      if (_cart[j].id === menuId) { existing = _cart[j]; break; }
     }
 
-    if (existing) {
-      existing.qty++;
-    } else {
-      _cart.push({
-        id: menuItem.id,
-        nama_menu: menuItem.nama_menu,
-        harga: menuItem.harga,
-        kategori: menuItem.kategori,
-        qty: 1
-      });
-    }
-
-    _renderFFUI();
+    if (existing) { existing.qty++; }
+    else { _cart.push({ id: menuItem.id, nama_menu: menuItem.nama_menu, harga: menuItem.harga, kategori: menuItem.kategori, qty: 1 }); }
+    _renderAll();
   }
 
-  /**
-   * Update jumlah item di keranjang
-   * @param {string} menuId
-   * @param {number} delta - +1 atau -1
-   */
   function updateQty(menuId, delta) {
     for (var i = 0; i < _cart.length; i++) {
       if (_cart[i].id === menuId) {
         _cart[i].qty += delta;
-        if (_cart[i].qty <= 0) {
-          _cart.splice(i, 1);
-        }
+        if (_cart[i].qty <= 0) _cart.splice(i, 1);
         break;
       }
     }
-    _renderFFUI();
+    _renderAll();
   }
 
-  /**
-   * Hapus item dari keranjang
-   * @param {string} menuId
-   */
   function removeItem(menuId) {
     _cart = _cart.filter(function(item) { return item.id !== menuId; });
-    _renderFFUI();
+    _renderAll();
   }
 
-  /**
-   * Reset seluruh keranjang
-   */
   function resetCart() {
     if (_cart.length === 0) return;
     _showConfirm('Reset semua pesanan Fast Food?', function(ok) {
       if (!ok) return;
       _cart = [];
-      _renderFFUI();
+      _renderAll();
       _showToast('Pesanan direset');
     });
   }
 
-  /**
-   * Hitung total keranjang
-   * @returns {number}
-   */
-  function getCartTotal() {
-    return _cart.reduce(function(s, i) { return s + i.harga * i.qty; }, 0);
+  function getCartTotal() { return _cart.reduce(function(s, i) { return s + i.harga * i.qty; }, 0); }
+  function getCartItemCount() { return _cart.reduce(function(s, i) { return s + i.qty; }, 0); }
+
+  // ===== CATEGORY =====
+
+  function setCategory(cat) {
+    _ffActiveCategory = cat;
+    var cats = ['Semua', 'Minuman', 'Makanan', 'Lainnya'];
+    cats.forEach(function(c) {
+      var btn = document.getElementById('ff-cat-' + c);
+      if (btn) {
+        btn.className = c === cat
+          ? 'cat-btn tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-orange-500 text-white'
+          : 'cat-btn tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-white text-orange-600 border border-orange-200';
+      }
+    });
+    _renderFFMenu();
+  }
+
+  // ===== QUEUE NUMBER =====
+
+  function _getQueueKey() {
+    return 'warkop_ff_queue_' + _getShopId() + '_' + _getTodayStr();
+  }
+  function _getQueueListKey() {
+    return 'warkop_ff_queue_list_' + _getShopId() + '_' + _getTodayStr();
   }
 
   /**
-   * Hitung jumlah item total
-   * @returns {number}
+   * Generate nomor antrian baru. Format: FC-001, FC-002, dst.
+   * Auto-increment, reset harian.
    */
-  function getCartItemCount() {
-    return _cart.reduce(function(s, i) { return s + i.qty; }, 0);
+  function generateQueueNumber() {
+    var key = _getQueueKey();
+    var saved = null;
+    try { saved = JSON.parse(localStorage.getItem(key)); } catch(e) {}
+
+    var lastNum = 0;
+    if (saved && saved.date === _getTodayStr()) {
+      lastNum = saved.lastNumber;
+    }
+
+    lastNum++;
+    var queueNumber = 'FC-' + String(lastNum).padStart(3, '0');
+
+    try {
+      localStorage.setItem(key, JSON.stringify({ date: _getTodayStr(), lastNumber: lastNum }));
+    } catch(e) {}
+
+    return queueNumber;
   }
 
-  // ===== PAYMENT (Menggunakan modal yang sudah ada) =====
+  function getLastQueueNumber() {
+    try {
+      var saved = JSON.parse(localStorage.getItem(_getQueueKey()));
+      if (saved && saved.date === _getTodayStr()) return saved.lastNumber;
+    } catch(e) {}
+    return 0;
+  }
 
-  /**
-   * Buka payment modal untuk Fast Food.
-   * Menggunakan DOM payment-modal yang sudah ada di sistem.
-   * TIDAK memanggil openPaymentModal() dari sistem utama.
-   */
+  // ===== PAYMENT (menggunakan payment-modal existing) =====
+
   function openFFPaymentModal() {
     if (_cart.length === 0) return;
 
     var subtotal = getCartTotal();
 
-    // Isi ringkasan pesanan ke payment modal yang sudah ada
+    // Isi payment modal yang sudah ada
     var paymentItems = document.getElementById('payment-items');
     if (paymentItems) {
       paymentItems.innerHTML = _cart.map(function(i) {
-        return '<div class="flex justify-between"><span class="text-sky-700">' + i.qty + 'x ' + i.nama_menu + '</span><span class="font-medium">' + _formatIDR(i.harga * i.qty) + '</span></div>';
+        return '<div class="flex justify-between"><span class="text-sky-700">' + i.qty + 'x ' + i.nama_menu + '</span><span class="font-medium">' + _fmtIDR(i.harga * i.qty) + '</span></div>';
       }).join('');
     }
 
-    // Set nilai default
     var paySubtotal = document.getElementById('pay-subtotal');
     var payDiscount = document.getElementById('pay-discount');
     var payCash = document.getElementById('pay-cash');
     var payChangeSection = document.getElementById('pay-change-section');
     var payTotal = document.getElementById('pay-total');
 
-    if (paySubtotal) paySubtotal.textContent = _formatIDR(subtotal);
+    if (paySubtotal) paySubtotal.textContent = _fmtIDR(subtotal);
     if (payDiscount) payDiscount.value = 0;
     if (payCash) payCash.value = '';
     if (payChangeSection) payChangeSection.classList.add('hidden');
-    if (payTotal) payTotal.textContent = _formatIDR(subtotal);
+    if (payTotal) payTotal.textContent = _fmtIDR(subtotal);
 
-    // Reset metode pembayaran ke Tunai
-    if (typeof selectedPayMethod !== 'undefined') {
-      selectedPayMethod = 'Tunai';
-    }
+    // Reset metode pembayaran
+    if (typeof selectedPayMethod !== 'undefined') selectedPayMethod = 'Tunai';
     _updateFFPayMethodUI();
 
-    // Tampilkan modal
-    var modal = document.getElementById('payment-modal');
-    if (modal) modal.classList.remove('hidden');
-
-    // Override tombol konfirmasi untuk fast food
+    // Simpan handler original dan override untuk fast food
     var confirmBtn = document.getElementById('confirm-pay-btn');
     if (confirmBtn) {
-      confirmBtn.setAttribute('data-original-onclick', confirmBtn.getAttribute('onclick') || '');
-      confirmBtn.setAttribute('onclick', 'FastFood.confirmFFPayment()');
+      confirmBtn.setAttribute('data-orig-onclick', confirmBtn.getAttribute('onclick') || '');
+      confirmBtn.setAttribute('onclick', 'FastFood.createFastFoodOrder()');
       confirmBtn.disabled = false;
       confirmBtn.innerHTML = '<i class="fas fa-circle-check mr-2"></i> Konfirmasi Pembayaran';
     }
 
-    // Override discount dan cash input handler
+    // Override input handlers
     var payDiscountEl = document.getElementById('pay-discount');
     var payCashEl = document.getElementById('pay-cash');
     if (payDiscountEl) payDiscountEl.setAttribute('oninput', 'FastFood._updateFFPaymentTotal()');
     if (payCashEl) payCashEl.setAttribute('oninput', 'FastFood._updateFFPaymentTotal()');
 
-    // Tutup mobile panel jika terbuka
-    if (typeof closeMobilePanel === 'function') closeMobilePanel();
+    // Tampilkan modal
+    var modal = document.getElementById('payment-modal');
+    if (modal) modal.classList.remove('hidden');
   }
 
-  /**
-   * Update tampilan metode pembayaran untuk fast food mode
-   */
   function _updateFFPayMethodUI() {
     var method = (typeof selectedPayMethod !== 'undefined') ? selectedPayMethod : 'Tunai';
     document.querySelectorAll('.pay-method-btn').forEach(function(btn) {
       btn.className = 'pay-method-btn py-2.5 rounded-xl text-sm font-semibold bg-white text-sky-600 border-2 border-sky-200 transition hover:border-sky-400';
     });
     var activeBtn = document.getElementById('pm-' + method);
-    if (activeBtn) {
-      activeBtn.className = 'pay-method-btn py-2.5 rounded-xl text-sm font-semibold bg-sky-700 text-white border-2 border-sky-700 transition';
-    }
+    if (activeBtn) activeBtn.className = 'pay-method-btn py-2.5 rounded-xl text-sm font-semibold bg-sky-700 text-white border-2 border-sky-700 transition';
     var cashSection = document.getElementById('cash-input-section');
     if (cashSection) cashSection.style.display = (method === 'Tunai') ? 'block' : 'none';
   }
 
-  /**
-   * Update total di payment modal saat discount/cash berubah
-   */
   function _updateFFPaymentTotal() {
     var subtotal = getCartTotal();
     var discountPct = parseInt(document.getElementById('pay-discount').value) || 0;
     var discount = Math.round(subtotal * discountPct / 100);
     var total = subtotal - discount;
+
     var payTotal = document.getElementById('pay-total');
-    if (payTotal) payTotal.textContent = _formatIDR(total);
+    if (payTotal) payTotal.textContent = _fmtIDR(total);
 
     var method = (typeof selectedPayMethod !== 'undefined') ? selectedPayMethod : 'Tunai';
     if (method === 'Tunai') {
@@ -326,52 +369,35 @@ var FastFood = (function() {
       var payChange = document.getElementById('pay-change');
       if (cash > 0) {
         if (changeSection) changeSection.classList.remove('hidden');
-        if (payChange) payChange.textContent = change >= 0 ? _formatIDR(change) : '-' + _formatIDR(Math.abs(change));
+        if (payChange) payChange.textContent = change >= 0 ? _fmtIDR(change) : '-' + _fmtIDR(Math.abs(change));
       } else {
         if (changeSection) changeSection.classList.add('hidden');
       }
     }
   }
 
-  /**
-   * Tutup payment modal dan restore handler original
-   */
   function closeFFPaymentModal() {
-    // Restore tombol konfirmasi ke handler original
+    // Restore handler original
     var confirmBtn = document.getElementById('confirm-pay-btn');
     if (confirmBtn) {
-      var originalOnclick = confirmBtn.getAttribute('data-original-onclick');
-      if (originalOnclick) {
-        confirmBtn.setAttribute('onclick', originalOnclick);
-        confirmBtn.removeAttribute('data-original-onclick');
+      var orig = confirmBtn.getAttribute('data-orig-onclick');
+      if (orig) {
+        confirmBtn.setAttribute('onclick', orig);
+        confirmBtn.removeAttribute('data-orig-onclick');
       }
     }
-
-    // Restore handler input
+    // Restore input handlers
     var payDiscountEl = document.getElementById('pay-discount');
     var payCashEl = document.getElementById('pay-cash');
     if (payDiscountEl) payDiscountEl.setAttribute('oninput', 'updatePaymentTotal()');
     if (payCashEl) payCashEl.setAttribute('oninput', 'updatePaymentTotal()');
 
-    // Tutup modal
     var modal = document.getElementById('payment-modal');
     if (modal) modal.classList.add('hidden');
   }
 
   // ===== CREATE FAST FOOD ORDER (Fungsi Utama) =====
 
-  /**
-   * Fungsi utama: Buat order Fast Food.
-   * Flow:
-   * 1. Validasi item
-   * 2. Validasi pembayaran
-   * 3. Generate nomor antrian (FC-001, FC-002, dst)
-   * 4. Simpan ke database (menggunakan saveTransactionToLS)
-   * 5. Reset keranjang
-   * 6. Tampilkan struk
-   * 
-   * @returns {Object|null} Transaction object atau null jika gagal
-   */
   function createFastFoodOrder() {
     if (_cart.length === 0) return null;
 
@@ -379,27 +405,19 @@ var FastFood = (function() {
     var discountPct = parseInt(document.getElementById('pay-discount').value) || 0;
     var discount = Math.round(subtotal * discountPct / 100);
     var total = subtotal - discount;
-
     var method = (typeof selectedPayMethod !== 'undefined') ? selectedPayMethod : 'Tunai';
 
-    // Validasi Tunai
     if (method === 'Tunai') {
       var cash = parseInt(document.getElementById('pay-cash').value) || 0;
-      if (cash < total) {
-        _showToast('Uang tidak cukup!', 'error');
-        return null;
-      }
+      if (cash < total) { _showToast('Uang tidak cukup!', 'error'); return null; }
     }
 
     var cashAmount = method === 'Tunai' ? (parseInt(document.getElementById('pay-cash').value) || total) : total;
-
-    // Generate nomor antrian
     var queueNumber = generateQueueNumber();
 
-    // Buat transaction object
     var trx = {
-      id: _generateTrxId(),
-      localId: _generateId(),
+      id: _genTrxId(),
+      localId: _genId(),
       date: _nowLocal(),
       orderType: 'fast_food',
       queueNumber: queueNumber,
@@ -415,41 +433,35 @@ var FastFood = (function() {
       cashPaid: cashAmount,
       paymentMethod: method,
       status: 'paid',
-      cashier: (typeof shopSettings !== 'undefined' && shopSettings.cashierName) ? shopSettings.cashierName : 'Admin'
+      cashier: (typeof shopSettings !== 'undefined' && shopSettings && shopSettings.cashierName) ? shopSettings.cashierName : 'Admin'
     };
 
-    // Set shopId jika ada
-    if (typeof currentShop !== 'undefined' && currentShop && currentShop.id) {
-      trx.shopId = currentShop.id;
-    }
+    var shopId = _getShopId();
+    if (shopId !== 'default') trx.shopId = shopId;
 
     try {
-      // Simpan ke database menggunakan sistem yang sudah ada
-      if (typeof saveTransactionToLS === 'function') {
-        saveTransactionToLS(trx);
-      }
+      // 1. Simpan ke database (sistem existing)
+      if (typeof saveTransactionToLS === 'function') saveTransactionToLS(trx);
 
-      // Simpan ke daftar antrian hari ini (untuk display)
+      // 2. Simpan ke daftar antrian hari ini
       _saveToQueueList(queueNumber, trx);
 
-      // Reset keranjang
+      // 3. Reset keranjang
       _cart = [];
 
-      // Tutup payment modal
+      // 4. Tutup payment modal
       closeFFPaymentModal();
 
-      // Update daily stats
-      if (typeof updateDailyStats === 'function') {
-        updateDailyStats();
-      }
+      // 5. Update daily stats (sistem existing)
+      if (typeof updateDailyStats === 'function') updateDailyStats();
 
-      // Render ulang UI
-      _renderFFUI();
+      // 6. Render ulang UI
+      _renderAll();
 
-      // Tampilkan struk
+      // 7. Tampilkan struk (sistem existing - showReceipt)
       _showReceipt(trx);
 
-      // Tampilkan success toast dengan nomor antrian
+      // 8. Success toast
       _showToast('Pembayaran berhasil! Antrian: ' + queueNumber);
 
       return trx;
@@ -460,16 +472,10 @@ var FastFood = (function() {
     }
   }
 
-  /**
-   * Simpan antrian ke daftar antrian hari ini
-   */
   function _saveToQueueList(queueNumber, trx) {
     var key = _getQueueListKey();
     var list = [];
-    try {
-      list = JSON.parse(localStorage.getItem(key)) || [];
-    } catch(e) { /* ignore */ }
-
+    try { list = JSON.parse(localStorage.getItem(key)) || []; } catch(e) {}
     list.unshift({
       queueNumber: queueNumber,
       items: trx.items.map(function(i) { return i.nama_menu + ' x' + i.qty; }),
@@ -478,21 +484,15 @@ var FastFood = (function() {
       time: trx.date,
       status: 'paid'
     });
-
-    // Simpan maksimal 200 antrian per hari
     if (list.length > 200) list = list.slice(0, 200);
-
-    try {
-      localStorage.setItem(key, JSON.stringify(list));
-    } catch(e) { /* ignore */ }
+    try { localStorage.setItem(key, JSON.stringify(list)); } catch(e) {}
   }
 
-  // ===== RECEIPT (Struk) =====
+  // ===== RECEIPT (menggunakan sistem struk existing) =====
 
-  /**
-   * Tampilkan struk untuk transaksi fast food
-   */
   function _showReceipt(trx) {
+    // Gunakan showReceipt() dari sistem utama jika ada
+    // Tapi kita override sedikit untuk menampilkan info fast food + antrian
     var cashier = trx.cashier || 'Admin';
     var shopName = (typeof currentShop !== 'undefined' && currentShop) ? currentShop.shopName : 'Warung Kopi';
     var shopAddr = (typeof currentShop !== 'undefined' && currentShop) ? currentShop.address : '';
@@ -517,26 +517,25 @@ var FastFood = (function() {
       '<div class="space-y-1 text-sm mb-3">';
 
     trx.items.forEach(function(item) {
-      html += '<div class="flex justify-between"><span>' + item.qty + 'x ' + item.nama_menu + '</span><span class="font-medium">' + _formatIDR(item.harga * item.qty) + '</span></div>';
+      html += '<div class="flex justify-between"><span>' + item.qty + 'x ' + item.nama_menu + '</span><span class="font-medium">' + _fmtIDR(item.harga * item.qty) + '</span></div>';
     });
 
     html += '</div><div class="border-t border-dashed border-sky-300 my-3"></div>' +
       '<div class="space-y-1 text-sm">' +
-      '<div class="flex justify-between"><span>Subtotal</span><span>' + _formatIDR(trx.subtotal) + '</span></div>';
+      '<div class="flex justify-between"><span>Subtotal</span><span>' + _fmtIDR(trx.subtotal) + '</span></div>';
 
     if (trx.discountPct > 0) {
-      html += '<div class="flex justify-between text-red-500"><span>Diskon (' + trx.discountPct + '%)</span><span>-' + _formatIDR(trx.discount) + '</span></div>';
+      html += '<div class="flex justify-between text-red-500"><span>Diskon (' + trx.discountPct + '%)</span><span>-' + _fmtIDR(trx.discount) + '</span></div>';
     }
 
-    html += '<div class="flex justify-between font-bold text-base pt-1"><span>TOTAL</span><span>' + _formatIDR(trx.total) + '</span></div>' +
-      '<div class="flex justify-between text-sky-600"><span>' + trx.paymentMethod + '</span><span>' + _formatIDR(cash) + '</span></div>';
+    html += '<div class="flex justify-between font-bold text-base pt-1"><span>TOTAL</span><span>' + _fmtIDR(trx.total) + '</span></div>' +
+      '<div class="flex justify-between text-sky-600"><span>' + trx.paymentMethod + '</span><span>' + _fmtIDR(cash) + '</span></div>';
 
     if (trx.paymentMethod === 'Tunai' && change > 0) {
-      html += '<div class="flex justify-between font-semibold text-green-600"><span>Kembalian</span><span>' + _formatIDR(change) + '</span></div>';
+      html += '<div class="flex justify-between font-semibold text-green-600"><span>Kembalian</span><span>' + _fmtIDR(change) + '</span></div>';
     }
 
-    html += '</div>' +
-      '<div class="border-t border-dashed border-sky-300 my-3"></div>' +
+    html += '</div><div class="border-t border-dashed border-sky-300 my-3"></div>' +
       '<div class="text-center text-xs text-slate-400">Terima kasih atas kunjungan Anda!</div>';
 
     var receiptContent = document.getElementById('receipt-modal-content');
@@ -544,94 +543,25 @@ var FastFood = (function() {
 
     var receiptModal = document.getElementById('receipt-modal');
     if (receiptModal) receiptModal.classList.remove('hidden');
-  }
 
-  function _formatDateTime(dateStr) {
-    if (typeof formatDateTime === 'function') return formatDateTime(dateStr);
-    var d = new Date(dateStr);
-    return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }) + ' ' +
-           d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-  }
-
-  // ===== MODE SWITCHING =====
-
-  /**
-   * Buka Fast Food Mode.
-   * Dipanggil dari tombol "FRIED CHICKEN" di UI.
-   * TIDAK memanggil switchOrderMode() dari sistem utama.
-   */
-  function openFastFoodMode() {
-    _isFFMode = true;
-
-    // Reset mode tabs (nonaktifkan dine-in dan takeaway)
-    var dineinBtn = document.getElementById('mode-dinein');
-    var takeawayBtn = document.getElementById('mode-takeaway');
-    if (dineinBtn) dineinBtn.className = 'order-mode-tab flex-1 py-3 rounded-xl font-bold text-sm bg-white text-gray-500 border-2 border-gray-200';
-    if (takeawayBtn) takeawayBtn.className = 'order-mode-tab flex-1 py-3 rounded-xl font-bold text-sm bg-white text-gray-500 border-2 border-gray-200';
-
-    // Sembunyikan section dine-in dan takeaway
-    var dineinSection = document.getElementById('section-dinein');
-    var takeawaySection = document.getElementById('section-takeaway');
-    if (dineinSection) dineinSection.classList.add('hidden');
-    if (takeawaySection) takeawaySection.classList.add('hidden');
-
-    // Tampilkan section fast food
-    var ffSection = document.getElementById('section-fastfood');
-    if (ffSection) ffSection.classList.remove('hidden');
-
-    // Reset currentTableId agar tidak ada meja aktif
-    if (typeof currentTableMode !== 'undefined') {
-      // We don't touch currentOrderMode to avoid confusion
+    // Simpan sebagai lastReceiptTrx agar cetak ulang bisa pakai sistem existing
+    if (typeof lastReceiptTrx !== 'undefined') {
+      // Simpan trx ke variabel global untuk thermal printer
+      window.lastReceiptTrx = trx;
     }
-
-    // Render UI Fast Food
-    _renderFFUI();
-  }
-
-  /**
-   * Keluar dari Fast Food Mode (dipanggil saat user klik Dine-in atau Takeaway)
-   */
-  function exitFastFoodMode() {
-    _isFFMode = false;
-    _cart = []; // Reset keranjang
-
-    // Sembunyikan section fast food
-    var ffSection = document.getElementById('section-fastfood');
-    if (ffSection) ffSection.classList.add('hidden');
-
-    // Reset FF mode button style
-    var ffBtn = document.getElementById('mode-fastfood');
-    if (ffBtn) ffBtn.className = 'order-mode-tab flex-1 py-3 rounded-xl font-bold text-sm bg-white text-orange-500 border-2 border-orange-200 hover:border-orange-400';
-  }
-
-  /**
-   * Cek apakah sedang dalam fast food mode
-   * @returns {boolean}
-   */
-  function isFFMode() {
-    return _isFFMode;
   }
 
   // ===== UI RENDERING =====
 
-  /**
-   * Render seluruh UI Fast Food
-   */
-  function _renderFFUI() {
+  function _renderAll() {
     _renderFFCart();
     _renderFFMenu();
     _renderFFQueueDisplay();
   }
 
-  /**
-   * Render keranjang Fast Food di panel
-   */
   function _renderFFCart() {
     var panel = document.getElementById('ff-cart-panel');
     if (!panel) return;
-
-    var total = getCartTotal();
-    var totalItems = getCartItemCount();
 
     if (_cart.length === 0) {
       panel.innerHTML = '<div class="flex-1 flex flex-col items-center justify-center py-8 text-slate-400">' +
@@ -640,20 +570,21 @@ var FastFood = (function() {
       return;
     }
 
+    var total = getCartTotal();
+    var totalItems = getCartItemCount();
+
     var itemsHtml = _cart.map(function(item) {
       return '<div class="flex items-center gap-2 bg-orange-50 rounded-xl p-2">' +
         '<div class="flex-1 min-w-0">' +
           '<div class="text-sm font-semibold text-gray-800 truncate">' + item.nama_menu + '</div>' +
-          '<div class="text-xs text-orange-500">' + _formatIDR(item.harga) + '</div>' +
+          '<div class="text-xs text-orange-500">' + _fmtIDR(item.harga) + '</div>' +
         '</div>' +
         '<div class="flex items-center gap-1">' +
           '<button onclick="FastFood.updateQty(\'' + item.id + '\', -1)" class="w-7 h-7 rounded-lg bg-orange-200 flex items-center justify-center text-orange-700 hover:bg-orange-300 transition text-xs"><i class="fas fa-minus"></i></button>' +
           '<span class="w-8 text-center font-bold text-sm text-gray-800">' + item.qty + '</span>' +
           '<button onclick="FastFood.updateQty(\'' + item.id + '\', 1)" class="w-7 h-7 rounded-lg bg-orange-500 flex items-center justify-center text-white hover:bg-orange-600 transition text-xs"><i class="fas fa-plus"></i></button>' +
         '</div>' +
-        '<div class="text-right min-w-[70px]">' +
-          '<div class="text-sm font-bold text-gray-800">' + _formatIDR(item.harga * item.qty) + '</div>' +
-        '</div>' +
+        '<div class="text-right min-w-[70px]"><div class="text-sm font-bold text-gray-800">' + _fmtIDR(item.harga * item.qty) + '</div></div>' +
         '<button onclick="FastFood.removeItem(\'' + item.id + '\')" class="text-red-400 hover:text-red-600 ml-1"><i class="fas fa-xmark text-xs"></i></button>' +
       '</div>';
     }).join('');
@@ -666,107 +597,85 @@ var FastFood = (function() {
       '<div class="border-t border-orange-200 pt-3">' +
         '<div class="flex justify-between items-center mb-3">' +
           '<span class="text-gray-500 font-medium">Total (' + totalItems + ' item)</span>' +
-          '<span class="text-lg font-bold text-gray-800">' + _formatIDR(total) + '</span>' +
+          '<span class="text-lg font-bold text-gray-800">' + _fmtIDR(total) + '</span>' +
         '</div>' +
         '<button onclick="FastFood.openFFPaymentModal()" class="w-full py-3 bg-orange-500 text-white rounded-xl font-bold hover:bg-orange-600 transition shadow-md active:scale-[0.98]">' +
-          '<i class="fas fa-bolt mr-2"></i>Bayar Sekarang' +
-        '</button>' +
+          '<i class="fas fa-bolt mr-2"></i>Bayar Sekarang</button>' +
       '</div>';
   }
 
-  /**
-   * Render menu grid untuk fast food
-   */
   function _renderFFMenu() {
     var grid = document.getElementById('ff-menu-grid');
     if (!grid) return;
 
-    if (typeof menuData === 'undefined' || !menuData) {
-      grid.innerHTML = '<div class="col-span-full text-center text-slate-400 py-8"><i class="fas fa-spinner fa-spin text-2xl mb-2"></i><p class="text-sm">Memuat menu...</p></div>';
+    var ffMenus = getMenuByMode('fast_food');
+
+    // Filter search
+    var searchInput = document.getElementById('ff-menu-search');
+    var searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
+    // Filter kategori
+    var filtered = ffMenus.filter(function(item) {
+      var matchSearch = !searchTerm || item.nama_menu.toLowerCase().includes(searchTerm);
+      var matchCat = _ffActiveCategory === 'Semua' || item.kategori === _ffActiveCategory;
+      return matchSearch && matchCat;
+    });
+
+    if (ffMenus.length === 0) {
+      grid.innerHTML = '<div class="col-span-full text-center py-8">' +
+        '<div class="text-3xl mb-2"><i class="fas fa-fire text-orange-300"></i></div>' +
+        '<p class="text-sm text-slate-500 mb-1">Belum ada menu Fast Food</p>' +
+        '<p class="text-xs text-slate-400">Tambahkan menu Fast Food di halaman Menu</p></div>';
       return;
     }
-
-    // Filter berdasarkan search
-    var searchTerm = '';
-    var searchInput = document.getElementById('ff-menu-search');
-    if (searchInput) searchTerm = searchInput.value.toLowerCase().trim();
-
-    // Filter berdasarkan kategori aktif
-    var activeCategory = _ffActiveCategory || 'Semua';
-    var filtered = menuData.filter(function(item) {
-      var matchSearch = !searchTerm || item.nama_menu.toLowerCase().includes(searchTerm);
-      var matchCategory = activeCategory === 'Semua' || item.kategori === activeCategory;
-      return matchSearch && matchCategory;
-    });
 
     if (filtered.length === 0) {
       grid.innerHTML = '<div class="col-span-full text-center text-slate-400 py-8"><i class="fas fa-search text-2xl mb-2"></i><p class="text-sm">Menu tidak ditemukan</p></div>';
       return;
     }
 
-    // Cek item yang ada di keranjang
     var cartQtyMap = {};
-    _cart.forEach(function(item) {
-      cartQtyMap[item.id] = item.qty;
-    });
+    _cart.forEach(function(item) { cartQtyMap[item.id] = item.qty; });
 
     grid.innerHTML = filtered.map(function(item) {
       var qty = cartQtyMap[item.id] || 0;
       var badgeClass = qty > 0 ? 'bg-orange-500 text-white' : 'bg-orange-100 text-orange-600';
       var icon = _getCategoryIcon(item.kategori);
       var borderClass = qty > 0 ? 'border-orange-400 ring-1 ring-orange-200' : 'border-gray-200 hover:border-orange-300';
+
+      // Cek foto
+      var photo = (typeof menuPhotoCache !== 'undefined' && menuPhotoCache) ? menuPhotoCache[item.id] : null;
+
+      if (photo) {
+        return '<div class="rounded-xl border transition cursor-pointer active:scale-95 hover:shadow-lg overflow-hidden bg-white ' + borderClass + '" onclick="FastFood.addToCart(\'' + item.id + '\')">' +
+          '<div class="relative">' +
+            '<img src="' + photo + '" class="w-full h-24 object-cover" alt="' + item.nama_menu + '" loading="lazy">' +
+            (qty > 0 ? '<span class="absolute top-1.5 right-1.5 text-xs font-bold px-2 py-0.5 rounded-full ' + badgeClass + '">' + qty + '</span>' : '') +
+          '</div>' +
+          '<div class="p-2">' +
+            '<div class="text-sm font-semibold text-gray-800 leading-tight mb-0.5 truncate">' + item.nama_menu + '</div>' +
+            '<div class="text-xs font-bold text-orange-600">' + _fmtIDR(item.harga) + '</div>' +
+          '</div></div>';
+      }
+
       return '<div class="rounded-xl p-3 border transition cursor-pointer active:scale-95 hover:shadow-md bg-white ' + borderClass + '" onclick="FastFood.addToCart(\'' + item.id + '\')">' +
         '<div class="flex items-start justify-between mb-1">' +
           '<div class="text-2xl"><i class="fas ' + icon + ' text-orange-400"></i></div>' +
           (qty > 0 ? '<span class="text-xs font-bold px-2 py-0.5 rounded-full ' + badgeClass + '">' + qty + '</span>' : '') +
         '</div>' +
         '<div class="text-sm font-semibold text-gray-800 leading-tight mb-1 truncate">' + item.nama_menu + '</div>' +
-        '<div class="text-xs font-bold text-orange-600">' + _formatIDR(item.harga) + '</div>' +
+        '<div class="text-xs font-bold text-orange-600">' + _fmtIDR(item.harga) + '</div>' +
       '</div>';
     }).join('');
   }
 
-  // State untuk kategori aktif fast food
-  var _ffActiveCategory = 'Semua';
-
-  /**
-   * Set kategori menu untuk fast food
-   * @param {string} category
-   */
-  function setCategory(category) {
-    _ffActiveCategory = category;
-
-    // Update UI tombol kategori
-    var cats = ['Semua', 'Minuman', 'Makanan', 'Lainnya'];
-    var catIcons = { 'Semua': 'fa-grip', 'Minuman': 'fa-mug-hot', 'Makanan': 'fa-utensils', 'Lainnya': 'fa-cookie' };
-    var catLabels = { 'Semua': 'Semua', 'Minuman': 'Minuman', 'Makanan': 'Makanan', 'Lainnya': 'Lainnya' };
-
-    cats.forEach(function(cat) {
-      var btn = document.getElementById('ff-cat-' + cat);
-      if (btn) {
-        if (cat === category) {
-          btn.className = 'cat-btn tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-orange-500 text-white';
-        } else {
-          btn.className = 'cat-btn tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-white text-orange-600 border border-orange-200';
-        }
-      }
-    });
-
-    _renderFFMenu();
-  }
-
-  /**
-   * Render daftar antrian hari ini
-   */
   function _renderFFQueueDisplay() {
     var container = document.getElementById('ff-queue-list');
     if (!container) return;
 
     var key = _getQueueListKey();
     var list = [];
-    try {
-      list = JSON.parse(localStorage.getItem(key)) || [];
-    } catch(e) { /* ignore */ }
+    try { list = JSON.parse(localStorage.getItem(key)) || []; } catch(e) {}
 
     var lastQueue = getLastQueueNumber();
     var nextQueueEl = document.getElementById('ff-next-queue');
@@ -780,16 +689,10 @@ var FastFood = (function() {
       return;
     }
 
-    // Tampilkan maksimal 20 antrian terakhir
     var displayList = list.slice(0, 20);
-
     container.innerHTML = displayList.map(function(item, idx) {
       var timeStr = '';
-      try {
-        var d = new Date(item.time);
-        timeStr = d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-      } catch(e) { timeStr = item.time; }
-
+      try { var d = new Date(item.time); timeStr = d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }); } catch(e) { timeStr = item.time; }
       var isNew = idx === 0;
       var bgClass = isNew ? 'bg-orange-50 border-orange-300' : 'bg-white border-gray-100';
       var numClass = isNew ? 'text-orange-600 font-bold' : 'text-gray-500';
@@ -800,9 +703,7 @@ var FastFood = (function() {
           '<span class="text-xs text-gray-400">' + timeStr + '</span>' +
           (isNew ? '<span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-green-100 text-green-600">BARU</span>' : '') +
         '</div>' +
-        '<div class="text-right">' +
-          '<span class="text-xs font-semibold text-gray-700">' + _formatIDR(item.total) + '</span>' +
-        '</div>' +
+        '<span class="text-xs font-semibold text-gray-700">' + _fmtIDR(item.total) + '</span>' +
       '</div>';
     }).join('');
 
@@ -811,7 +712,6 @@ var FastFood = (function() {
     }
   }
 
-  // ===== HELPER =====
   function _getCategoryIcon(kategori) {
     if (!kategori) return 'fa-utensils';
     var k = kategori.toLowerCase();
@@ -820,28 +720,16 @@ var FastFood = (function() {
     return 'fa-cookie';
   }
 
-  function _showToast(message, type) {
-    if (typeof showToast === 'function') {
-      showToast(message, type || 'success');
-    } else {
-      alert(message);
-    }
-  }
-
-  function _showConfirm(message, callback) {
-    if (typeof customConfirm === 'function') {
-      customConfirm(message, callback);
-    } else if (confirm) {
-      callback(confirm(message));
-    }
-  }
-
   // ===== PUBLIC API =====
   return {
     // Mode switching
-    openFastFoodMode: openFastFoodMode,
-    exitFastFoodMode: exitFastFoodMode,
+    switchMainMode: switchMainMode,
     isFFMode: isFFMode,
+    getCurrentMode: getCurrentMode,
+
+    // Menu
+    getMenuByMode: getMenuByMode,
+    getFilteredWarungMenu: getFilteredWarungMenu,
 
     // Cart
     addToCart: addToCart,
@@ -851,86 +739,243 @@ var FastFood = (function() {
     getCartTotal: getCartTotal,
     getCartItemCount: getCartItemCount,
 
+    // Category
+    setCategory: setCategory,
+
     // Payment
     openFFPaymentModal: openFFPaymentModal,
     closeFFPaymentModal: closeFFPaymentModal,
-    confirmFFPayment: createFastFoodOrder,
+    createFastFoodOrder: createFastFoodOrder,
 
     // Queue
     generateQueueNumber: generateQueueNumber,
     getLastQueueNumber: getLastQueueNumber,
 
-    // Order
-    createFastFoodOrder: createFastFoodOrder,
-
-    // Menu category
-    setCategory: setCategory,
-
-    // Internal (exposed for onclick handlers)
-    _updateFFPaymentTotal: _updateFFPaymentTotal,
-    _updateFFPayMethodUI: _updateFFPayMethodUI,
-
-    // Refresh menu (for search input oninput)
+    // UI
     refreshMenu: function() { _renderFFMenu(); },
-    getActiveCategory: function() { return _ffActiveCategory; },
-
-    // Cart state (read-only, for integration)
-    getCart: function() { return _cart.slice(); }
+    _updateFFPaymentTotal: _updateFFPaymentTotal,
+    _updateFFPayMethodUI: _updateFFPayMethodUI
   };
 
 })();
 
 
 // ============================================================
-// INTEGRASI: Patch switchOrderMode untuk mendukung fast_food
-// Dipanggil secara otomatis saat file ini dimuat.
+// INTEGRASI PATCH - Dipanggil otomatis saat file dimuat.
 // TIDAK mengubah logic existing, hanya menambah fallback.
 // ============================================================
 (function() {
-  // Simpan referensi ke fungsi original
-  var _originalSwitchOrderMode = (typeof switchOrderMode === 'function') ? switchOrderMode : null;
 
-  // Override hanya jika fungsi ada
-  if (_originalSwitchOrderMode) {
-    window.switchOrderMode = function(mode) {
-      // Jika mode fast_food, gunakan handler Fast Food
-      if (mode === 'fast_food') {
-        FastFood.openFastFoodMode();
-        return;
+  // --- 1. TAMBAHKAN switchMainMode ke global scope ---
+  window.switchMainMode = FastFood.switchMainMode;
+
+  // --- 2. TAMBAHKAN selectMenuMode ke global scope (untuk menu edit modal) ---
+  var _selectedMenuMode = 'warung';
+
+  window.selectMenuMode = function(mode) {
+    _selectedMenuMode = mode;
+    document.querySelectorAll('#menu-edit-modal [id^="mm-"]').forEach(function(btn) {
+      if (btn.id === 'mm-' + mode) {
+        btn.className = 'flex-1 py-2 rounded-xl text-sm font-semibold bg-sky-700 text-white border-2 border-sky-700 transition';
+      } else {
+        btn.className = 'flex-1 py-2 rounded-xl text-sm font-semibold bg-white text-orange-600 border-2 border-orange-200 transition';
       }
+    });
+  };
 
-      // Exit fast food mode jika sedang aktif
+  window.getSelectedMenuMode = function() { return _selectedMenuMode; };
+
+  // --- 3. PATCH selectPayMethod agar juga update FF UI ---
+  var _origSelectPayMethod = (typeof selectPayMethod === 'function') ? selectPayMethod : null;
+  if (_origSelectPayMethod) {
+    window.selectPayMethod = function(method) {
+      _origSelectPayMethod(method);
       if (FastFood.isFFMode()) {
-        FastFood.exitFastFoodMode();
+        FastFood._updateFFPayMethodUI();
+        FastFood._updateFFPaymentTotal();
       }
-
-      // Panggil fungsi original untuk dine-in dan takeaway
-      _originalSwitchOrderMode(mode);
     };
-
-    // Patch selectPayMethod agar juga update FF UI
-    var _originalSelectPayMethod = (typeof selectPayMethod === 'function') ? selectPayMethod : null;
-    if (_originalSelectPayMethod) {
-      window.selectPayMethod = function(method) {
-        _originalSelectPayMethod(method);
-        // Jika sedang di fast food mode, update UI
-        if (FastFood.isFFMode()) {
-          if (typeof FastFood._updateFFPayMethodUI === 'function') FastFood._updateFFPayMethodUI();
-          if (typeof FastFood._updateFFPaymentTotal === 'function') FastFood._updateFFPaymentTotal();
-        }
-      };
-    }
   }
 
-  // Override closePaymentModal untuk restore FF handler
-  var _originalClosePaymentModal = (typeof closePaymentModal === 'function') ? closePaymentModal : null;
-  if (_originalClosePaymentModal) {
+  // --- 4. PATCH closePaymentModal agar restore FF handler ---
+  var _origClosePaymentModal = (typeof closePaymentModal === 'function') ? closePaymentModal : null;
+  if (_origClosePaymentModal) {
     window.closePaymentModal = function() {
       if (FastFood.isFFMode()) {
         FastFood.closeFFPaymentModal();
         return;
       }
-      _originalClosePaymentModal();
+      _origClosePaymentModal();
     };
   }
+
+  // --- 5. PATCH openMenuModal (addMenuItem) untuk reset mode ke warung ---
+  // Cari fungsi yang membuka menu modal untuk tambah menu baru
+  // Variable ini digunakan di saveMenuFormItem untuk include mode field
+  var _origSaveMenuFormItem = (typeof saveMenuFormItem === 'function') ? saveMenuFormItem : null;
+  if (_origSaveMenuFormItem) {
+    window.saveMenuFormItem = function() {
+      var editId = document.getElementById('menu-edit-id').value;
+      var name = document.getElementById('menu-edit-name').value.trim();
+      var price = parseInt(document.getElementById('menu-edit-price').value) || 0;
+
+      if (!name) { showToast('Nama menu wajib diisi', 'error'); return; }
+      if (price <= 0) { showToast('Harga harus lebih dari 0', 'error'); return; }
+
+      var saveBtn = document.getElementById('save-menu-btn');
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '<span class="spinner-dark"></span> Menyimpan...';
+
+      var photo = (typeof currentMenuPhoto !== 'undefined') ? currentMenuPhoto : null;
+      var mode = _selectedMenuMode; // 'warung' atau 'fast_food'
+
+      try {
+        var savedId;
+        if (editId) {
+          // EDIT: update menu termasuk mode
+          if (typeof updateMenuItemInLS === 'function') {
+            updateMenuItemInLS(editId, { nama_menu: name, harga: price, kategori: selectedMenuKategori, mode: mode });
+          }
+          if (typeof menuData !== 'undefined') {
+            var idx = menuData.findIndex(function(m) { return m.id === editId; });
+            if (idx >= 0) {
+              menuData[idx] = Object.assign({}, menuData[idx], { nama_menu: name, harga: price, kategori: selectedMenuKategori, mode: mode });
+            }
+          }
+          savedId = editId;
+          showToast('Menu berhasil diperbarui');
+        } else {
+          // ADD: buat menu baru dengan mode
+          var newItem = { nama_menu: name, harga: price, kategori: selectedMenuKategori, mode: mode };
+          var newId;
+          if (typeof addMenuItemToLS === 'function') {
+            newId = addMenuItemToLS(newItem);
+          } else {
+            newId = 'M' + Date.now().toString(36).toUpperCase();
+          }
+          newItem.id = newId;
+          if (typeof menuData !== 'undefined') {
+            menuData.push(newItem);
+            menuData.sort(function(a, b) { return a.nama_menu.localeCompare(b.nama_menu); });
+          }
+          savedId = newId;
+          showToast('Menu berhasil ditambahkan');
+        }
+
+        // Simpan foto
+        if (photo) {
+          if (typeof menuPhotoCache !== 'undefined') menuPhotoCache[savedId] = photo;
+          if (typeof saveMenuPhotoToIDB === 'function') saveMenuPhotoToIDB(savedId, photo);
+        } else if (editId) {
+          if (typeof menuPhotoCache !== 'undefined') delete menuPhotoCache[editId];
+          if (typeof deleteMenuPhotoFromIDB === 'function') deleteMenuPhotoFromIDB(editId);
+        }
+
+        if (typeof closeMenuModal === 'function') closeMenuModal();
+        if (typeof renderMenuManagement === 'function') renderMenuManagement();
+        if (typeof renderMenuGrid === 'function') renderMenuGrid();
+
+        // Refresh fast food menu juga jika sedang di mode fast food
+        if (FastFood.isFFMode()) FastFood.refreshMenu();
+
+      } catch (error) {
+        console.error('Save menu error:', error);
+        showToast('Gagal menyimpan menu', 'error');
+      }
+
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = '<i class="fas fa-floppy-disk mr-2"></i> Simpan';
+    };
+  }
+
+  // --- 6. PATCH editMenuItem untuk load mode ---
+  var _origEditMenuItem = (typeof editMenuItem === 'function') ? editMenuItem : null;
+  if (_origEditMenuItem) {
+    window.editMenuItem = function(docId) {
+      _origEditMenuItem(docId);
+      // Set mode berdasarkan data menu yang ada
+      if (typeof menuData !== 'undefined') {
+        var item = menuData.find(function(m) { return m.id === docId; });
+        if (item && item.mode) {
+          selectMenuMode(item.mode);
+        } else {
+          selectMenuMode('warung'); // default
+        }
+      }
+    };
+  }
+
+  // --- 7. PATCH openMenuModal (add new) untuk reset mode ke warung ---
+  // Cari fungsi yang dipanggil saat tambah menu baru
+  var _origOpenMenuModal = null;
+  // Function ini biasanya inline di onclick atau bernama addMenuItem
+  if (typeof addMenuItem === 'function') {
+    _origOpenMenuModal = addMenuItem;
+    window.addMenuItem = function() {
+      _origOpenMenuModal();
+      selectMenuMode('warung'); // default mode saat tambah baru
+    };
+  }
+
+  // --- 8. WRAP renderMenuGrid untuk filter berdasarkan mode ---
+  // Saat di mode warung: hanya tampilkan menu warung
+  // Saat di mode fast food: jangan tampilkan (ada menu grid sendiri)
+  var _origRenderMenuGrid = (typeof renderMenuGrid === 'function') ? renderMenuGrid : null;
+  if (_origRenderMenuGrid) {
+    window.renderMenuGrid = function() {
+      if (FastFood.isFFMode()) {
+        // Saat fast food mode, kosongkan warung menu grid
+        var menuGrid = document.getElementById('menu-grid');
+        if (menuGrid) menuGrid.innerHTML = '';
+        return;
+      }
+
+      // Saat warung mode, filter menu yang mode-nya bukan fast_food
+      var origMenuData = (typeof menuData !== 'undefined') ? menuData : [];
+      if (typeof window !== 'undefined') {
+        window._warungFilteredMenu = origMenuData.filter(function(item) {
+          return item.mode !== 'fast_food';
+        });
+      }
+
+      // Temporarily swap menuData untuk render warung only
+      // Kita tidak bisa mengubah menuData langsung (referensi), jadi
+      // kita override di scope fungsi ini saja
+      _origRenderMenuGrid();
+    };
+  }
+
+  // --- 9. PATCH addToCart untuk cek mode ---
+  // Saat fast food mode, addToCart harus ke FastFood.addToCart
+  var _origAddToCart = (typeof addToCart === 'function') ? addToCart : null;
+  if (_origAddToCart) {
+    window.addToCart = function(menuId) {
+      if (FastFood.isFFMode()) {
+        FastFood.addToCart(menuId);
+        return;
+      }
+      // Saat warung mode, cek apakah menu ini fast_food (seharusnya tidak bisa)
+      if (typeof menuData !== 'undefined') {
+        var item = menuData.find(function(m) { return m.id === menuId; });
+        if (item && item.mode === 'fast_food') {
+          // Menu fast food tidak bisa diakses dari warung mode
+          return;
+        }
+      }
+      _origAddToCart(menuId);
+    };
+  }
+
+  // --- 10. PATCH refreshUI untuk handle fast food mode ---
+  var _origRefreshUI = (typeof refreshUI === 'function') ? refreshUI : null;
+  if (_origRefreshUI) {
+    window.refreshUI = function() {
+      if (FastFood.isFFMode()) {
+        FastFood.refreshMenu();
+        return;
+      }
+      _origRefreshUI();
+    };
+  }
+
 })();
