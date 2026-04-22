@@ -59,12 +59,12 @@ var FastFood = (function() {
 
   function _genId() {
     if (typeof generateId === 'function') return generateId();
-    return 'M' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substr(2, 4).toUpperCase();
+    return 'M' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substring(2, 6).toUpperCase();
   }
 
   function _genTrxId() {
     if (typeof generateTrxId === 'function') return generateTrxId();
-    return 'TRX' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substr(2, 3).toUpperCase();
+    return 'TRX' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substring(2, 5).toUpperCase();
   }
 
   function _formatDateTime(dateStr) {
@@ -932,16 +932,20 @@ var FastFood = (function() {
 
       // Saat warung mode, filter menu yang mode-nya bukan fast_food
       var origMenuData = (typeof menuData !== 'undefined') ? menuData : [];
-      if (typeof window !== 'undefined') {
-        window._warungFilteredMenu = origMenuData.filter(function(item) {
-          return item.mode !== 'fast_food';
-        });
-      }
+      var warungOnly = origMenuData.filter(function(item) {
+        return !item.mode || item.mode === 'warung';
+      });
 
-      // Temporarily swap menuData untuk render warung only
-      // Kita tidak bisa mengubah menuData langsung (referensi), jadi
-      // kita override di scope fungsi ini saja
-      _origRenderMenuGrid();
+      // Temporarily swap menuData agar renderMenuGrid asli hanya menampilkan warung items
+      if (typeof window !== 'undefined') {
+        window._warungFilteredMenu = warungOnly;
+        window.menuData = warungOnly;
+        _origRenderMenuGrid();
+        // Restore original menuData
+        window.menuData = origMenuData;
+      } else {
+        _origRenderMenuGrid();
+      }
     };
   }
 
@@ -975,6 +979,27 @@ var FastFood = (function() {
         return;
       }
       _origRefreshUI();
+    };
+  }
+
+  // --- 11. PATCH generateThermalReceiptHTML untuk Fast Food ---
+  // Agar struk thermal menampilkan nomor antrian (FC-XXX) bukan "Meja Fast Food"
+  var _origGenThermal = (typeof generateThermalReceiptHTML === 'function') ? generateThermalReceiptHTML : null;
+  if (_origGenThermal) {
+    window.generateThermalReceiptHTML = function(trx) {
+      // Jika ini transaksi fast food, patch table field sebelum render
+      if (trx && trx.orderType === 'fast_food' && trx.queueNumber) {
+        var patchedTrx = Object.assign({}, trx);
+        patchedTrx._isFastFood = true;
+        patchedTrx._queueNumber = trx.queueNumber;
+        // Set table ke format yang bisa dikenali
+        patchedTrx.table = '__FASTFOOD__' + trx.queueNumber;
+        var html = _origGenThermal(patchedTrx);
+        // Replace "Meja __FASTFOOD__FC-001" dengan "Antrian FC-001"
+        html = html.replace(/Meja __FASTFOOD__(FC-\d+)/g, 'Antrian $1');
+        return html;
+      }
+      return _origGenThermal(trx);
     };
   }
 
