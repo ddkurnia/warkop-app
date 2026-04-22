@@ -1491,19 +1491,27 @@
       <div id="page-kasir" class="page active">
         <div class="max-w-7xl mx-auto p-4">
 
-          <!-- ORDER MODE TABS -->
+          <!-- MAIN MODE TABS: WARUNG / FAST FOOD -->
           <div class="flex gap-2 mb-4">
-            <button onclick="switchOrderMode('dine-in')" id="mode-dinein" class="order-mode-tab flex-1 py-3 rounded-xl font-bold text-sm bg-sky-600 text-white shadow-md active-mode">
-              <i class="fas fa-couch mr-2"></i> Di Tempat
+            <button onclick="switchMainMode('warung')" id="mode-warung" class="main-mode-tab flex-1 py-3 rounded-xl font-bold text-sm bg-sky-600 text-white shadow-md active-main-mode">
+              <i class="fas fa-mug-hot mr-2"></i> WARUNG
             </button>
-            <button onclick="switchOrderMode('takeaway')" id="mode-takeaway" class="order-mode-tab flex-1 py-3 rounded-xl font-bold text-sm bg-white text-gray-500 border-2 border-gray-200">
-              <i class="fas fa-bag-shopping mr-2"></i> Bungkus (Take Away)
-            </button>
-            <!-- === FAST FOOD MODE === -->
-            <button onclick="switchOrderMode('fast_food')" id="mode-fastfood" class="order-mode-tab flex-1 py-3 rounded-xl font-bold text-sm bg-white text-orange-500 border-2 border-orange-200 hover:border-orange-400">
-              <i class="fas fa-fire mr-2"></i> FRIED CHICKEN
+            <button onclick="switchMainMode('fast_food')" id="mode-fastfood" class="main-mode-tab flex-1 py-3 rounded-xl font-bold text-sm bg-white text-orange-500 border-2 border-orange-200 hover:border-orange-400">
+              <i class="fas fa-fire mr-2"></i> FAST FOOD
             </button>
           </div>
+
+          <!-- ===== WARUNG CONTENT (existing system, unchanged) ===== -->
+          <div id="warung-content">
+            <!-- Warung Sub-tabs: Dine-in / Takeaway -->
+            <div id="warung-subtabs" class="flex gap-2 mb-4">
+              <button onclick="switchOrderMode('dine-in')" id="mode-dinein" class="order-mode-tab flex-1 py-3 rounded-xl font-bold text-sm bg-sky-600 text-white shadow-md active-mode">
+                <i class="fas fa-couch mr-2"></i> Di Tempat
+              </button>
+              <button onclick="switchOrderMode('takeaway')" id="mode-takeaway" class="order-mode-tab flex-1 py-3 rounded-xl font-bold text-sm bg-white text-gray-500 border-2 border-gray-200">
+                <i class="fas fa-bag-shopping mr-2"></i> Bungkus (Take Away)
+              </button>
+            </div>
 
           <div class="flex flex-col lg:flex-row gap-4">
             <div class="flex-1 min-w-0">
@@ -1536,57 +1544,6 @@
                 <div id="takeaway-grid" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-2.5"></div>
               </div>
 
-              <!-- === FAST FOOD SECTION === -->
-              <div id="section-fastfood" class="hidden mb-4">
-                <!-- Antrian Info -->
-                <div class="bg-gradient-to-r from-orange-500 to-amber-500 rounded-xl p-4 mb-4 text-white">
-                  <div class="flex items-center justify-between">
-                    <div>
-                      <div class="text-xs font-semibold opacity-80">Antrian Selanjutnya</div>
-                      <div id="ff-next-queue" class="text-2xl font-black">FC-001</div>
-                    </div>
-                    <div class="text-right">
-                      <div id="ff-queue-count" class="text-xs font-semibold opacity-80">0 transaksi hari ini</div>
-                      <div class="mt-1"><i class="fas fa-fire-flame-curved text-xl opacity-60"></i></div>
-                    </div>
-                  </div>
-                </div>
-                <!-- Antrian List -->
-                <details class="mb-4 bg-white rounded-xl border border-orange-100 overflow-hidden">
-                  <summary class="px-4 py-2.5 cursor-pointer text-sm font-semibold text-orange-700 hover:bg-orange-50 transition">
-                    <i class="fas fa-list-ol mr-2"></i>Daftar Antrian Hari Ini
-                  </summary>
-                  <div id="ff-queue-list" class="px-3 pb-3 space-y-1 max-h-60 overflow-y-auto">
-                    <div class="text-center text-slate-400 py-4 text-sm">Belum ada antrian hari ini</div>
-                  </div>
-                </details>
-                <!-- Search & Category -->
-                <div class="mb-3">
-                  <div class="relative mb-3">
-                    <i class="fas fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-orange-400"></i>
-                    <input type="text" id="ff-menu-search" placeholder="Cari menu..." class="w-full pl-10 pr-4 py-2.5 bg-white border border-orange-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400" oninput="FastFood.refreshMenu()">
-                  </div>
-                  <div class="flex gap-2">
-                    <button onclick="FastFood.setCategory('Semua')" id="ff-cat-Semua" class="cat-btn tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-orange-500 text-white">Semua</button>
-                    <button onclick="FastFood.setCategory('Minuman')" id="ff-cat-Minuman" class="cat-btn tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-white text-orange-600 border border-orange-200">Minuman</button>
-                    <button onclick="FastFood.setCategory('Makanan')" id="ff-cat-Makanan" class="cat-btn tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-white text-orange-600 border border-orange-200">Makanan</button>
-                    <button onclick="FastFood.setCategory('Lainnya')" id="ff-cat-Lainnya" class="cat-btn tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-white text-orange-600 border border-orange-200">Lainnya</button>
-                  </div>
-                </div>
-                <!-- Menu Grid -->
-                <div id="ff-menu-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 mb-4"></div>
-                <!-- Cart Panel -->
-                <div class="bg-white rounded-2xl shadow-sm border border-orange-100 p-4">
-                  <div id="ff-cart-panel">
-                    <div class="flex-1 flex flex-col items-center justify-center py-8 text-slate-400">
-                      <i class="fas fa-fire text-3xl mb-2 text-orange-300"></i>
-                      <p class="text-sm">Tap menu untuk mulai</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <!-- === END FAST FOOD SECTION === -->
-
               <!-- MENU SECTION (shared) -->
               <div class="mb-4">
                 <div class="relative mb-3">
@@ -1607,7 +1564,7 @@
               </div>
             </div>
           </div>
-        </div>
+        </div><!-- end max-w-7xl -->
         <div id="mobile-panel" class="hidden fixed inset-0 z-50 lg:hidden">
           <div class="absolute inset-0 modal-overlay" onclick="closeMobilePanel()"></div>
           <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl md:rounded-2xl shadow-2xl max-h-[85vh] md:max-h-[90vh] md:max-w-[560px] md:mx-auto md:bottom-auto md:top-1/2 md:-translate-y-1/2 md:relative md:translate-y-0 md:inset-auto flex flex-col">
@@ -1620,7 +1577,59 @@
             <div class="overflow-y-auto flex-1 p-4" id="panel-content-mobile"></div>
           </div>
         </div>
-      </div>
+      </div><!-- end warung-content -->
+
+      <!-- ===== FAST FOOD CONTENT (new module) ===== -->
+      <div id="fastfood-content" class="hidden">
+        <div class="max-w-7xl mx-auto p-4">
+          <!-- Antrian Header -->
+          <div class="bg-gradient-to-r from-orange-500 to-amber-500 rounded-xl p-4 mb-4 text-white">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="text-xs font-semibold opacity-80">Antrian Selanjutnya</div>
+                <div id="ff-next-queue" class="text-2xl font-black">FC-001</div>
+              </div>
+              <div class="text-right">
+                <div id="ff-queue-count" class="text-xs font-semibold opacity-80">0 transaksi hari ini</div>
+                <div class="mt-1"><i class="fas fa-fire-flame-curved text-xl opacity-60"></i></div>
+              </div>
+            </div>
+          </div>
+          <!-- Antrian List -->
+          <details class="mb-4 bg-white rounded-xl border border-orange-100 overflow-hidden">
+            <summary class="px-4 py-2.5 cursor-pointer text-sm font-semibold text-orange-700 hover:bg-orange-50 transition">
+              <i class="fas fa-list-ol mr-2"></i>Daftar Antrian Hari Ini
+            </summary>
+            <div id="ff-queue-list" class="px-3 pb-3 space-y-1 max-h-60 overflow-y-auto">
+              <div class="text-center text-slate-400 py-4 text-sm">Belum ada antrian hari ini</div>
+            </div>
+          </details>
+          <!-- Search -->
+          <div class="mb-3">
+            <div class="relative mb-3">
+              <i class="fas fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-orange-400"></i>
+              <input type="text" id="ff-menu-search" placeholder="Cari menu..." class="w-full pl-10 pr-4 py-2.5 bg-white border border-orange-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-orange-400" oninput="FastFood.refreshMenu()">
+            </div>
+            <div class="flex gap-2">
+              <button onclick="FastFood.setCategory('Semua')" id="ff-cat-Semua" class="cat-btn tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-orange-500 text-white">Semua</button>
+              <button onclick="FastFood.setCategory('Minuman')" id="ff-cat-Minuman" class="cat-btn tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-white text-orange-600 border border-orange-200">Minuman</button>
+              <button onclick="FastFood.setCategory('Makanan')" id="ff-cat-Makanan" class="cat-btn tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-white text-orange-600 border border-orange-200">Makanan</button>
+              <button onclick="FastFood.setCategory('Lainnya')" id="ff-cat-Lainnya" class="cat-btn tab-btn flex-1 py-2 rounded-xl text-xs font-semibold bg-white text-orange-600 border border-orange-200">Lainnya</button>
+            </div>
+          </div>
+          <!-- Menu Grid -->
+          <div id="ff-menu-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2 mb-4"></div>
+          <!-- Cart Panel -->
+          <div class="bg-white rounded-2xl shadow-sm border border-orange-100 p-4">
+            <div id="ff-cart-panel">
+              <div class="flex-1 flex flex-col items-center justify-center py-8 text-slate-400">
+                <i class="fas fa-fire text-3xl mb-2 text-orange-300"></i>
+                <p class="text-sm">Tap menu untuk mulai</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- end fastfood-content -->
 
       <!-- PAGE: RIWAYAT -->
       <div id="page-riwayat" class="page">
@@ -1937,9 +1946,17 @@
           <div>
             <label class="block text-sm font-semibold text-sky-700 mb-2">Kategori</label>
             <div class="flex gap-2">
-              <button onclick="selectMenuKategori('Minuman')" id="mk-Minuman" class="flex-1 py-2 rounded-xl text-sm font-semibold bg-sky-700 text-white border-2 border-sky-700 transition">☕ Minuman</button>
-              <button onclick="selectMenuKategori('Makanan')" id="mk-Makanan" class="flex-1 py-2 rounded-xl text-sm font-semibold bg-white text-sky-600 border-2 border-sky-200 transition">🍽 Makanan</button>
-              <button onclick="selectMenuKategori('Lainnya')" id="mk-Lainnya" class="flex-1 py-2 rounded-xl text-sm font-semibold bg-white text-sky-600 border-2 border-sky-200 transition">🥨 Lainnya</button>
+              <button onclick="selectMenuKategori('Minuman')" id="mk-Minuman" class="flex-1 py-2 rounded-xl text-sm font-semibold bg-sky-700 text-white border-2 border-sky-700 transition">Minuman</button>
+              <button onclick="selectMenuKategori('Makanan')" id="mk-Makanan" class="flex-1 py-2 rounded-xl text-sm font-semibold bg-white text-sky-600 border-2 border-sky-200 transition">Makanan</button>
+              <button onclick="selectMenuKategori('Lainnya')" id="mk-Lainnya" class="flex-1 py-2 rounded-xl text-sm font-semibold bg-white text-sky-600 border-2 border-sky-200 transition">Lainnya</button>
+            </div>
+          </div>
+          <!-- Mode: Warung / Fast Food -->
+          <div>
+            <label class="block text-sm font-semibold text-sky-700 mb-2">Mode</label>
+            <div class="flex gap-2">
+              <button onclick="selectMenuMode('warung')" id="mm-warung" class="flex-1 py-2 rounded-xl text-sm font-semibold bg-sky-700 text-white border-2 border-sky-700 transition"><i class="fas fa-mug-hot mr-1"></i>Warung</button>
+              <button onclick="selectMenuMode('fast_food')" id="mm-fast_food" class="flex-1 py-2 rounded-xl text-sm font-semibold bg-white text-orange-600 border-2 border-orange-200 transition"><i class="fas fa-fire mr-1"></i>Fast Food</button>
             </div>
           </div>
           <button onclick="saveMenuFormItem()" id="save-menu-btn" class="w-full py-3 bg-sky-700 text-white rounded-xl font-bold hover:bg-sky-800 transition"><i class="fas fa-floppy-disk mr-2"></i> Simpan</button>
