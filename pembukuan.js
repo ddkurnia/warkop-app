@@ -540,21 +540,30 @@ var Pembukuan = (function() {
   }
 
   // =============================================
-  // INJECT POS SWITCH BUTTON
+  // INJECT PEMBUKUAN NAV BUTTON INTO POS
   // =============================================
   function _injectPOSSwitchBtn() {
-    if (document.getElementById('pb-switch-btn')) return;
-    // Find POS header and inject a small switch button
-    var header = document.querySelector('#pos-app > header');
-    if (!header) return;
+    // Inject tombol Pembukuan di bottom navigation bar POS
+    if (document.getElementById('nav-pembukuan')) return;
+    var navContainer = document.querySelector('#pos-app nav > div');
+    if (!navContainer) return;
+
     var btn = document.createElement('button');
-    btn.id = 'pb-switch-btn';
-    btn.onclick = function() { selectMode('pembukuan'); };
+    btn.id = 'nav-pembukuan';
+    btn.className = 'nav-btn flex-1 py-3 flex flex-col items-center gap-0.5 text-emerald-600';
+    btn.setAttribute('onclick', "selectMode('pembukuan')");
     btn.title = 'Buka Pembukuan';
-    btn.style.cssText = 'position:absolute;right:16px;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.2);border:none;color:white;width:36px;height:36px;border-radius:10px;cursor:pointer;font-size:15px;z-index:10;backdrop-filter:blur(8px)';
-    btn.innerHTML = '<i class="fas fa-book-open"></i>';
-    header.style.position = 'relative';
-    header.appendChild(btn);
+    btn.innerHTML = '<i class="fas fa-book-open text-lg"></i><span class="text-xs font-medium">Buku</span>';
+    navContainer.appendChild(btn);
+  }
+
+  // Highlight nav button when returning to POS
+  function _highlightPOSNav() {
+    var pbNav = document.getElementById('nav-pembukuan');
+    if (!pbNav) return;
+    pbNav.classList.remove('text-emerald-600', 'bg-emerald-50', 'border-t-2', 'border-emerald-600');
+    pbNav.classList.add('text-emerald-600');
+    pbNav.style.opacity = '1';
   }
 
   // =============================================
@@ -571,6 +580,8 @@ var Pembukuan = (function() {
       if (posApp) { posApp.classList.remove('hidden'); }
       if (pbView) { pbView.classList.add('hidden'); }
       localStorage.setItem(LS.appMode, 'pos');
+      // Re-inject nav button every time we return to POS (in case DOM was modified)
+      setTimeout(function() { _injectPOSSwitchBtn(); _highlightPOSNav(); }, 100);
     } else if (viewId === 'pembukuan') {
       if (posApp) { posApp.classList.add('hidden'); }
       if (pbView) { pbView.classList.remove('hidden'); }
@@ -1388,10 +1399,32 @@ var Pembukuan = (function() {
     _injectCSS();
     _injectModeSelect();
     _injectView();
-    // Inject POS switch button after a short delay (wait for POS to load)
+    // Inject POS nav button after POS loads
     setTimeout(function() {
       _injectPOSSwitchBtn();
+      _highlightPOSNav();
+      // Patch switchPage to preserve Pembukuan nav button styling
+      _patchSwitchPage();
     }, 500);
+  }
+
+  // Patch switchPage so it doesn't reset Pembukuan nav button
+  function _patchSwitchPage() {
+    var _origSwitchPage = (typeof window.switchPage === 'function') ? window.switchPage : null;
+    if (!_origSwitchPage) return;
+    var _patched = false;
+    if (window.switchPage && window.switchPage._pbPatched) return; // already patched
+
+    window.switchPage = function(page) {
+      _origSwitchPage(page);
+      // Restore Pembukuan nav button styling after switchPage resets all .nav-btn
+      var pbNav = document.getElementById('nav-pembukuan');
+      if (pbNav) {
+        pbNav.classList.remove('text-sky-600', 'bg-sky-50', 'border-sky-600', 'text-gray-400');
+        pbNav.classList.add('text-emerald-600');
+      }
+    };
+    window.switchPage._pbPatched = true;
   }
 
   // Run boot
