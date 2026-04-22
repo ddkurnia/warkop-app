@@ -2931,6 +2931,8 @@
         console.error('Error loading POS:', error);
         showToast('Gagal memuat data POS.', 'error');
       }
+      // === PEMBUKUAN: Trigger mode selection after POS loaded ===
+      if (typeof showModeSelect === 'function') setTimeout(showModeSelect, 300);
     }
 
     // ===== LOCALSTORAGE: LOAD DATA =====
@@ -6711,5 +6713,8 @@
 
   <!-- === FAST FOOD MODULE === -->
   <script src="fastfood.js"></script>
+
+  <!-- === PEMBUKUAN MODULE === -->
+  <script src="pembukuan.js"></script>
 </body>
 </html>
