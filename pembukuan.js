@@ -399,17 +399,17 @@ var Pembukuan = (function() {
 .mode-btn .mode-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px}\
 .mode-btn-pos .mode-icon{background:linear-gradient(135deg,#0EA5E9,#0369A1);color:white}\
 .mode-btn-pb .mode-icon{background:linear-gradient(135deg,#10B981,#065F46);color:white}\
-#pembukuan-view{display:flex;flex-direction:column;height:100vh;height:100dvh;height:calc(var(--vh,1vh)*100);overflow:hidden;background:#F8FAFC}\
+#pembukuan-view{display:flex!important;flex-direction:column;height:100vh;height:100dvh;height:calc(var(--vh,1vh)*100);overflow:hidden;background:#F8FAFC}\
 #pembukuan-view.hidden{display:none!important}\
-.pb-header{background:linear-gradient(135deg,#065F46,#047857);color:white;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;z-index:50;box-shadow:0 2px 8px rgba(0,0,0,0.1)}\
-.pb-subnav{background:white;border-bottom:1px solid #E5E7EB;overflow-x:auto;flex-shrink:0;z-index:40}\
+.pb-header{background:linear-gradient(135deg,#065F46,#047857);color:white;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0!important;z-index:50;box-shadow:0 2px 8px rgba(0,0,0,0.1)}\
+.pb-subnav{background:white;border-bottom:1px solid #E5E7EB;overflow-x:auto;flex-shrink:0!important;z-index:40}\
 .pb-subnav-inner{display:flex;max-width:700px;margin:0 auto}\
 .pb-nav-btn{flex:1;padding:10px 4px;border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:all .15s;border-bottom:3px solid transparent;min-width:64px}\
 .pb-nav-btn.nav-active{color:#059669;border-bottom-color:#059669;background:#ECFDF5}\
 .pb-nav-btn.nav-inactive{color:#94A3B8}\
 .pb-nav-btn i{font-size:16px}\
 .pb-nav-btn span{font-size:10px;font-weight:600}\
-.pb-content{max-width:700px;margin:0 auto;padding:16px;padding-bottom:40px;flex:1 1 0%;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}\
+.pb-content{max-width:700px;margin:0 auto;padding:16px;padding-bottom:40px;flex:1 1 0%!important;min-height:0!important;overflow-y:auto!important;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}\
 .pb-card{background:white;border-radius:16px;border:1px solid #E5E7EB;padding:16px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,0.04)}\
 .pb-card-title{font-size:14px;font-weight:700;color:#1E293B;margin-bottom:12px;display:flex;align-items:center;gap:8px}\
 .pb-stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px}\
@@ -602,7 +602,7 @@ var Pembukuan = (function() {
       }
       if (pbView) {
         pbView.classList.remove('hidden');
-        pbView.style.display = 'block';
+        pbView.style.display = '';  // let CSS display:flex take effect (NOT 'block'!)
       }
       localStorage.setItem(LS.appMode, 'pembukuan');
       if (!_initialized) {
