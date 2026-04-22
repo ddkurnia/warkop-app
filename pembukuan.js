@@ -195,7 +195,7 @@ var Pembukuan = (function() {
   // =============================================
   // INVENTORY CRUD
   // =============================================
-  function addStockItem(name, stock, unit, category) {
+  function addStockItem(name, stock, unit, category, hargaBeli, lowStock) {
     _loadInv();
     _inventory.push({
       id: _genId(),
@@ -203,6 +203,8 @@ var Pembukuan = (function() {
       stock: Number(stock) || 0,
       unit: unit || 'pcs',
       category: category || 'bahan_baku',
+      hargaBeli: Number(hargaBeli) || 0,
+      lowStock: Number(lowStock) || 5,
       createdAt: _now()
     });
     _saveInv();
@@ -216,6 +218,8 @@ var Pembukuan = (function() {
         if (updates.stock !== undefined) _inventory[i].stock = Number(updates.stock);
         if (updates.unit !== undefined) _inventory[i].unit = updates.unit;
         if (updates.category !== undefined) _inventory[i].category = updates.category;
+        if (updates.hargaBeli !== undefined) _inventory[i].hargaBeli = Number(updates.hargaBeli);
+        if (updates.lowStock !== undefined) _inventory[i].lowStock = Number(updates.lowStock);
         break;
       }
     }
@@ -331,9 +335,10 @@ var Pembukuan = (function() {
     return new Promise(function(resolve) {
       _loadSales(function(sales) {
         _loadExp();
+        _loadInv();
 
         var len = periodType === 'daily' ? 10 : 7;
-        var totalSales = 0, totalExp = 0, trxCount = 0, expCount = 0;
+        var totalSales = 0, totalExpBB = 0, totalExpOps = 0, trxCount = 0, expCount = 0;
         var filteredSales = [], filteredExp = [];
 
         for (var i = 0; i < sales.length; i++) {
@@ -348,11 +353,19 @@ var Pembukuan = (function() {
         for (var j = 0; j < _expenses.length; j++) {
           var ed = (_expenses[j].date || '').substring(0, len);
           if (ed === dateVal) {
-            totalExp += Number(_expenses[j].amount) || 0;
+            var amt = Number(_expenses[j].amount) || 0;
             expCount++;
             filteredExp.push(_expenses[j]);
+            // Separate Bahan Baku vs Operasional
+            if ((_expenses[j].category || '') === 'bahan_baku') {
+              totalExpBB += amt;
+            } else {
+              totalExpOps += amt;
+            }
           }
         }
+
+        var totalExp = totalExpBB + totalExpOps;
 
         // Group expenses by category
         var expByCat = {};
@@ -362,11 +375,20 @@ var Pembukuan = (function() {
           expByCat[cat] += Number(filteredExp[k].amount) || 0;
         }
 
+        // Calculate total inventory value (stock * hargaBeli)
+        var totalInventoryValue = 0;
+        for (var m = 0; m < _inventory.length; m++) {
+          totalInventoryValue += (_inventory[m].stock || 0) * (_inventory[m].hargaBeli || 0);
+        }
+
         resolve({
           period: dateVal,
           periodType: periodType,
           totalSales: totalSales,
           totalExpenses: totalExp,
+          totalExpBB: totalExpBB,
+          totalExpOps: totalExpOps,
+          totalInventoryValue: totalInventoryValue,
           profit: totalSales - totalExp,
           trxCount: trxCount,
           expCount: expCount,
@@ -686,8 +708,11 @@ var Pembukuan = (function() {
     _loadInv();
     var totalItems = _inventory.length;
     var lowStock = 0;
+    var totalValue = 0;
     for (var i = 0; i < _inventory.length; i++) {
-      if (_inventory[i].stock <= 5) lowStock++;
+      var threshold = _inventory[i].lowStock || 5;
+      if (_inventory[i].stock <= threshold) lowStock++;
+      totalValue += (_inventory[i].stock || 0) * (_inventory[i].hargaBeli || 0);
     }
 
     var catFilter = '\
@@ -700,13 +725,15 @@ var Pembukuan = (function() {
       }
       catFilter += '<button onclick="Pembukuan._renderStokFiltered(\'' + STOCK_CATS[c].id + '\')" class="pb-btn pb-btn-ghost pb-btn-sm" id="pb-stock-cat-' + STOCK_CATS[c].id + '">' + STOCK_CATS[c].label + ' (' + catCount + ')</button>';
     }
+    catFilter += '<button onclick="Pembukuan._renderStokFiltered(\'low_stock\')" class="pb-btn pb-btn-ghost pb-btn-sm" id="pb-stock-cat-low_stock">Stok Rendah (' + lowStock + ')</button>';
     catFilter += '</div>';
 
     container.innerHTML = '\
-      <div class="pb-stat-grid">\
+      <div class="pb-stat-grid" style="grid-template-columns:1fr 1fr 1fr 1fr">\
         <div class="pb-stat"><div class="pb-stat-label">Total Item</div><div class="pb-stat-val blue">' + totalItems + '</div></div>\
         <div class="pb-stat"><div class="pb-stat-label">Stok Rendah</div><div class="pb-stat-val red">' + lowStock + '</div></div>\
-        <div class="pb-stat"><div class="pb-stat-label">Kategori</div><div class="pb-stat-val emerald">' + STOCK_CATS.length + '</div></div>\
+        <div class="pb-stat"><div class="pb-stat-label">Nilai Stok</div><div class="pb-stat-val emerald">' + _fmtIDR(totalValue) + '</div></div>\
+        <div class="pb-stat"><div class="pb-stat-label">Kategori</div><div class="pb-stat-val">' + STOCK_CATS.length + '</div></div>\
       </div>\
       <div class="pb-card">\
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">\
@@ -733,15 +760,20 @@ var Pembukuan = (function() {
       return;
     }
 
-    var html = '<table class="pb-table"><thead><tr><th>Nama</th><th>Kategori</th><th>Stok</th><th>Aksi</th></tr></thead><tbody>';
+    var html = '<table class="pb-table"><thead><tr><th>Nama</th><th>Kategori</th><th>Stok</th><th>Harga Beli</th><th>Nilai</th><th>Aksi</th></tr></thead><tbody>';
     for (var i = 0; i < items.length; i++) {
       var item = items[i];
-      var stockColor = item.stock <= 5 ? 'color:#DC2626;font-weight:700' : 'color:#059669;font-weight:700';
+      var threshold = item.lowStock || 5;
+      var isLow = item.stock <= threshold;
+      var stockColor = isLow ? 'color:#DC2626;font-weight:700' : 'color:#059669;font-weight:700';
       var catLabel = _getCatLabel(STOCK_CATS, item.category);
+      var nilai = (item.stock || 0) * (item.hargaBeli || 0);
       html += '<tr id="pb-stock-row-' + item.id + '">\
-        <td><div style="font-weight:600;color:#1E293B">' + _escHtml(item.name) + '</div></td>\
+        <td><div style="font-weight:600;color:#1E293B">' + _escHtml(item.name) + '</div>' + (isLow ? '<div style="font-size:10px;color:#DC2626"><i class="fas fa-triangle-exclamation"></i> Min: ' + threshold + ' ' + _escHtml(item.unit) + '</div>' : '') + '</td>\
         <td><span class="pb-chip pb-chip-green">' + _escHtml(catLabel) + '</span></td>\
-        <td style="' + stockColor + '">' + item.stock + ' ' + _escHtml(item.unit) + (item.stock <= 5 ? ' <i class="fas fa-triangle-exclamation" style="color:#DC2626;font-size:10px"></i>' : '') + '</td>\
+        <td style="' + stockColor + '">' + item.stock + ' ' + _escHtml(item.unit) + '</td>\
+        <td style="font-size:11px;color:#64748B">' + (item.hargaBeli ? _fmtIDR(item.hargaBeli) + '/' + _escHtml(item.unit) : '-') + '</td>\
+        <td style="font-weight:600;color:#1E293B;font-size:12px">' + _fmtIDR(nilai) + '</td>\
         <td>\
           <button onclick="Pembukuan._showEditStockModal(\'' + item.id + '\')" class="pb-btn pb-btn-ghost pb-btn-sm" title="Edit"><i class="fas fa-pen"></i></button>\
           <button onclick="Pembukuan._adjustStockModal(\'' + item.id + '\')" class="pb-btn pb-btn-ghost pb-btn-sm" title="Sesuaikan Stok"><i class="fas fa-plus-minus"></i></button>\
@@ -755,7 +787,17 @@ var Pembukuan = (function() {
 
   function _renderStokFiltered(category) {
     _loadInv();
-    var filtered = category === 'all' ? _inventory : _inventory.filter(function(item) { return item.category === category; });
+    var filtered;
+    if (category === 'low_stock') {
+      filtered = _inventory.filter(function(item) {
+        var threshold = item.lowStock || 5;
+        return item.stock <= threshold;
+      });
+    } else if (category === 'all') {
+      filtered = _inventory;
+    } else {
+      filtered = _inventory.filter(function(item) { return item.category === category; });
+    }
 
     // Update button styles
     var buttons = document.querySelectorAll('#pb-content .pb-card .pb-btn');
@@ -832,6 +874,22 @@ var Pembukuan = (function() {
               <select id="pb-stock-unit" class="pb-select" style="width:100%">' + unitOptions + '</select>\
             </div>\
           </div>\
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">\
+            <div>\
+              <label class="pb-label">Harga Beli / ' + (isEdit ? _escHtml(item.unit) : 'unit') + '</label>\
+              <input type="number" id="pb-stock-price" class="pb-input" placeholder="0" min="0" value="' + (isEdit && item.hargaBeli ? item.hargaBeli : '') + '" oninput="Pembukuan._updateStockValuePreview()">\
+              <div style="font-size:10px;color:#94A3B8;margin-top:2px">Harga modal per satuan</div>\
+            </div>\
+            <div>\
+              <label class="pb-label">Batas Stok Rendah</label>\
+              <input type="number" id="pb-stock-low" class="pb-input" placeholder="5" min="0" value="' + (isEdit && item.lowStock ? item.lowStock : 5) + '" oninput="Pembukuan._updateStockValuePreview()">\
+              <div style="font-size:10px;color:#94A3B8;margin-top:2px">Peringatan jika stok di bawah ini</div>\
+            </div>\
+          </div>\
+          <div id="pb-stock-preview" style="background:#F0FDF4;border:1px solid #A7F3D0;border-radius:10px;padding:10px;text-align:center;display:none">\
+            <div style="font-size:11px;color:#64748B">Total Nilai Stok</div>\
+            <div style="font-size:16px;font-weight:800;color:#047857" id="pb-stock-preview-val">Rp 0</div>\
+          </div>\
           <div>\
             <label class="pb-label">Kategori</label>\
             <select id="pb-stock-cat" class="pb-select" style="width:100%">' + catOptions + '</select>\
@@ -851,18 +909,35 @@ var Pembukuan = (function() {
     var qty = document.getElementById('pb-stock-qty').value;
     var unit = document.getElementById('pb-stock-unit').value;
     var cat = document.getElementById('pb-stock-cat').value;
+    var hargaBeli = document.getElementById('pb-stock-price').value;
+    var lowStockVal = document.getElementById('pb-stock-low').value;
 
     if (!name) { alert('Nama item wajib diisi!'); return; }
     if (!qty || Number(qty) < 0) { alert('Stok harus berupa angka positif!'); return; }
 
     if (editId) {
-      editStockItem(editId, { name: name, stock: Number(qty), unit: unit, category: cat });
+      editStockItem(editId, { name: name, stock: Number(qty), unit: unit, category: cat, hargaBeli: Number(hargaBeli) || 0, lowStock: Number(lowStockVal) || 5 });
     } else {
-      addStockItem(name, Number(qty), unit, cat);
+      addStockItem(name, Number(qty), unit, cat, Number(hargaBeli) || 0, Number(lowStockVal) || 5);
     }
 
     document.querySelector('.pb-modal-bg').remove();
     _renderStok(document.getElementById('pb-content'));
+  }
+
+  function _updateStockValuePreview() {
+    var qty = Number(document.getElementById('pb-stock-qty').value) || 0;
+    var price = Number(document.getElementById('pb-stock-price').value) || 0;
+    var previewEl = document.getElementById('pb-stock-preview');
+    var previewVal = document.getElementById('pb-stock-preview-val');
+    if (!previewEl || !previewVal) return;
+    var total = qty * price;
+    if (total > 0) {
+      previewEl.style.display = 'block';
+      previewVal.textContent = _fmtIDR(total);
+    } else {
+      previewEl.style.display = 'none';
+    }
   }
 
   function _adjustStockModal(id) {
@@ -1422,16 +1497,11 @@ var Pembukuan = (function() {
       }
 
       contentEl.innerHTML = '\
-        <div class="pb-stat-grid" style="grid-template-columns:1fr 1fr 1fr">\
+        <div class="pb-stat-grid" style="grid-template-columns:1fr 1fr">\
           <div class="pb-stat" style="border-left:4px solid #0284C7">\
             <div class="pb-stat-label"><i class="fas fa-cart-shopping mr-1"></i>Penjualan</div>\
             <div class="pb-stat-val blue">' + _fmtIDR(report.totalSales) + '</div>\
             <div style="font-size:10px;color:#94A3B8;margin-top:2px">' + report.trxCount + ' transaksi</div>\
-          </div>\
-          <div class="pb-stat" style="border-left:4px solid #DC2626">\
-            <div class="pb-stat-label"><i class="fas fa-arrow-down mr-1"></i>Pengeluaran</div>\
-            <div class="pb-stat-val red">' + _fmtIDR(report.totalExpenses) + '</div>\
-            <div style="font-size:10px;color:#94A3B8;margin-top:2px">' + report.expCount + ' item</div>\
           </div>\
           <div class="pb-stat" style="border-left:4px solid ' + (report.profit >= 0 ? '#059669' : '#DC2626') + '">\
             <div class="pb-stat-label"><i class="fas ' + profitIcon + ' mr-1"></i>PROFIT</div>\
@@ -1439,13 +1509,28 @@ var Pembukuan = (function() {
             <div style="font-size:10px;color:#94A3B8;margin-top:2px">' + (report.profit >= 0 ? 'Untung' : 'Rugi') + '</div>\
           </div>\
         </div>\
+        <div class="pb-stat-grid" style="grid-template-columns:1fr 1fr 1fr">\
+          <div class="pb-stat" style="border-left:3px solid #F59E0B">\
+            <div class="pb-stat-label"><i class="fas fa-box-open mr-1"></i>Modal Bahan</div>\
+            <div class="pb-stat-val" style="color:#B45309;font-size:15px">' + _fmtIDR(report.totalExpBB) + '</div>\
+          </div>\
+          <div class="pb-stat" style="border-left:3px solid #6366F1">\
+            <div class="pb-stat-label"><i class="fas fa-wrench mr-1"></i>Operasional</div>\
+            <div class="pb-stat-val" style="color:#4F46E5;font-size:15px">' + _fmtIDR(report.totalExpOps) + '</div>\
+          </div>\
+          <div class="pb-stat" style="border-left:3px solid #10B981">\
+            <div class="pb-stat-label"><i class="fas fa-warehouse mr-1"></i>Nilai Stok</div>\
+            <div class="pb-stat-val" style="color:#047857;font-size:15px">' + _fmtIDR(report.totalInventoryValue) + '</div>\
+          </div>\
+        </div>\
         <div class="pb-card" style="background:linear-gradient(135deg,#F0FDF4,#ECFDF5);border-color:#A7F3D0">\
           <div style="text-align:center;padding:8px 0">\
-            <div style="font-size:12px;color:#64748B;font-weight:600;margin-bottom:4px">Rumus: Penjualan - Pengeluaran = Profit</div>\
+            <div style="font-size:12px;color:#64748B;font-weight:600;margin-bottom:4px">Rumus: Penjualan - Modal Bahan - Operasional = Profit</div>\
             <div style="font-size:13px;color:#475569">\
-              <b>' + _fmtIDR(report.totalSales) + '</b> - <b>' + _fmtIDR(report.totalExpenses) + '</b> = \
+              <b>' + _fmtIDR(report.totalSales) + '</b> - <b style="color:#B45309">' + _fmtIDR(report.totalExpBB) + '</b> - <b style="color:#4F46E5">' + _fmtIDR(report.totalExpOps) + '</b> = \
               <b style="' + profitColor + '">' + (report.profit >= 0 ? '' : '-') + _fmtIDR(Math.abs(report.profit)) + '</b>\
             </div>\
+            <div style="font-size:11px;color:#94A3B8;margin-top:6px"><i class="fas fa-warehouse mr-1"></i>Nilai Stok Saat Ini: <b style="color:#047857">' + _fmtIDR(report.totalInventoryValue) + '</b> (stok x harga beli, bukan periode)</div>\
           </div>' +
           expBreakdown +
         '</div>';
@@ -1512,6 +1597,7 @@ var Pembukuan = (function() {
     _showAddStockModal: _showAddStockModal,
     _showEditStockModal: _showEditStockModal,
     _saveStock: _saveStock,
+    _updateStockValuePreview: _updateStockValuePreview,
     _adjustStockModal: _adjustStockModal,
     _adjStockDelta: _adjStockDelta,
     _doAdjustStock: _doAdjustStock,
