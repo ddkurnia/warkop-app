@@ -1090,11 +1090,59 @@ var Pembukuan = (function() {
       unitOptions += '<option value="' + UNITS[u] + '">' + UNITS[u] + '</option>';
     }
 
+    // --- Stok Bahan Baku Overview ---
+    var stokBBHtml = '';
+    if (bahanBaku.length === 0) {
+      stokBBHtml = '<div style="text-align:center;padding:14px;color:#94A3B8;font-size:12px"><i class="fas fa-box-open" style="font-size:20px;display:block;margin-bottom:4px;opacity:.5"></i>Belum ada bahan baku</div>';
+    } else {
+      stokBBHtml = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px">';
+      for (var bb = 0; bb < bahanBaku.length; bb++) {
+        var bbItem = bahanBaku[bb];
+        var bbThreshold = bbItem.lowStock || 5;
+        var bbIsLow = bbItem.stock <= bbThreshold;
+        var bbBorder = bbIsLow ? 'border-color:#FECACA;background:#FEF2F2' : 'border-color:#E5E7EB;background:white';
+        var bbStockColor = bbIsLow ? 'color:#DC2626' : 'color:#059669';
+        var bbWarn = bbIsLow ? '<div style="font-size:9px;color:#DC2626"><i class="fas fa-triangle-exclamation"></i> Rendah</div>' : '';
+        var bbNilai = (bbItem.hargaBeli || 0) > 0
+          ? '<div style="font-size:9px;color:#94A3B8">' + _fmtIDR(bbItem.stock * bbItem.hargaBeli) + '</div>'
+          : '';
+        stokBBHtml += '\
+          <div style="border:1px solid;border-radius:10px;padding:10px;' + bbBorder + '">\
+            <div style="font-size:11px;font-weight:700;color:#1E293B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + _escHtml(bbItem.name) + '</div>\
+            <div style="font-size:16px;font-weight:800;' + bbStockColor + ';margin:2px 0">' + bbItem.stock + ' <span style="font-size:10px;font-weight:500">' + _escHtml(bbItem.unit) + '</span></div>\
+            ' + bbNilai + bbWarn + '\
+          </div>';
+      }
+      stokBBHtml += '</div>';
+    }
+
+    // --- Stok Produk Jadi Overview ---
+    var stokPJHtml = '';
+    if (produkJadi.length > 0) {
+      stokPJHtml = '<div style="margin-top:10px;padding-top:10px;border-top:1px dashed #E5E7EB">\
+        <div style="font-size:11px;font-weight:600;color:#64748B;margin-bottom:8px"><i class="fas fa-utensils mr-1"></i>Stok Produk Jadi</div>\
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px">';
+      for (var pj = 0; pj < produkJadi.length; pj++) {
+        var pjItem = produkJadi[pj];
+        stokPJHtml += '\
+          <div style="background:#ECFDF5;border:1px solid #A7F3D0;border-radius:8px;padding:8px;text-align:center">\
+            <div style="font-size:10px;font-weight:600;color:#1E293B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + _escHtml(pjItem.name) + '</div>\
+            <div style="font-size:15px;font-weight:800;color:#047857">' + pjItem.stock + ' <span style="font-size:9px;font-weight:500">' + _escHtml(pjItem.unit) + '</span></div>\
+          </div>';
+      }
+      stokPJHtml += '</div></div>';
+    }
+
     container.innerHTML = '\
-      <div class="pb-stat-grid">\
-        <div class="pb-stat"><div class="pb-stat-label">Hari Ini</div><div class="pb-stat-val blue">' + todayProd.length + '</div></div>\
+      <div class="pb-stat-grid" style="grid-template-columns:1fr 1fr 1fr 1fr">\
+        <div class="pb-stat"><div class="pb-stat-label">Produksi Hari Ini</div><div class="pb-stat-val blue">' + todayProd.length + '</div></div>\
         <div class="pb-stat"><div class="pb-stat-label">Total Produksi</div><div class="pb-stat-val emerald">' + _production.length + '</div></div>\
         <div class="pb-stat"><div class="pb-stat-label">Bahan Baku</div><div class="pb-stat-val">' + bahanBaku.length + '</div></div>\
+        <div class="pb-stat"><div class="pb-stat-label">Produk Jadi</div><div class="pb-stat-val">' + produkJadi.length + '</div></div>\
+      </div>\
+      <div class="pb-card">\
+        <div class="pb-card-title"><i class="fas fa-boxes-stacked" style="color:#059669"></i> Stok Tersedia <span style="font-size:10px;color:#94A3B8;font-weight:400">otomatis update saat ada penambahan</span></div>' +
+        stokBBHtml + stokPJHtml + '\
       </div>\
       <div class="pb-card">\
         <div class="pb-card-title"><i class="fas fa-industry" style="color:#059669"></i> Produksi Baru</div>\
@@ -1117,7 +1165,7 @@ var Pembukuan = (function() {
       </div>\
       <div class="pb-card">\
         <div class="pb-card-title"><i class="fas fa-bolt" style="color:#F59E0B"></i> Quick Add Stok</div>\
-        <div style="font-size:11px;color:#64748B;margin-bottom:10px">Tambahkan bahan baku atau produk jadi langsung di sini tanpa pindah halaman.</div>\
+        <div style="font-size:11px;color:#64748B;margin-bottom:10px">Tambahkan bahan baku atau produk jadi langsung di sini. Stok akan otomatis muncul di atas.</div>\
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;margin-bottom:8px;align-items:end">\
           <div>\
             <label class="pb-label">Nama</label>\
