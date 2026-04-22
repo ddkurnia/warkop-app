@@ -967,6 +967,19 @@ var Pembukuan = (function() {
       prodHistory += '</tbody></table>';
     }
 
+    // Quick-add status hints
+    var fromHint = bahanBaku.length === 0
+      ? '<div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;padding:8px;font-size:11px;color:#B45309;margin-top:6px"><i class="fas fa-info-circle mr-1"></i>Bahan baku belum ada. Tambahkan di bawah atau di halaman <b>Stok</b>.</div>'
+      : '';
+    var toHint = produkJadi.length === 0
+      ? '<div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;padding:8px;font-size:11px;color:#B45309;margin-top:6px"><i class="fas fa-info-circle mr-1"></i>Produk jadi belum ada. Tambahkan di bawah atau di halaman <b>Stok</b>.</div>'
+      : '';
+
+    var unitOptions = '';
+    for (var u = 0; u < UNITS.length; u++) {
+      unitOptions += '<option value="' + UNITS[u] + '">' + UNITS[u] + '</option>';
+    }
+
     container.innerHTML = '\
       <div class="pb-stat-grid">\
         <div class="pb-stat"><div class="pb-stat-label">Hari Ini</div><div class="pb-stat-val blue">' + todayProd.length + '</div></div>\
@@ -976,14 +989,14 @@ var Pembukuan = (function() {
       <div class="pb-card">\
         <div class="pb-card-title"><i class="fas fa-industry" style="color:#059669"></i> Produksi Baru</div>\
         <div id="pb-prod-result" style="margin-bottom:12px"></div>\
-        <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:12px;align-items:end">\
+        <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:12px;align-items:start">\
           <div>\
             <label class="pb-label">Bahan Baku</label>\
-            <select id="pb-prod-from" class="pb-select" style="width:100%">' + fromOptions + '</select>\
+            <select id="pb-prod-from" class="pb-select" style="width:100%">' + fromOptions + '</select>' + fromHint + '\
           </div>\
           <div>\
             <label class="pb-label">Produk Jadi</label>\
-            <select id="pb-prod-to" class="pb-select" style="width:100%">' + toOptions + '</select>\
+            <select id="pb-prod-to" class="pb-select" style="width:100%">' + toOptions + '</select>' + toHint + '\
           </div>\
           <div>\
             <label class="pb-label">Qty</label>\
@@ -993,16 +1006,43 @@ var Pembukuan = (function() {
         <button onclick="Pembukuan._doProduction()" class="pb-btn pb-btn-primary" style="width:100%"><i class="fas fa-arrow-right-arrow-left"></i> Proses Produksi</button>\
       </div>\
       <div class="pb-card">\
+        <div class="pb-card-title"><i class="fas fa-bolt" style="color:#F59E0B"></i> Quick Add Stok</div>\
+        <div style="font-size:11px;color:#64748B;margin-bottom:10px">Tambahkan bahan baku atau produk jadi langsung di sini tanpa pindah halaman.</div>\
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;margin-bottom:8px;align-items:end">\
+          <div>\
+            <label class="pb-label">Nama</label>\
+            <input type="text" id="pb-qa-name" class="pb-input" placeholder="Contoh: Ayam Mentah">\
+          </div>\
+          <div>\
+            <label class="pb-label">Kategori</label>\
+            <select id="pb-qa-cat" class="pb-select" style="width:100%">\
+              <option value="bahan_baku">Bahan Baku</option>\
+              <option value="produk_jadi">Produk Jadi</option>\
+            </select>\
+          </div>\
+          <div>\
+            <label class="pb-label">Satuan</label>\
+            <select id="pb-qa-unit" class="pb-select" style="width:100%">' + unitOptions + '</select>\
+          </div>\
+          <div>\
+            <button onclick="Pembukuan._quickAddStock()" class="pb-btn pb-btn-primary pb-btn-sm" style="margin-bottom:1px;height:40px"><i class="fas fa-plus"></i></button>\
+          </div>\
+        </div>\
+      </div>\
+      <div class="pb-card">\
         <div class="pb-card-title"><i class="fas fa-clock-rotate-left" style="color:#64748B"></i> Riwayat Produksi</div>' +
         prodHistory +
       '</div>';
+  }
 
-    if (bahanBaku.length === 0 || produkJadi.length === 0) {
-      document.getElementById('pb-prod-result').innerHTML = '\
-        <div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:10px;padding:10px;font-size:12px;color:#B45309">\
-          <i class="fas fa-circle-info mr-1"></i> Tambahkan <b>Bahan Baku</b> dan <b>Produk Jadi</b> di halaman Stok terlebih dahulu.\
-        </div>';
-    }
+  function _quickAddStock() {
+    var name = document.getElementById('pb-qa-name').value.trim();
+    var cat = document.getElementById('pb-qa-cat').value;
+    var unit = document.getElementById('pb-qa-unit').value;
+    if (!name) { alert('Nama item wajib diisi!'); return; }
+    addStockItem(name, 0, unit, cat);
+    // Re-render produksi page to refresh dropdowns
+    _renderProduksi(document.getElementById('pb-content'));
   }
 
   function _doProduction() {
@@ -1477,6 +1517,7 @@ var Pembukuan = (function() {
     _doAdjustStock: _doAdjustStock,
     _deleteStock: _deleteStock,
     _doProduction: _doProduction,
+    _quickAddStock: _quickAddStock,
     _delProduction: _delProduction,
     _addExpenseUI: _addExpenseUI,
     _showEditExpModal: _showEditExpModal,
