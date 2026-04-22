@@ -8,7 +8,7 @@
  *  - Stok (Inventory CRUD)
  *  - Produksi (Bahan → Produk)
  *  - Pengeluaran (CRUD + Kategori)
- *  - Penjualan (Read-only dari POS)a
+ *  - Penjualan (Read-only dari POS)
  *  - Laporan (Harian & Bulanan, Profit)
  * 
  * Data: localStorage dengan key warkop_{module}_{uid}
@@ -536,6 +536,30 @@ var Pembukuan = (function() {
 .pb-search{position:relative}\
 .pb-search i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#94A3B8;font-size:13px}\
 .pb-search input{padding-left:36px}\
+.pb-guide-hero{background:linear-gradient(135deg,#065F46,#047857,#059669);border-radius:16px;padding:24px 20px;color:white;margin-bottom:16px;text-align:center}\
+.pb-guide-hero h2{font-size:20px;font-weight:800;margin-bottom:6px}\
+.pb-guide-hero p{font-size:12px;opacity:.85;line-height:1.5}\
+.pb-guide-section{background:white;border-radius:16px;border:1px solid #E5E7EB;padding:0;margin-bottom:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.04)}\
+.pb-guide-sec-header{padding:14px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:background .15s;user-select:none}\
+.pb-guide-sec-header:hover{background:#F8FAFC}\
+.pb-guide-sec-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}\
+.pb-guide-sec-title{flex:1;font-size:14px;font-weight:700;color:#1E293B}\
+.pb-guide-sec-arrow{color:#94A3B8;font-size:12px;transition:transform .2s}\
+.pb-guide-sec-arrow.open{transform:rotate(180deg)}\
+.pb-guide-sec-body{padding:0 16px 16px;display:none}\
+.pb-guide-sec-body.open{display:block}\
+.pb-guide-step{display:flex;gap:10px;margin-bottom:14px}\
+.pb-guide-step:last-child{margin-bottom:0}\
+.pb-guide-step-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:2px}\
+.pb-guide-step-text{flex:1;font-size:12px;color:#374151;line-height:1.6}\
+.pb-guide-step-text strong{color:#1E293B}\
+.pb-guide-tip{background:#FFFBEB;border:1px solid #FDE68A;border-radius:10px;padding:12px 14px;margin-top:12px;font-size:11px;color:#92400E;line-height:1.6;display:flex;gap:8px}\
+.pb-guide-tip i{color:#F59E0B;margin-top:2px;flex-shrink:0}\
+.pb-guide-example{background:#F0FDF4;border:1px solid #A7F3D0;border-radius:10px;padding:12px 14px;margin-top:10px;font-size:11px;color:#065F46;line-height:1.6}\
+.pb-guide-example strong{color:#047857}\
+.pb-guide-flow{display:flex;flex-direction:column;align-items:center;gap:0;margin:12px 0}\
+.pb-guide-flow-item{background:#F1F5F9;border:1px solid #E2E8F0;border-radius:10px;padding:8px 14px;font-size:11px;font-weight:600;color:#334155;text-align:center;width:100%}\
+.pb-guide-flow-arrow{color:#94A3B8;font-size:14px;line-height:1}\
 ';
     document.head.appendChild(css);
   }
@@ -610,6 +634,9 @@ var Pembukuan = (function() {
           </button>\
           <button onclick="Pembukuan.switchPage(\'laporan\')" id="pb-nav-laporan" class="pb-nav-btn nav-inactive">\
             <i class="fas fa-file-invoice-dollar"></i><span>Laporan</span>\
+          </button>\
+          <button onclick="Pembukuan.switchPage(\'panduan\')" id="pb-nav-panduan" class="pb-nav-btn nav-inactive">\
+            <i class="fas fa-circle-question"></i><span>Panduan</span>\
           </button>\
         </div>\
       </nav>\
@@ -728,7 +755,7 @@ var Pembukuan = (function() {
   // =============================================
   function _switchPage(page) {
     _currentPage = page;
-    var pages = ['stok', 'produksi', 'pengeluaran', 'penjualan', 'laporan'];
+    var pages = ['stok', 'produksi', 'pengeluaran', 'penjualan', 'laporan', 'panduan'];
     for (var i = 0; i < pages.length; i++) {
       var nav = document.getElementById('pb-nav-' + pages[i]);
       if (nav) {
@@ -753,6 +780,7 @@ var Pembukuan = (function() {
       case 'pengeluaran': _renderPengeluaran(container); break;
       case 'penjualan': _renderPenjualan(container); break;
       case 'laporan': _renderLaporan(container); break;
+      case 'panduan': _renderPanduan(container); break;
       default: _renderStok(container);
     }
   }
@@ -1791,6 +1819,303 @@ var Pembukuan = (function() {
   }
 
   // =============================================
+  // RENDER: PANDUAN (User Guide)
+  // =============================================
+  function _toggleGuideSection(id) {
+    var body = document.getElementById(id);
+    var arrow = document.getElementById(id + '-arrow');
+    if (body) {
+      body.classList.toggle('open');
+      if (arrow) arrow.classList.toggle('open');
+    }
+  }
+
+  function _renderPanduan(container) {
+    container.innerHTML = '\
+      <div class="pb-guide-hero">\
+        <div style="font-size:36px;margin-bottom:8px"><i class="fas fa-book-open"></i></div>\
+        <h2>Panduan Pembukuan WARKOPOS</h2>\
+        <p>Panduan lengkap penggunaan fitur pembukuan.<br>Klik setiap topik di bawah untuk membaca penjelasannya.</p>\
+      </div>\
+      <!-- 1. ALUR KERJA -->\
+      <div class="pb-guide-section">\
+        <div class="pb-guide-sec-header" onclick="Pembukuan._toggleGuideSection(\'pb-guide-1\')">\
+          <div class="pb-guide-sec-icon" style="background:#ECFDF5;color:#047857"><i class="fas fa-route"></i></div>\
+          <div class="pb-guide-sec-title">Alur Kerja Pembukuan</div>\
+          <i class="fas fa-chevron-down pb-guide-sec-arrow" id="pb-guide-1-arrow"></i>\
+        </div>\
+        <div class="pb-guide-sec-body" id="pb-guide-1">\
+          <div style="font-size:12px;color:#374151;line-height:1.7;margin-bottom:12px">\
+            Pembukuan WARKOPOS dirancang agar sesuai dengan alur kerja usaha Anda sehari-hari. Berikut adalah urutan yang direkomendasikan agar catatan keuangan Anda akurat dan terintegrasi secara otomatis.\
+          </div>\
+          <div class="pb-guide-flow">\
+            <div class="pb-guide-flow-item"><i class="fas fa-1" style="color:#059669;margin-right:6px"></i> Belanja Bahan Baku di Pasar</div>\
+            <div class="pb-guide-flow-arrow"><i class="fas fa-arrow-down"></i></div>\
+            <div class="pb-guide-flow-item"><i class="fas fa-2" style="color:#059669;margin-right:6px"></i> Catat di <strong>Stok</strong> (nama, jumlah, harga beli)</div>\
+            <div class="pb-guide-flow-arrow"><i class="fas fa-arrow-down"></i></div>\
+            <div class="pb-guide-flow-item" style="background:#ECFDF5;border-color:#A7F3D0"><i class="fas fa-robot" style="color:#047857;margin-right:6px"></i> Otomatis masuk ke <strong>Pengeluaran (Bahan Baku)</strong></div>\
+            <div class="pb-guide-flow-arrow"><i class="fas fa-arrow-down"></i></div>\
+            <div class="pb-guide-flow-item"><i class="fas fa-3" style="color:#059669;margin-right:6px"></i> Proses Bahan Baku di <strong>Produksi</strong></div>\
+            <div class="pb-guide-flow-arrow"><i class="fas fa-arrow-down"></i></div>\
+            <div class="pb-guide-flow-item"><i class="fas fa-4" style="color:#059669;margin-right:6px"></i> Jualan berjalan (tercatat otomatis di <strong>Penjualan</strong>)</div>\
+            <div class="pb-guide-flow-arrow"><i class="fas fa-arrow-down"></i></div>\
+            <div class="pb-guide-flow-item"><i class="fas fa-5" style="color:#059669;margin-right:6px"></i> Catat Pengeluaran <strong>Operasional</strong> jika ada</div>\
+            <div class="pb-guide-flow-arrow"><i class="fas fa-arrow-down"></i></div>\
+            <div class="pb-guide-flow-item" style="background:#EFF6FF;border-color:#BAE6FD"><i class="fas fa-chart-pie" style="color:#0284C7;margin-right:6px"></i> Cek <strong>Laporan</strong> di akhir hari</div>\
+          </div>\
+          <div class="pb-guide-tip">\
+            <i class="fas fa-lightbulb"></i>\
+            <div><strong>Kunci utama:</strong> Selalu catat stok dengan <strong>harga beli</strong> yang benar. Dari situ, sistem akan otomatis menghitung pengeluaran bahan baku dan menyajikan laporan profit yang akurat.</div>\
+          </div>\
+        </div>\
+      </div>\
+      <!-- 2. STOK -->\
+      <div class="pb-guide-section">\
+        <div class="pb-guide-sec-header" onclick="Pembukuan._toggleGuideSection(\'pb-guide-2\')">\
+          <div class="pb-guide-sec-icon" style="background:#EFF6FF;color:#0284C7"><i class="fas fa-boxes-stacked"></i></div>\
+          <div class="pb-guide-sec-title">Stok (Gudang Barang)</div>\
+          <i class="fas fa-chevron-down pb-guide-sec-arrow" id="pb-guide-2-arrow"></i>\
+        </div>\
+        <div class="pb-guide-sec-body" id="pb-guide-2">\
+          <div style="font-size:12px;color:#374151;line-height:1.7;margin-bottom:12px">\
+            Fitur Stok adalah tempat Anda mencatat semua barang yang dimiliki, baik bahan baku mentah maupun produk jadi yang siap dijual. Ini adalah <strong>titik awal</strong> dari seluruh alur pembukuan.\
+          </div>\
+          <div class="pb-guide-step">\
+            <div class="pb-guide-step-num" style="background:#EFF6FF;color:#0284C7">1</div>\
+            <div class="pb-guide-step-text"><strong>Tambah Stok Baru</strong><br>Klik tombol <strong>"+ Tambah"</strong> di halaman Stok. Isi formulir: Nama Item (contoh: Ayam Mentah), Jumlah yang dibeli, Satuan (kg, pcs, liter, dll), Kategori (Bahan Baku / Produk Jadi), <strong>Harga Beli per satuan</strong>, dan Batas Stok Rendah (peringatan jika stok hampir habis).</div>\
+          </div>\
+          <div class="pb-guide-step">\
+            <div class="pb-guide-step-num" style="background:#EFF6FF;color:#0284C7">2</div>\
+            <div class="pb-guide-step-text"><strong>Pengeluaran Otomatis</strong><br>Ketika Anda mengisi Harga Beli, sistem <strong>secara otomatis</strong> akan membuat catatan di Pengeluaran dengan kategori "Bahan Baku". Entri ini ditandai dengan lencana kuning <strong>"STOK"</strong> dan tidak bisa diedit atau dihapus manual, karena datanya bersumber dari Stok.</div>\
+          </div>\
+          <div class="pb-guide-step">\
+            <div class="pb-guide-step-num" style="background:#EFF6FF;color:#0284C7">3</div>\
+            <div class="pb-guide-step-text"><strong>Sesuaikan Stok (+/-)</strong><br>Klik ikon <strong>plus-minus</strong> untuk menambah atau mengurangi stok secara manual. Gunakan saat ada barang masuk tanpa beli (misal: barang kiriman) atau saat ada barang rusak/expired. Jika menambah stok dan mengisi harga, Anda bisa memilih apakah dicatat ke pengeluaran atau tidak.</div>\
+          </div>\
+          <div class="pb-guide-step">\
+            <div class="pb-guide-step-num" style="background:#EFF6FF;color:#0284C7">4</div>\
+            <div class="pb-guide-step-text"><strong>Edit & Hapus</strong><br>Klik ikon <strong>pensil</strong> untuk mengubah data stok (nama, harga, kategori, dll). Klik ikon <strong>tempat sampah</strong> untuk menghapus item dari daftar stok.</div>\
+          </div>\
+          <div class="pb-guide-example">\
+            <strong>Contoh:</strong> Anda beli 5 kg ayam mentah di pasar dengan harga Rp 35.000/kg. Total belanja: Rp 175.000.<br>\
+            Cara mencatat: Tambah Stok baru -> Nama: "Ayam Mentah", Stok: 5, Satuan: kg, Harga Beli: 35000.<br>\
+            Hasil: Stok tercatat 5 kg, dan Pengeluaran otomatis bertambah Rp 175.000 (kategori Bahan Baku).\
+          </div>\
+          <div class="pb-guide-tip">\
+            <i class="fas fa-lightbulb"></i>\
+            <div><strong>Tips:</strong> Selalu isi <strong>Harga Beli</strong> dengan benar. Ini adalah harga modal per satuan yang akan digunakan untuk menghitung nilai stok dan pengeluaran bahan baku secara otomatis.</div>\
+          </div>\
+        </div>\
+      </div>\
+      <!-- 3. PRODUKSI -->\
+      <div class="pb-guide-section">\
+        <div class="pb-guide-sec-header" onclick="Pembukuan._toggleGuideSection(\'pb-guide-3\')">\
+          <div class="pb-guide-sec-icon" style="background:#FDF4FF;color:#9333EA"><i class="fas fa-industry"></i></div>\
+          <div class="pb-guide-sec-title">Produksi (Olah Bahan Jadi Produk)</div>\
+          <i class="fas fa-chevron-down pb-guide-sec-arrow" id="pb-guide-3-arrow"></i>\
+        </div>\
+        <div class="pb-guide-sec-body" id="pb-guide-3">\
+          <div style="font-size:12px;color:#374151;line-height:1.7;margin-bottom:12px">\
+            Fitur Produksi digunakan ketika Anda mengolah beberapa bahan baku menjadi satu produk jadi yang siap dijual. Misalnya, mengolah tepung, ayam, dan minyak menjadi ayam goreng. Di sini, stok bahan baku akan <strong>berkurang otomatis</strong> dan stok produk jadi akan <strong>bertambah otomatis</strong>.\
+          </div>\
+          <div class="pb-guide-step">\
+            <div class="pb-guide-step-num" style="background:#FDF4FF;color:#9333EA">1</div>\
+            <div class="pb-guide-step-text"><strong>Lihat Ketersediaan Stok</strong><br>Di bagian atas halaman Produksi, Anda bisa melihat sisa stok semua bahan baku dan produk jadi yang tersedia. Ini membantu Anda mengetahui apakah bahan cukup sebelum memulai produksi.</div>\
+          </div>\
+          <div class="pb-guide-step">\
+            <div class="pb-guide-step-num" style="background:#FDF4FF;color:#9333EA">2</div>\
+            <div class="pb-guide-step-text"><strong>Pilih Bahan Baku</strong><br>Klik tombol <strong>"+ Produksi Baru"</strong>. Pilih bahan baku pertama dari dropdown, lalu isi jumlah yang akan dipakai. Untuk menambah bahan lain, klik tombol <strong>"+ Bahan"</strong>. Anda bisa menambahkan beberapa bahan sekaligus (misal: 2 kg ayam + 500 gram tepung + 200 ml minyak).</div>\
+          </div>\
+          <div class="pb-guide-step">\
+            <div class="pb-guide-step-num" style="background:#FDF4FF;color:#9333EA">3</div>\
+            <div class="pb-guide-step-text"><strong>Pilih Produk Jadi</strong><br>Pilih produk jadi yang dihasilkan dari dropdown (pastikan produk jadi sudah didaftarkan di Stok dengan kategori "Produk Jadi"). Isi berapa jumlah/banyak produk yang dihasilkan.</div>\
+          </div>\
+          <div class="pb-guide-step">\
+            <div class="pb-guide-step-num" style="background:#FDF4FF;color:#9333EA">4</div>\
+            <div class="pb-guide-step-text"><strong>Proses Produksi</strong><br>Klik <strong>"Proses"</strong>. Sistem akan otomatis: (a) Mengurangi stok bahan baku yang dipakai, (b) Menambah stok produk jadi, (c) Mencatat riwayat produksi di halaman yang sama.</div>\
+          </div>\
+          <div class="pb-guide-example">\
+            <strong>Contoh:</strong> Membuat 10 porsi Ayam Goreng.<br>\
+            Bahan yang dipakai: 2 kg Ayam Mentah + 500 gram Tepung + 200 ml Minyak Goreng<br>\
+            Produk jadi: 10 pcs Ayam Goreng<br>\
+            Hasil: Stok Ayam Mentah berkurang 2 kg, Tepung berkurang 500 gram, Minyak berkurang 200 ml. Stok Ayam Goreng bertambah 10 pcs.\
+          </div>\
+          <div class="pb-guide-tip">\
+            <i class="fas fa-triangle-exclamation"></i>\
+            <div><strong>Perhatian:</strong> Jika stok bahan baku tidak cukup, produksi akan dibatalkan dan muncul pesan peringatan. Pastikan selalu cek ketersediaan stok sebelum memproses. Jika produk jadi belum ada di daftar Stok, tambahkan dulu melalui halaman Stok dengan kategori "Produk Jadi".</div>\
+          </div>\
+        </div>\
+      </div>\
+      <!-- 4. PENGELUARAN -->\
+      <div class="pb-guide-section">\
+        <div class="pb-guide-sec-header" onclick="Pembukuan._toggleGuideSection(\'pb-guide-4\')">\
+          <div class="pb-guide-sec-icon" style="background:#FEF2F2;color:#DC2626"><i class="fas fa-receipt"></i></div>\
+          <div class="pb-guide-sec-title">Pengeluaran (Uang Keluar)</div>\
+          <i class="fas fa-chevron-down pb-guide-sec-arrow" id="pb-guide-4-arrow"></i>\
+        </div>\
+        <div class="pb-guide-sec-body" id="pb-guide-4">\
+          <div style="font-size:12px;color:#374151;line-height:1.7;margin-bottom:12px">\
+            Fitur Pengeluaran mencatat semua uang yang keluar dari kas usaha Anda. Ada dua jenis pengeluaran yang ditangani secara berbeda oleh sistem, dan penting untuk memahami perbedaannya.\
+          </div>\
+          <div style="background:white;border:1px solid #E5E7EB;border-radius:10px;padding:12px;margin-bottom:12px">\
+            <div style="display:flex;gap:10px;margin-bottom:10px">\
+              <div style="flex:1;background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;padding:10px">\
+                <div style="font-size:11px;font-weight:700;color:#B45309;margin-bottom:4px"><i class="fas fa-box-open" style="margin-right:4px"></i> Bahan Baku</div>\
+                <div style="font-size:10px;color:#92400E;line-height:1.5"><strong>Otomatis dari Stok.</strong> Tidak perlu dicatat manual. Entri ini muncul sendiri saat Anda menambah stok dengan harga beli. Ditandai dengan lencana kuning "STOK".</div>\
+              </div>\
+              <div style="flex:1;background:#EFF6FF;border:1px solid #BAE6FD;border-radius:8px;padding:10px">\
+                <div style="font-size:11px;font-weight:700;color:#1D4ED8;margin-bottom:4px"><i class="fas fa-wrench" style="margin-right:4px"></i> Operasional</div>\
+                <div style="font-size:10px;color:#1E40AF;line-height:1.5"><strong>Dicatat manual.</strong> Untuk biaya sehari-hari: gas, listrik, gaji karyawan, sewa, transportasi, dll. Gunakan tombol "+ Tambah".</div>\
+              </div>\
+            </div>\
+          </div>\
+          <div class="pb-guide-step">\
+            <div class="pb-guide-step-num" style="background:#FEF2F2;color:#DC2626">1</div>\
+            <div class="pb-guide-step-text"><strong>Menambah Pengeluaran Manual</strong><br>Klik tombol <strong>"+ Tambah"</strong>. Isi: Nama pengeluaran (contoh: "Beli Gas LPG 5kg"), Kategori (Operasional / Lainnya), Jumlah uang (Rp), dan Tanggal. Klik Simpan.</div>\
+          </div>\
+          <div class="pb-guide-step">\
+            <div class="pb-guide-step-num" style="background:#FEF2F2;color:#DC2626">2</div>\
+            <div class="pb-guide-step-text"><strong>Entri Otomatis (STOK)</strong><br>Entri berwarna <strong>kuning</strong> dengan lencana "STOK" adalah pengeluaran bahan baku yang dibuat otomatis dari fitur Stok. Entri ini <strong>tidak bisa diedit atau dihapus</strong> secara manual. Untuk mengubahnya, edit data Stok terkait.</div>\
+          </div>\
+          <div class="pb-guide-step">\
+            <div class="pb-guide-step-num" style="background:#FEF2F2;color:#DC2626">3</div>\
+            <div class="pb-guide-step-text"><strong>Edit & Hapus</strong><br>Hanya pengeluaran manual (Operasional/Lainnya) yang bisa diedit atau dihapus. Klik ikon pensil untuk mengubah atau ikon tempat sampah untuk menghapus.</div>\
+          </div>\
+          <div class="pb-guide-tip">\
+            <i class="fas fa-lightbulb"></i>\
+            <div><strong>Penting:</strong> Jangan menambah pengeluaran Bahan Baku secara manual, karena sudah otomatis dari Stok. Cukup fokus mencatat pengeluaran Operasional dan Lainnya di sini.</div>\
+          </div>\
+        </div>\
+      </div>\
+      <!-- 5. PENJUALAN -->\
+      <div class="pb-guide-section">\
+        <div class="pb-guide-sec-header" onclick="Pembukuan._toggleGuideSection(\'pb-guide-5\')">\
+          <div class="pb-guide-sec-icon" style="background:#ECFDF5;color:#047857"><i class="fas fa-chart-line"></i></div>\
+          <div class="pb-guide-sec-title">Penjualan (Uang Masuk)</div>\
+          <i class="fas fa-chevron-down pb-guide-sec-arrow" id="pb-guide-5-arrow"></i>\
+        </div>\
+        <div class="pb-guide-sec-body" id="pb-guide-5">\
+          <div style="font-size:12px;color:#374151;line-height:1.7;margin-bottom:12px">\
+            Fitur Penjualan menampilkan data transaksi yang berasal dari <strong>mesin POS (Kasir)</strong>. Data ini diambil secara otomatis, artinya Anda tidak perlu mencatat penjualan manual di pembukuan. Setiap kali Anda menyelesaikan transaksi di POS, data penjualan akan langsung muncul di sini.\
+          </div>\
+          <div class="pb-guide-step">\
+            <div class="pb-guide-step-num" style="background:#ECFDF5;color:#047857">1</div>\
+            <div class="pb-guide-step-text"><strong>Daftar Transaksi</strong><br>Halaman Penjualan menampilkan semua riwayat transaksi: tanggal, nama pesanan, jumlah item, dan total harga. Anda bisa menggunakan fitur pencarian untuk menemukan transaksi tertentu berdasarkan nama menu atau nomor meja.</div>\
+          </div>\
+          <div class="pb-guide-step">\
+            <div class="pb-guide-step-num" style="background:#ECFDF5;color:#047857">2</div>\
+            <div class="pb-guide-step-text"><strong>Ringkasan Hari Ini</strong><br>Di bagian atas ditampilkan ringkasan: total pendapatan hari ini dan jumlah transaksi. Ini membantu Anda memantau performa penjualan secara real-time tanpa harus menghitung manual.</div>\
+          </div>\
+          <div class="pb-guide-step">\
+            <div class="pb-guide-step-num" style="background:#ECFDF5;color:#047857">3</div>\
+            <div class="pb-guide-step-text"><strong>Data Read-Only</strong><br>Data penjualan tidak bisa diedit atau dihapus dari Pembukuan karena bersumber langsung dari POS. Jika ada kesalahan transaksi, perbaiki melalui fitur Riwayat di halaman POS.</div>\
+          </div>\
+          <div class="pb-guide-tip">\
+            <i class="fas fa-lightbulb"></i>\
+            <div><strong>Tips:</strong> Setiap selesai berjualan, cek halaman Penjualan untuk memastikan semua transaksi tercatat. Jika ada transaksi yang tidak muncul, kemungkinan belum selesai (belum dibayar) di POS.</div>\
+          </div>\
+        </div>\
+      </div>\
+      <!-- 6. LAPORAN -->\
+      <div class="pb-guide-section">\
+        <div class="pb-guide-sec-header" onclick="Pembukuan._toggleGuideSection(\'pb-guide-6\')">\
+          <div class="pb-guide-sec-icon" style="background:#FFF7ED;color:#EA580C"><i class="fas fa-file-invoice-dollar"></i></div>\
+          <div class="pb-guide-sec-title">Laporan (Keuangan Harian & Bulanan)</div>\
+          <i class="fas fa-chevron-down pb-guide-sec-arrow" id="pb-guide-6-arrow"></i>\
+        </div>\
+        <div class="pb-guide-sec-body" id="pb-guide-6">\
+          <div style="font-size:12px;color:#374151;line-height:1.7;margin-bottom:12px">\
+            Fitur Laporan adalah tujuan akhir dari seluruh pembukuan. Di sini Anda bisa melihat ringkasan keuangan: berapa uang masuk, berapa uang keluar, dan berapa keuntungan bersih dalam satu hari atau satu bulan. Laporan mengambil data dari Penjualan, Pengeluaran, dan Stok secara otomatis.\
+          </div>\
+          <div class="pb-guide-step">\
+            <div class="pb-guide-step-num" style="background:#FFF7ED;color:#EA580C">1</div>\
+            <div class="pb-guide-step-text"><strong>Pilih Periode</strong><br>Di bagian atas, pilih antara <strong>"Harian"</strong> (satu hari tertentu) atau <strong>"Bulanan"</strong> (satu bulan penuh). Gunakan tombol panah kiri/kanan atau klik tanggal/bulan untuk memilih periode yang ingin dilihat.</div>\
+          </div>\
+          <div class="pb-guide-step">\
+            <div class="pb-guide-step-num" style="background:#FFF7ED;color:#EA580C">2</div>\
+            <div class="pb-guide-step-text"><strong>Membaca Angka-angka Laporan</strong><br>\
+              <strong style="color:#059669">Penjualan:</strong> Total uang masuk dari semua transaksi POS di periode tersebut.<br>\
+              <strong style="color:#B45309">Pengeluaran Bahan Baku:</strong> Total uang keluar untuk belanja bahan (otomatis dari Stok).<br>\
+              <strong style="color:#1D4ED8">Pengeluaran Operasional:</strong> Total biaya operasional (dicatat manual).<br>\
+              <strong style="display:inline-block;padding:1px 8px;border-radius:4px;font-size:11px" class="pb-badge">Profit</strong> = Penjualan - Pengeluaran Bahan Baku - Pengeluaran Operasional.<br>\
+              <strong style="color:#64748B">Nilai Stok:</strong> Perkiraan nilai total barang yang masih tersisa di gudang (stok x harga beli). Ini hanya informasi, bukan uang kas.\
+            </div>\
+          </div>\
+          <div class="pb-guide-step">\
+            <div class="pb-guide-step-num" style="background:#FFF7ED;color:#EA580C">3</div>\
+            <div class="pb-guide-step-text"><strong>Detail Transaksi</strong><br>Scroll ke bawah untuk melihat daftar rincian: setiap transaksi penjualan dan setiap pengeluaran yang terjadi di periode tersebut.</div>\
+          </div>\
+          <div class="pb-guide-example">\
+            <strong>Contoh Laporan Harian:</strong><br>\
+            Penjualan: Rp 500.000 (10 transaksi)<br>\
+            Pengeluaran Bahan Baku: Rp 200.000 (beli ayam, tepung, minyak)<br>\
+            Pengeluaran Operasional: Rp 50.000 (gas, listrik)<br>\
+            <strong>Profit = Rp 500.000 - Rp 200.000 - Rp 50.000 = Rp 250.000</strong><br>\
+            Nilai Stok Tersisa: Rp 150.000 (sisa barang di gudang) -> ini info saja, bukan uang kas.\
+          </div>\
+          <div class="pb-guide-tip">\
+            <i class="fas fa-lightbulb"></i>\
+            <div><strong>Tips:</strong> Cek laporan setiap akhir hari untuk mengetahui apakah usaha hari ini untung atau rugi. Jika profit minus, evaluasi pengeluaran operational atau sesuaikan harga jual produk.</div>\
+          </div>\
+        </div>\
+      </div>\
+      <!-- 7. ISTILAH & FAQ -->\
+      <div class="pb-guide-section">\
+        <div class="pb-guide-sec-header" onclick="Pembukuan._toggleGuideSection(\'pb-guide-7\')">\
+          <div class="pb-guide-sec-icon" style="background:#F1F5F9;color:#475569"><i class="fas fa-circle-question"></i></div>\
+          <div class="pb-guide-sec-title">Istilah Penting & Pertanyaan Umum</div>\
+          <i class="fas fa-chevron-down pb-guide-sec-arrow" id="pb-guide-7-arrow"></i>\
+        </div>\
+        <div class="pb-guide-sec-body" id="pb-guide-7">\
+          <div style="font-size:13px;font-weight:700;color:#1E293B;margin-bottom:10px">Istilah yang Perlu Dipahami:</div>\
+          <div style="margin-bottom:14px">\
+            <div style="font-size:12px;color:#374151;line-height:1.7;padding:8px 0;border-bottom:1px solid #F1F5F9">\
+              <strong>Bahan Baku</strong> &mdash; Bahan mentah yang dibeli untuk diolah menjadi produk jual. Contoh: ayam mentah, tepung, minyak goreng, gula, kopi.\
+            </div>\
+            <div style="font-size:12px;color:#374151;line-height:1.7;padding:8px 0;border-bottom:1px solid #F1F5F9">\
+              <strong>Produk Jadi</strong> &mdash; Hasil olahan dari bahan baku yang siap dijual ke pelanggan. Contoh: ayam goreng, kopi susu, nasi goreng.\
+            </div>\
+            <div style="font-size:12px;color:#374151;line-height:1.7;padding:8px 0;border-bottom:1px solid #F1F5F9">\
+              <strong>Harga Beli</strong> &mdash; Harga modal per satuan saat Anda membeli bahan baku. Bukan harga jual ke pelanggan. Contoh: Rp 35.000/kg untuk ayam mentah.\
+            </div>\
+            <div style="font-size:12px;color:#374151;line-height:1.7;padding:8px 0;border-bottom:1px solid #F1F5F9">\
+              <strong>Nilai Stok</strong> &mdash; Perkiraan nilai uang yang "terikat" di barang yang masih tersisa di gudang. Dihitung: jumlah stok x harga beli. Ini hanya informasi referensi, bukan uang kas yang benar-benar ada.\
+            </div>\
+            <div style="font-size:12px;color:#374151;line-height:1.7;padding:8px 0;border-bottom:1px solid #F1F5F9">\
+              <strong>Profit</strong> &mdash; Keuntungan bersih = Total Penjualan dikurangi Total Pengeluaran (Bahan Baku + Operasional). Angka ini menunjukkan apakah usaha Anda untung atau rugi di periode tersebut.\
+            </div>\
+            <div style="font-size:12px;color:#374151;line-height:1.7;padding:8px 0">\
+              <strong>Operasional</strong> &mdash; Biaya harian untuk menjalankan usaha selain bahan baku. Contoh: gas LPG, listrik, air, gaji karyawan, sewa tempat, transportasi.\
+            </div>\
+          </div>\
+          <div style="font-size:13px;font-weight:700;color:#1E293B;margin-bottom:10px">Pertanyaan Umum (FAQ):</div>\
+          <div style="margin-bottom:14px">\
+            <div style="font-size:12px;color:#374151;line-height:1.7;padding:8px 0;border-bottom:1px solid #F1F5F9">\
+              <strong>Q: Kenapa ada pengeluaran yang tidak bisa dihapus?</strong><br>\
+              A: Pengeluaran dengan lencana kuning "STOK" dibuat otomatis dari fitur Stok. Untuk mengubahnya, edit atau hapus item stok terkait di halaman Stok.\
+            </div>\
+            <div style="font-size:12px;color:#374151;line-height:1.7;padding:8px 0;border-bottom:1px solid #F1F5F9">\
+              <strong>Q: Apakah "Nilai Stok" dihitung sebagai uang keluar?</strong><br>\
+              A: Tidak. Nilai Stok hanya menampilkan perkiraan nilai barang di gudang. Nilai Stok tidak masuk ke perhitungan Profit. Profit dihitung hanya dari Penjualan dikurangi Pengeluaran yang sudah terjadi.\
+            </div>\
+            <div style="font-size:12px;color:#374151;line-height:1.7;padding:8px 0;border-bottom:1px solid #F1F5F9">\
+              <strong>Q: Bagaimana jika saya beli bahan tapi tidak ingat harga per satuan?</strong><br>\
+              A: Isi saja total harga beli pada jumlah satuan yang Anda catat. Misal, beli 3 kg ayam total Rp 100.000, maka isi harga beli: Rp 33.333/kg (dibagi rata). Sistem akan menghitung pengeluaran otomatis berdasarkan harga yang Anda isi.\
+            </div>\
+            <div style="font-size:12px;color:#374151;line-height:1.7;padding:8px 0">\
+              <strong>Q: Data pembukuan tersimpan di mana?</strong><br>\
+              A: Semua data disimpan di perangkat Anda (localStorage browser). Data tidak dikirim ke server manapun. Pastikan tidak menghapus data browser jika tidak ingin kehilangan catatan.\
+            </div>\
+          </div>\
+        </div>\
+      </div>\
+      <!-- FOOTER -->\
+      <div style="text-align:center;padding:16px 0 8px;font-size:11px;color:#94A3B8">\
+        <i class="fas fa-heart" style="color:#F87171;margin:0 2px"></i> WARKOPOS Pembukuan v2.0 &mdash; Sistem pembukuan sederhana untuk usaha Anda\
+      </div>';
+  }
+
+  // =============================================
   // INITIALIZATION
   // =============================================
   function _init() {
@@ -1867,6 +2192,7 @@ var Pembukuan = (function() {
     _loadSalesView: _loadSalesView,
     _setReportPeriod: _setReportPeriod,
     _loadReport: _loadReport,
+    _toggleGuideSection: _toggleGuideSection,
     // Data access
     addStockItem: addStockItem,
     editStockItem: editStockItem,
