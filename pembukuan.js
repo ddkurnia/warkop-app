@@ -8,7 +8,7 @@
  *  - Stok (Inventory CRUD)
  *  - Produksi (Bahan → Produk)
  *  - Pengeluaran (CRUD + Kategori)
- *  - Penjualan (Read-only dari POS)
+ *  - Penjualan (Read-only dari POS)a
  *  - Laporan (Harian & Bulanan, Profit)
  * 
  * Data: localStorage dengan key warkop_{module}_{uid}
@@ -266,38 +266,79 @@ var Pembukuan = (function() {
   }
 
   // =============================================
-  // PRODUCTION CRUD
+  // PRODUCTION CRUD (many-to-1: multiple bahan baku → 1 produk jadi)
   // =============================================
-  function addProduction(fromId, toId, qty) {
+  // inputs format: [{ fromId, qty }]
+  function addProduction(inputs, toId, toQty) {
     _loadInv();
     _loadProd();
 
-    var fromItem = null, toItem = null;
-    for (var i = 0; i < _inventory.length; i++) {
-      if (_inventory[i].id === fromId) fromItem = _inventory[i];
-      if (_inventory[i].id === toId) toItem = _inventory[i];
+    var toItem = null;
+    for (var t = 0; t < _inventory.length; t++) {
+      if (_inventory[t].id === toId) { toItem = _inventory[t]; break; }
+    }
+    if (!toItem) return { ok: false, msg: 'Produk jadi tidak ditemukan' };
+    if (!inputs || inputs.length === 0) return { ok: false, msg: 'Pilih minimal 1 bahan baku!' };
+
+    // Validate all inputs and check stock
+    var inputDetails = [];
+    for (var i = 0; i < inputs.length; i++) {
+      var inp = inputs[i];
+      var fromItem = null;
+      for (var f = 0; f < _inventory.length; f++) {
+        if (_inventory[f].id === inp.fromId) { fromItem = _inventory[f]; break; }
+      }
+      if (!fromItem) return { ok: false, msg: 'Bahan baku "' + (inp.fromId || '?') + '" tidak ditemukan' };
+      var qty = Number(inp.qty) || 0;
+      if (qty <= 0) return { ok: false, msg: 'Jumlah ' + fromItem.name + ' harus lebih dari 0' };
+      if (fromItem.stock < qty) return { ok: false, msg: 'Stok "' + fromItem.name + '" tidak cukup! Sisa: ' + fromItem.stock + ' ' + fromItem.unit };
+      inputDetails.push({ fromId: fromItem.id, fromName: fromItem.name, fromUnit: fromItem.unit, qty: qty });
     }
 
-    if (!fromItem) return { ok: false, msg: 'Bahan baku tidak ditemukan' };
-    if (!toItem) return { ok: false, msg: 'Produk jadi tidak ditemukan' };
-    if (fromItem.stock < Number(qty)) return { ok: false, msg: 'Stok "' + fromItem.name + '" tidak cukup! Sisa: ' + fromItem.stock + ' ' + fromItem.unit };
+    // Deduct all inputs, add to output
+    for (var d = 0; d < inputDetails.length; d++) {
+      for (var inv = 0; inv < _inventory.length; inv++) {
+        if (_inventory[inv].id === inputDetails[d].fromId) {
+          _inventory[inv].stock -= inputDetails[d].qty;
+          break;
+        }
+      }
+    }
+    toItem.stock += Number(toQty) || 0;
 
-    fromItem.stock -= Number(qty);
-    toItem.stock += Number(qty);
+    // Build summary text
+    var bahanSummary = '';
+    for (var s = 0; s < inputDetails.length; s++) {
+      bahanSummary += (s > 0 ? ' + ' : '') + inputDetails[s].qty + inputDetails[s].fromUnit + ' ' + inputDetails[s].fromName;
+    }
 
     _production.push({
       id: _genId(),
-      fromId: fromId,
-      fromName: fromItem.name,
       toId: toId,
       toName: toItem.name,
-      qty: Number(qty),
+      toUnit: toItem.unit,
+      toQty: Number(toQty) || 0,
+      inputs: inputDetails,
       date: _now()
     });
 
     _saveInv();
     _saveProd();
-    return { ok: true, msg: 'Produksi berhasil: ' + qty + ' ' + fromItem.unit + ' ' + fromItem.name + ' → ' + toItem.name };
+    return { ok: true, msg: toQty + ' ' + toItem.unit + ' ' + toItem.name + ' ← ' + bahanSummary };
+  }
+
+  // Legacy helper: convert old single-input format to new format
+  function _normalizeProductionRecord(rec) {
+    if (rec.inputs) return rec;
+    return {
+      id: rec.id,
+      toId: rec.toId,
+      toName: rec.toName,
+      toUnit: rec.unit || 'pcs',
+      toQty: rec.qty,
+      inputs: [{ fromId: rec.fromId, fromName: rec.fromName, fromUnit: rec.unit || '', qty: rec.qty }],
+      date: rec.date
+    };
   }
 
   function deleteProduction(id) {
@@ -1062,15 +1103,18 @@ var Pembukuan = (function() {
     if (_production.length === 0) {
       prodHistory = '<div class="pb-empty"><i class="fas fa-industry"></i><p>Belum ada riwayat produksi</p></div>';
     } else {
-      prodHistory = '<table class="pb-table"><thead><tr><th>Tanggal</th><th>Bahan</th><th>Produk</th><th>Qty</th><th></th></tr></thead><tbody>';
+      prodHistory = '<table class="pb-table"><thead><tr><th>Tanggal</th><th>Produk Jadi</th><th>Bahan Baku Dipakai</th><th></th></tr></thead><tbody>';
       var shown = _production.slice().reverse().slice(0, 50);
       for (var p = 0; p < shown.length; p++) {
-        var pr = shown[p];
+        var pr = _normalizeProductionRecord(shown[p]);
+        var bahanList = '';
+        for (var bi = 0; bi < pr.inputs.length; bi++) {
+          bahanList += (bi > 0 ? ', ' : '') + _escHtml(pr.inputs[bi].qty + ' ' + pr.inputs[bi].fromUnit + ' ' + pr.inputs[bi].fromName);
+        }
         prodHistory += '<tr>\
           <td style="font-size:11px;color:#64748B">' + _fmtDT(pr.date) + '</td>\
-          <td>' + _escHtml(pr.fromName) + '</td>\
-          <td style="font-weight:600;color:#059669">' + _escHtml(pr.toName) + '</td>\
-          <td style="font-weight:700">' + pr.qty + '</td>\
+          <td style="font-weight:700;color:#059669">' + _escHtml(pr.toQty + ' ' + pr.toUnit + ' ' + pr.toName) + '</td>\
+          <td style="font-size:11px;color:#475569">' + bahanList + '</td>\
           <td><button onclick="Pembukuan._delProduction(\'' + pr.id + '\')" class="pb-btn pb-btn-danger pb-btn-sm"><i class="fas fa-trash"></i></button></td>\
         </tr>';
       }
@@ -1147,19 +1191,23 @@ var Pembukuan = (function() {
       <div class="pb-card">\
         <div class="pb-card-title"><i class="fas fa-industry" style="color:#059669"></i> Produksi Baru</div>\
         <div id="pb-prod-result" style="margin-bottom:12px"></div>\
-        <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:12px;align-items:start">\
-          <div>\
-            <label class="pb-label">Bahan Baku</label>\
-            <select id="pb-prod-from" class="pb-select" style="width:100%">' + fromOptions + '</select>' + fromHint + '\
-          </div>\
-          <div>\
-            <label class="pb-label">Produk Jadi</label>\
+        <div style="margin-bottom:12px">\
+          <label class="pb-label"><i class="fas fa-utensils mr-1"></i>Hasil Produksi (Produk Jadi)</label>\
+          <div style="display:grid;grid-template-columns:2fr 1fr;gap:8px">\
             <select id="pb-prod-to" class="pb-select" style="width:100%">' + toOptions + '</select>' + toHint + '\
+            <input type="number" id="pb-prod-qty" class="pb-input" style="width:100%" value="1" min="1" placeholder="Jumlah hasil">\
           </div>\
-          <div>\
-            <label class="pb-label">Qty</label>\
-            <input type="number" id="pb-prod-qty" class="pb-input" style="width:80px" value="1" min="1">\
-          </div>\
+        </div>\
+        <div style="margin-bottom:10px">\
+          <label class="pb-label"><i class="fas fa-box-open mr-1"></i> Bahan Baku yang Dipakai</label>\
+          <div id="pb-prod-inputs">\
+            <div class="pb-prod-input-row" style="display:grid;grid-template-columns:1fr 100px 32px;gap:6px;margin-bottom:6px;align-items:end">\
+              <select class="pb-select pb-prod-from-sel" style="width:100%"><option value="">-- Pilih Bahan --</option>' + fromOptions + '</select>\
+              <input type="number" class="pb-input pb-prod-from-qty" style="width:100%" placeholder="Qty" min="0" value="1">\
+              <button onclick="Pembukuan._removeProdInput(this)" class="pb-btn pb-btn-danger pb-btn-sm" style="height:38px;padding:0"><i class="fas fa-xmark"></i></button>\
+            </div>\
+          </div>' + fromHint + '\
+          <button onclick="Pembukuan._addProdInputRow()" class="pb-btn pb-btn-ghost pb-btn-sm" style="margin-top:4px"><i class="fas fa-plus"></i> Tambah Bahan</button>\
         </div>\
         <button onclick="Pembukuan._doProduction()" class="pb-btn pb-btn-primary" style="width:100%"><i class="fas fa-arrow-right-arrow-left"></i> Proses Produksi</button>\
       </div>\
@@ -1203,15 +1251,75 @@ var Pembukuan = (function() {
     _renderProduksi(document.getElementById('pb-content'));
   }
 
+  // --- Dynamic input rows for multi-bahan produksi ---
+  function _addProdInputRow() {
+    var container = document.getElementById('pb-prod-inputs');
+    if (!container) return;
+    _loadInv();
+    var bahanBaku = _inventory.filter(function(item) { return item.category === 'bahan_baku'; });
+    var fromOpts = '<option value="">-- Pilih Bahan --</option>';
+    for (var i = 0; i < bahanBaku.length; i++) {
+      fromOpts += '<option value="' + bahanBaku[i].id + '">' + _escHtml(bahanBaku[i].name) + ' (sisa: ' + bahanBaku[i].stock + ' ' + _escHtml(bahanBaku[i].unit) + ')</option>';
+    }
+    var row = document.createElement('div');
+    row.className = 'pb-prod-input-row';
+    row.style.cssText = 'display:grid;grid-template-columns:1fr 100px 32px;gap:6px;margin-bottom:6px;align-items:end';
+    row.innerHTML = '\
+      <select class="pb-select pb-prod-from-sel" style="width:100%">' + fromOpts + '</select>\
+      <input type="number" class="pb-input pb-prod-from-qty" style="width:100%" placeholder="Qty" min="0" value="1">\
+      <button onclick="Pembukuan._removeProdInput(this)" class="pb-btn pb-btn-danger pb-btn-sm" style="height:38px;padding:0"><i class="fas fa-xmark"></i></button>';
+    container.appendChild(row);
+  }
+
+  function _removeProdInput(btn) {
+    var container = document.getElementById('pb-prod-inputs');
+    var rows = container.querySelectorAll('.pb-prod-input-row');
+    if (rows.length <= 1) { alert('Minimal harus ada 1 bahan baku!'); return; }
+    btn.closest('.pb-prod-input-row').remove();
+  }
+
   function _doProduction() {
-    var fromId = document.getElementById('pb-prod-from').value;
     var toId = document.getElementById('pb-prod-to').value;
-    var qty = document.getElementById('pb-prod-qty').value;
+    var toQty = document.getElementById('pb-prod-qty').value;
 
-    if (!fromId || !toId) { alert('Pilih bahan baku dan produk jadi!'); return; }
-    if (!qty || Number(qty) < 1) { alert('Jumlah minimal 1!'); return; }
+    if (!toId) { alert('Pilih produk jadi!'); return; }
+    if (!toQty || Number(toQty) < 1) { alert('Jumlah hasil minimal 1!'); return; }
 
-    var result = addProduction(fromId, toId, qty);
+    // Collect all input rows
+    var rows = document.querySelectorAll('#pb-prod-inputs .pb-prod-input-row');
+    var inputs = [];
+    var hasError = false;
+    for (var r = 0; r < rows.length; r++) {
+      var sel = rows[r].querySelector('.pb-prod-from-sel');
+      var qtyInput = rows[r].querySelector('.pb-prod-from-qty');
+      if (!sel || !qtyInput) continue;
+      var fromId = sel.value;
+      var qty = Number(qtyInput.value) || 0;
+      if (fromId && qty > 0) {
+        inputs.push({ fromId: fromId, qty: qty });
+      } else if (fromId && qty <= 0) {
+        hasError = true;
+      }
+    }
+
+    if (inputs.length === 0) { alert('Pilih minimal 1 bahan baku dengan jumlah yang valid!'); return; }
+    if (hasError) { alert('Pastikan semua bahan baku yang dipilih memiliki jumlah yang valid (> 0)!'); return; }
+
+    // Check for duplicate bahan baku
+    var seen = {};
+    for (var d = 0; d < inputs.length; d++) {
+      if (seen[inputs[d].fromId]) {
+        var dupItem = null;
+        for (var fi = 0; fi < _inventory.length; fi++) {
+          if (_inventory[fi].id === inputs[d].fromId) { dupItem = _inventory[fi]; break; }
+        }
+        alert('Bahan baku "' + (dupItem ? dupItem.name : '') + '" dipilih lebih dari 1x. Gabungkan jumlahnya ke 1 baris.');
+        return;
+      }
+      seen[inputs[d].fromId] = true;
+    }
+
+    var result = addProduction(inputs, toId, Number(toQty));
     var resultEl = document.getElementById('pb-prod-result');
     if (result.ok) {
       resultEl.innerHTML = '\
@@ -1748,6 +1856,8 @@ var Pembukuan = (function() {
     _doAdjustStock: _doAdjustStock,
     _deleteStock: _deleteStock,
     _doProduction: _doProduction,
+    _addProdInputRow: _addProdInputRow,
+    _removeProdInput: _removeProdInput,
     _quickAddStock: _quickAddStock,
     _delProduction: _delProduction,
     _addExpenseUI: _addExpenseUI,
