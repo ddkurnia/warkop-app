@@ -574,17 +574,36 @@ var Pembukuan = (function() {
     var pbView = document.getElementById('pembukuan-view');
     var overlay = document.getElementById('mode-select-overlay');
 
-    if (overlay) overlay.classList.add('hidden');
+    if (overlay) {
+      overlay.classList.add('hidden');
+      overlay.style.display = 'none';
+    }
 
     if (viewId === 'pos') {
-      if (posApp) { posApp.classList.remove('hidden'); }
-      if (pbView) { pbView.classList.add('hidden'); }
+      // Show POS the same way showPOS() does
+      if (pbView) {
+        pbView.classList.add('hidden');
+        pbView.style.display = 'none';
+      }
+      if (posApp) {
+        posApp.classList.remove('hidden');
+        posApp.classList.add('pos-visible');
+        posApp.style.display = '';  // clear inline display:none
+      }
       localStorage.setItem(LS.appMode, 'pos');
       // Re-inject nav button every time we return to POS (in case DOM was modified)
       setTimeout(function() { _injectPOSSwitchBtn(); _highlightPOSNav(); }, 100);
     } else if (viewId === 'pembukuan') {
-      if (posApp) { posApp.classList.add('hidden'); }
-      if (pbView) { pbView.classList.remove('hidden'); }
+      // Hide POS the same way showScreen() does
+      if (posApp) {
+        posApp.classList.remove('pos-visible');
+        posApp.classList.add('hidden');
+        posApp.style.display = 'none';  // must use inline style to override showPOS()
+      }
+      if (pbView) {
+        pbView.classList.remove('hidden');
+        pbView.style.display = 'block';
+      }
       localStorage.setItem(LS.appMode, 'pembukuan');
       if (!_initialized) {
         _init();
@@ -596,6 +615,8 @@ var Pembukuan = (function() {
 
   function _showModeSelect() {
     var saved = localStorage.getItem(LS.appMode);
+    var overlay = document.getElementById('mode-select-overlay');
+
     if (saved === 'pos') {
       _showView('pos');
       return;
@@ -604,10 +625,16 @@ var Pembukuan = (function() {
       _showView('pembukuan');
       return;
     }
-    // No saved preference, show selection
-    var overlay = document.getElementById('mode-select-overlay');
+    // No saved preference, show selection overlay
     if (overlay) {
+      // Hide POS first (using inline style like showScreen does)
+      var posApp = document.getElementById('pos-app');
+      if (posApp) {
+        posApp.classList.remove('pos-visible');
+        posApp.style.display = 'none';
+      }
       overlay.classList.remove('hidden');
+      overlay.style.display = 'flex';
     } else {
       _showView('pos');
     }
