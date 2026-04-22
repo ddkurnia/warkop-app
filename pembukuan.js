@@ -208,6 +208,11 @@ var Pembukuan = (function() {
       createdAt: _now()
     });
     _saveInv();
+    // Auto-create expense for bahan baku cost
+    var totalCost = (Number(stock) || 0) * (Number(hargaBeli) || 0);
+    if (totalCost > 0) {
+      addExpense('Stok masuk: ' + name.trim() + ' (' + (Number(stock) || 0) + ' ' + (unit || 'pcs') + ')', 'bahan_baku', totalCost, _now(), true);
+    }
   }
 
   function editStockItem(id, updates) {
@@ -234,13 +239,22 @@ var Pembukuan = (function() {
 
   function adjustStock(id, amount) {
     _loadInv();
+    var result = null;
     for (var i = 0; i < _inventory.length; i++) {
       if (_inventory[i].id === id) {
-        _inventory[i].stock = Math.max(0, (_inventory[i].stock || 0) + Number(amount));
+        var oldStock = _inventory[i].stock || 0;
+        _inventory[i].stock = Math.max(0, oldStock + Number(amount));
+        result = {
+          name: _inventory[i].name,
+          unit: _inventory[i].unit,
+          delta: _inventory[i].stock - oldStock,
+          hargaBeli: _inventory[i].hargaBeli || 0
+        };
         break;
       }
     }
     _saveInv();
+    return result;
   }
 
   function getStockItem(id) {
@@ -295,7 +309,7 @@ var Pembukuan = (function() {
   // =============================================
   // EXPENSE CRUD
   // =============================================
-  function addExpense(name, category, amount, date) {
+  function addExpense(name, category, amount, date, auto) {
     _loadExp();
     _expenses.push({
       id: _genId(),
@@ -303,7 +317,8 @@ var Pembukuan = (function() {
       name: name.trim(),
       category: category || 'lainnya',
       amount: Number(amount) || 0,
-      date: date || _now()
+      date: date || _now(),
+      auto: !!auto
     });
     _saveExp();
   }
@@ -890,6 +905,7 @@ var Pembukuan = (function() {
             <div style="font-size:11px;color:#64748B">Total Nilai Stok</div>\
             <div style="font-size:16px;font-weight:800;color:#047857" id="pb-stock-preview-val">Rp 0</div>\
           </div>\
+          <div id="pb-stock-auto-exp-note" style="font-size:10px;color:#B45309;display:none;margin-top:4px;text-align:center"><i class="fas fa-link"></i> Otomatis tercatat sebagai Pengeluaran Bahan Baku</div>\
           <div>\
             <label class="pb-label">Kategori</label>\
             <select id="pb-stock-cat" class="pb-select" style="width:100%">' + catOptions + '</select>\
@@ -930,13 +946,16 @@ var Pembukuan = (function() {
     var price = Number(document.getElementById('pb-stock-price').value) || 0;
     var previewEl = document.getElementById('pb-stock-preview');
     var previewVal = document.getElementById('pb-stock-preview-val');
+    var autoNote = document.getElementById('pb-stock-auto-exp-note');
     if (!previewEl || !previewVal) return;
     var total = qty * price;
     if (total > 0) {
       previewEl.style.display = 'block';
       previewVal.textContent = _fmtIDR(total);
+      if (autoNote) autoNote.style.display = 'block';
     } else {
       previewEl.style.display = 'none';
+      if (autoNote) autoNote.style.display = 'none';
     }
   }
 
@@ -969,7 +988,14 @@ var Pembukuan = (function() {
             <button onclick="document.getElementById(\'pb-adj-amount\').value=10" class="pb-btn pb-btn-ghost pb-btn-sm">10</button>\
             <button onclick="document.getElementById(\'pb-adj-amount\').value=25" class="pb-btn pb-btn-ghost pb-btn-sm">25</button>\
             <button onclick="document.getElementById(\'pb-adj-amount\').value=50" class="pb-btn pb-btn-ghost pb-btn-sm">50</button>\
-          </div>\
+          </div>' + (item.hargaBeli ? '\
+          <div style="margin-top:14px;padding:10px;background:#FFFBEB;border:1px solid #FDE68A;border-radius:10px;display:flex;align-items:flex-start;gap:8px">\
+            <input type="checkbox" id="pb-adj-auto-exp" checked style="width:18px;height:18px;accent-color:#059669;margin-top:2px">\
+            <label for="pb-adj-auto-exp" style="font-size:12px;color:#92400E">\
+              <b>Catat ke Pengeluaran Bahan Baku</b><br>\
+              <span style="font-size:10px;color:#B45309">Harga beli: ' + _fmtIDR(item.hargaBeli) + '/' + _escHtml(item.unit) + '</span>\
+            </label>\
+          </div>' : '') + '\
         </div>\
         <div class="pb-modal-footer">\
           <button onclick="Pembukuan._doAdjustStock(\'' + id + '\',-1)" class="pb-btn pb-btn-danger"><i class="fas fa-minus"></i> Kurangi</button>\
@@ -989,7 +1015,16 @@ var Pembukuan = (function() {
 
   function _doAdjustStock(id, direction) {
     var amount = Number(document.getElementById('pb-adj-amount').value) || 1;
-    adjustStock(id, amount * direction);
+    var autoExpCheckbox = document.getElementById('pb-adj-auto-exp');
+    var result = adjustStock(id, amount * direction);
+    // Auto-create expense when adding stock with harga beli
+    if (result && result.delta > 0 && result.hargaBeli > 0) {
+      var shouldAutoExp = autoExpCheckbox ? autoExpCheckbox.checked : false;
+      if (shouldAutoExp) {
+        var totalCost = result.delta * result.hargaBeli;
+        addExpense('Tambah stok: ' + result.name + ' (+' + result.delta + ' ' + result.unit + ')', 'bahan_baku', totalCost, _now(), true);
+      }
+    }
     document.querySelector('.pb-modal-bg').remove();
     _renderStok(document.getElementById('pb-content'));
   }
@@ -1156,28 +1191,77 @@ var Pembukuan = (function() {
   function _renderPengeluaran(container) {
     _loadExp();
 
-    var todayExp = _expenses.filter(function(e) { return (e.date || '').substring(0, 10) === _today(); });
-    var totalToday = 0;
-    for (var i = 0; i < todayExp.length; i++) totalToday += Number(todayExp[i].amount) || 0;
-    var totalAll = 0;
-    for (var j = 0; j < _expenses.length; j++) totalAll += Number(_expenses[j].amount) || 0;
+    // Separate auto (from Stok) vs manual expenses
+    var autoExps = [];
+    var manualExps = [];
+    for (var i = 0; i < _expenses.length; i++) {
+      if (_expenses[i].auto) {
+        autoExps.push(_expenses[i]);
+      } else {
+        manualExps.push(_expenses[i]);
+      }
+    }
 
+    // Stats - manual only
+    var todayManual = manualExps.filter(function(e) { return (e.date || '').substring(0, 10) === _today(); });
+    var totalToday = 0;
+    for (var j = 0; j < todayManual.length; j++) totalToday += Number(todayManual[j].amount) || 0;
+    var totalAll = 0;
+    for (var k = 0; k < manualExps.length; k++) totalAll += Number(manualExps[k].amount) || 0;
+
+    // Category options (only operasional + lainnya, NO bahan_baku)
     var catOptions = '<option value="">-- Kategori --</option>';
     for (var c = 0; c < EXPENSE_CATS.length; c++) {
+      if (EXPENSE_CATS[c].id === 'bahan_baku') continue;
       catOptions += '<option value="' + EXPENSE_CATS[c].id + '">' + EXPENSE_CATS[c].label + '</option>';
     }
 
-    var expList = '';
-    if (_expenses.length === 0) {
-      expList = '<div class="pb-empty"><i class="fas fa-receipt"></i><p>Belum ada pengeluaran</p></div>';
+    // --- SECTION: Modal Bahan Baku (Auto from Stok) ---
+    var autoSection = '';
+    if (autoExps.length > 0) {
+      var todayAuto = autoExps.filter(function(e) { return (e.date || '').substring(0, 10) === _today(); });
+      var totalAutoToday = 0;
+      for (var at = 0; at < todayAuto.length; at++) totalAutoToday += Number(todayAuto[at].amount) || 0;
+      var totalAutoAll = 0;
+      for (var aa = 0; aa < autoExps.length; aa++) totalAutoAll += Number(autoExps[aa].amount) || 0;
+
+      autoSection = '<div class="pb-card" style="border-left:4px solid #F59E0B;background:#FFFBEB">\
+        <div class="pb-card-title" style="margin-bottom:8px"><i class="fas fa-box-open" style="color:#F59E0B"></i> Modal Bahan Baku <span style="font-size:10px;color:#94A3B8;font-weight:400">(otomatis dari Stok)</span></div>\
+        <div style="display:flex;gap:16px;margin-bottom:10px">\
+          <div style="font-size:12px;color:#92400E">Hari ini: <b style="color:#B45309">' + _fmtIDR(totalAutoToday) + '</b></div>\
+          <div style="font-size:12px;color:#92400E">Total: <b style="color:#B45309">' + _fmtIDR(totalAutoAll) + '</b></div>\
+        </div>';
+
+      var recentAuto = autoExps.slice().reverse().slice(0, 30);
+      autoSection += '<table class="pb-table"><thead><tr><th>Tanggal</th><th>Nama</th><th>Jumlah</th></tr></thead><tbody>';
+      for (var ae = 0; ae < recentAuto.length; ae++) {
+        var ax = recentAuto[ae];
+        autoSection += '<tr>\
+          <td style="font-size:11px;color:#64748B">' + _fmtDT(ax.date) + '</td>\
+          <td><span style="font-size:9px;background:#FDE68A;color:#92400E;padding:2px 5px;border-radius:4px;font-weight:600"><i class="fas fa-link" style="font-size:7px"></i> STOK</span> ' + _escHtml(ax.name) + '</td>\
+          <td style="font-weight:700;color:#B45309">-' + _fmtIDR(ax.amount) + '</td>\
+        </tr>';
+      }
+      autoSection += '</tbody></table></div>';
     } else {
-      expList = '<table class="pb-table"><thead><tr><th>Tanggal</th><th>Nama</th><th>Kategori</th><th>Jumlah</th><th></th></tr></thead><tbody>';
-      var shown = _expenses.slice().reverse().slice(0, 100);
+      autoSection = '<div class="pb-card" style="border-left:4px solid #F59E0B;background:#FFFBEB">\
+        <div class="pb-card-title"><i class="fas fa-box-open" style="color:#F59E0B"></i> Modal Bahan Baku <span style="font-size:10px;color:#94A3B8;font-weight:400">(otomatis dari Stok)</span></div>\
+        <div style="text-align:center;padding:16px;color:#B45309;font-size:12px"><i class="fas fa-info-circle" style="font-size:20px;display:block;margin-bottom:6px;opacity:.5"></i>Belum ada stok masuk. Tambah stok dengan Harga Beli di menu <b>Stok</b> untuk otomatis mencatat pengeluaran bahan baku.</div>\
+      </div>';
+    }
+
+    // --- SECTION: Pengeluaran Operasional (Manual) ---
+    var manualList = '';
+    if (manualExps.length === 0) {
+      manualList = '<div class="pb-empty"><i class="fas fa-receipt"></i><p>Belum ada pengeluaran operasional</p></div>';
+    } else {
+      manualList = '<table class="pb-table"><thead><tr><th>Tanggal</th><th>Nama</th><th>Kategori</th><th>Jumlah</th><th></th></tr></thead><tbody>';
+      var shown = manualExps.slice().reverse().slice(0, 100);
       for (var e = 0; e < shown.length; e++) {
         var ex = shown[e];
         var catColor = _getCatColor(EXPENSE_CATS, ex.category);
         var catLabel = _getCatLabel(EXPENSE_CATS, ex.category);
-        expList += '<tr>\
+        manualList += '<tr>\
           <td style="font-size:11px;color:#64748B">' + _fmtDT(ex.date) + '</td>\
           <td style="font-weight:600">' + _escHtml(ex.name) + '</td>\
           <td><span class="pb-chip pb-chip-' + catColor + '">' + _escHtml(catLabel) + '</span></td>\
@@ -1188,20 +1272,21 @@ var Pembukuan = (function() {
           </td>\
         </tr>';
       }
-      expList += '</tbody></table>';
+      manualList += '</tbody></table>';
     }
 
     container.innerHTML = '\
-      <div class="pb-stat-grid">\
-        <div class="pb-stat"><div class="pb-stat-label">Pengeluaran Hari Ini</div><div class="pb-stat-val red">' + _fmtIDR(totalToday) + '</div></div>\
-        <div class="pb-stat"><div class="pb-stat-label">Total Pengeluaran</div><div class="pb-stat-val red">' + _fmtIDR(totalAll) + '</div></div>\
-        <div class="pb-stat"><div class="pb-stat-label">Jumlah</div><div class="pb-stat-val blue">' + _expenses.length + '</div></div>\
+      <div class="pb-stat-grid" style="grid-template-columns:1fr 1fr 1fr 1fr">\
+        <div class="pb-stat"><div class="pb-stat-label">Operasional Hari Ini</div><div class="pb-stat-val red">' + _fmtIDR(totalToday) + '</div></div>\
+        <div class="pb-stat"><div class="pb-stat-label">Total Operasional</div><div class="pb-stat-val red">' + _fmtIDR(totalAll) + '</div></div>\
+        <div class="pb-stat"><div class="pb-stat-label">Bahan Baku Hari Ini</div><div class="pb-stat-val" style="color:#B45309;font-size:15px">' + (function(){var t=0;for(var x=0;x<autoExps.length;x++){if((autoExps[x].date||'').substring(0,10)===_today())t+=Number(autoExps[x].amount)||0;}return _fmtIDR(t);})() + '</div></div>\
+        <div class="pb-stat"><div class="pb-stat-label">Jumlah Operasional</div><div class="pb-stat-val blue">' + manualExps.length + '</div></div>\
       </div>\
       <div class="pb-card">\
-        <div class="pb-card-title"><i class="fas fa-plus-circle" style="color:#059669"></i> Tambah Pengeluaran</div>\
+        <div class="pb-card-title"><i class="fas fa-plus-circle" style="color:#059669"></i> Tambah Pengeluaran Operasional</div>\
         <div style="margin-bottom:10px">\
           <label class="pb-label">Nama Pengeluaran</label>\
-          <input type="text" id="pb-exp-name" class="pb-input" placeholder="Contoh: Beli Ayam 5kg">\
+          <input type="text" id="pb-exp-name" class="pb-input" placeholder="Contoh: Bayar Listrik, Gaji Karyawan">\
         </div>\
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">\
           <div>\
@@ -1218,10 +1303,11 @@ var Pembukuan = (function() {
           <input type="datetime-local" id="pb-exp-date" class="pb-input" value="' + _today() + 'T' + String(new Date().getHours()).padStart(2, '0') + ':' + String(new Date().getMinutes()).padStart(2, '0') + '">\
         </div>\
         <button onclick="Pembukuan._addExpenseUI()" class="pb-btn pb-btn-primary" style="width:100%"><i class="fas fa-plus"></i> Simpan Pengeluaran</button>\
-      </div>\
-      <div class="pb-card">\
-        <div class="pb-card-title"><i class="fas fa-clock-rotate-left" style="color:#64748B"></i> Riwayat Pengeluaran</div>' +
-        expList +
+      </div>' +
+      autoSection +
+      '<div class="pb-card">\
+        <div class="pb-card-title"><i class="fas fa-clock-rotate-left" style="color:#64748B"></i> Riwayat Pengeluaran Operasional</div>' +
+        manualList +
       '</div>';
   }
 
@@ -1234,11 +1320,12 @@ var Pembukuan = (function() {
     if (!name) { alert('Nama pengeluaran wajib diisi!'); return; }
     if (!cat) { alert('Pilih kategori!'); return; }
     if (!amount || Number(amount) <= 0) { alert('Jumlah harus lebih dari 0!'); return; }
+    if (cat === 'bahan_baku') { alert('Pengeluaran Bahan Baku otomatis dicatat dari Stok.\nGunakan kategori Operasional atau Lainnya.'); return; }
 
     // Convert datetime-local to our format
     var dateStr = dateVal ? dateVal.replace('T', ' ') + ':00' : _now();
 
-    addExpense(name, cat, Number(amount), dateStr);
+    addExpense(name, cat, Number(amount), dateStr, false);
     _renderPengeluaran(document.getElementById('pb-content'));
   }
 
@@ -1249,9 +1336,12 @@ var Pembukuan = (function() {
       if (_expenses[i].id === id) { exp = _expenses[i]; break; }
     }
     if (!exp) return;
+    // Block editing auto-generated expenses
+    if (exp.auto) { alert('Pengeluaran ini otomatis dari Stok dan tidak bisa diedit.\nUntuk mengubahnya, edit stok barang terkait.'); return; }
 
     var catOptions = '';
     for (var c = 0; c < EXPENSE_CATS.length; c++) {
+      if (EXPENSE_CATS[c].id === 'bahan_baku') continue;
       var sel = exp.category === EXPENSE_CATS[c].id ? 'selected' : '';
       catOptions += '<option value="' + EXPENSE_CATS[c].id + '" ' + sel + '>' + EXPENSE_CATS[c].label + '</option>';
     }
@@ -1316,6 +1406,13 @@ var Pembukuan = (function() {
   }
 
   function _delExpense(id) {
+    _loadExp();
+    for (var i = 0; i < _expenses.length; i++) {
+      if (_expenses[i].id === id && _expenses[i].auto) {
+        alert('Pengeluaran ini otomatis dari Stok dan tidak bisa dihapus.\nHapus stok barang terkait untuk menghapus pengeluaran ini.');
+        return;
+      }
+    }
     if (!confirm('Hapus pengeluaran ini?')) return;
     deleteExpense(id);
     _renderPengeluaran(document.getElementById('pb-content'));
