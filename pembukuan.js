@@ -399,7 +399,7 @@ var Pembukuan = (function() {
 .mode-btn .mode-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px}\
 .mode-btn-pos .mode-icon{background:linear-gradient(135deg,#0EA5E9,#0369A1);color:white}\
 .mode-btn-pb .mode-icon{background:linear-gradient(135deg,#10B981,#065F46);color:white}\
-#pembukuan-view{min-height:100vh;background:#F8FAFC}\
+#pembukuan-view{min-height:100vh;background:#F8FAFC;padding-bottom:40px}\
 #pembukuan-view.hidden{display:none}\
 .pb-header{background:linear-gradient(135deg,#065F46,#047857);color:white;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:0 2px 8px rgba(0,0,0,0.1)}\
 .pb-subnav{background:white;border-bottom:1px solid #E5E7EB;overflow-x:auto;position:sticky;top:52px;z-index:40}\
