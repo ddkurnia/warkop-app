@@ -515,6 +515,39 @@ var Pembukuan = (function() {
 .pb-table th{text-align:left;padding:8px 8px;color:#64748B;font-weight:600;border-bottom:2px solid #E5E7EB;font-size:11px;text-transform:uppercase;letter-spacing:.5px;word-wrap:break-word;overflow-wrap:break-word;white-space:normal}\
 .pb-table td{padding:8px;border-bottom:1px solid #F1F5F9;vertical-align:middle;word-wrap:break-word;overflow-wrap:break-word;white-space:normal}\
 .pb-table tr:hover td{background:#F8FAFC}\
+.pb-expense-list,.pb-auto-list,.pb-stock-list,.pb-prod-list{display:flex;flex-direction:column;gap:10px}\
+.pb-expense-card{background:#fff;border-radius:14px;padding:14px 16px;box-shadow:0 2px 8px rgba(0,0,0,0.05);border:1px solid #F1F5F9}\
+.pb-expense-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px}\
+.pb-expense-card-info{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}\
+.pb-expense-card-name{font-size:15px;font-weight:700;color:#1E293B;word-wrap:break-word;overflow-wrap:break-word}\
+.pb-expense-card-amount{font-size:16px;font-weight:800;color:#DC2626;white-space:nowrap;flex-shrink:0}\
+.pb-expense-card-bottom{display:flex;justify-content:space-between;align-items:center;gap:8px}\
+.pb-expense-card-date{font-size:11px;color:#94A3B8;white-space:nowrap}\
+.pb-expense-card-date i{margin-right:3px;font-size:10px}\
+.pb-expense-card-actions{display:flex;gap:6px;flex-shrink:0}\
+.pb-auto-card{background:#fff;border-radius:12px;padding:12px 14px;margin-bottom:8px;border:1px solid #FDE68A;box-shadow:0 1px 4px rgba(0,0,0,0.04)}\
+.pb-auto-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px}\
+.pb-auto-card-info{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}\
+.pb-auto-card-name{font-size:14px;font-weight:600;color:#1E293B;word-wrap:break-word;overflow-wrap:break-word}\
+.pb-auto-card-amount{font-size:14px;font-weight:700;color:#B45309;white-space:nowrap;flex-shrink:0}\
+.pb-auto-card-date{font-size:11px;color:#94A3B8}\
+.pb-auto-card-date i{margin-right:3px;font-size:10px}\
+.pb-stock-card{background:#fff;border-radius:14px;padding:14px 16px;box-shadow:0 2px 8px rgba(0,0,0,0.05);border:1px solid #F1F5F9}\
+.pb-stock-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:6px}\
+.pb-stock-card-info{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}\
+.pb-stock-card-name{font-size:15px;font-weight:700;color:#1E293B;word-wrap:break-word;overflow-wrap:break-word}\
+.pb-stock-card-qty{font-size:18px;font-weight:800;white-space:nowrap;flex-shrink:0}\
+.pb-stock-card-mid{display:flex;gap:16px;margin-bottom:8px;flex-wrap:wrap}\
+.pb-stock-card-price{font-size:12px;color:#64748B}\
+.pb-stock-card-value{font-size:12px;font-weight:600;color:#1E293B}\
+.pb-stock-card-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}\
+.pb-prod-card{background:#fff;border-radius:14px;padding:14px 16px;box-shadow:0 2px 8px rgba(0,0,0,0.05);border:1px solid #F1F5F9}\
+.pb-prod-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:6px}\
+.pb-prod-card-info{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}\
+.pb-prod-card-name{font-size:14px;font-weight:700;color:#059669;word-wrap:break-word;overflow-wrap:break-word}\
+.pb-prod-card-bahan{font-size:12px;color:#475569;line-height:1.4;word-wrap:break-word;overflow-wrap:break-word}\
+.pb-prod-card-date{font-size:11px;color:#94A3B8}\
+.pb-prod-card-date i{margin-right:3px;font-size:10px}\
 .pb-badge{display:inline-block;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600}\
 .pb-empty{text-align:center;padding:40px 20px;color:#94A3B8}\
 .pb-empty i{font-size:36px;margin-bottom:8px;display:block}\
@@ -844,28 +877,35 @@ var Pembukuan = (function() {
       return;
     }
 
-    var html = '<table class="pb-table"><thead><tr><th>Nama</th><th>Kategori</th><th>Stok</th><th>Harga Beli</th><th>Nilai</th><th>Aksi</th></tr></thead><tbody>';
+    var html = '<div class="pb-stock-list">';
     for (var i = 0; i < items.length; i++) {
       var item = items[i];
       var threshold = item.lowStock || 5;
       var isLow = item.stock <= threshold;
-      var stockColor = isLow ? 'color:#DC2626;font-weight:700' : 'color:#059669;font-weight:700';
+      var stockColor = isLow ? 'color:#DC2626' : 'color:#059669';
       var catLabel = _getCatLabel(STOCK_CATS, item.category);
       var nilai = (item.stock || 0) * (item.hargaBeli || 0);
-      html += '<tr id="pb-stock-row-' + item.id + '">\
-        <td><div style="font-weight:600;color:#1E293B">' + _escHtml(item.name) + '</div>' + (isLow ? '<div style="font-size:10px;color:#DC2626"><i class="fas fa-triangle-exclamation"></i> Min: ' + threshold + ' ' + _escHtml(item.unit) + '</div>' : '') + '</td>\
-        <td><span class="pb-chip pb-chip-green">' + _escHtml(catLabel) + '</span></td>\
-        <td style="' + stockColor + '">' + item.stock + ' ' + _escHtml(item.unit) + '</td>\
-        <td style="font-size:11px;color:#64748B">' + (item.hargaBeli ? _fmtIDR(item.hargaBeli) + '/' + _escHtml(item.unit) : '-') + '</td>\
-        <td style="font-weight:600;color:#1E293B;font-size:12px">' + _fmtIDR(nilai) + '</td>\
-        <td>\
-          <button onclick="Pembukuan._showEditStockModal(\'' + item.id + '\')" class="pb-btn pb-btn-ghost pb-btn-sm" title="Edit"><i class="fas fa-pen"></i></button>\
-          <button onclick="Pembukuan._adjustStockModal(\'' + item.id + '\')" class="pb-btn pb-btn-ghost pb-btn-sm" title="Sesuaikan Stok"><i class="fas fa-plus-minus"></i></button>\
+      html += '<div class="pb-stock-card" id="pb-stock-row-' + item.id + '">\
+        <div class="pb-stock-card-top">\
+          <div class="pb-stock-card-info">\
+            <div class="pb-stock-card-name">' + _escHtml(item.name) + '</div>\
+            <span class="pb-chip pb-chip-green">' + _escHtml(catLabel) + '</span>\
+          </div>\
+          <div class="pb-stock-card-qty" style="' + stockColor + '">' + item.stock + ' ' + _escHtml(item.unit) + '</div>\
+        </div>\
+        <div class="pb-stock-card-mid">\
+          <div class="pb-stock-card-price">' + (item.hargaBeli ? _fmtIDR(item.hargaBeli) + '/' + _escHtml(item.unit) : 'Rp -') + '</div>\
+          <div class="pb-stock-card-value">Nilai: ' + _fmtIDR(nilai) + '</div>\
+        </div>' +
+        (isLow ? '<div style="font-size:11px;color:#DC2626;padding:2px 0"><i class="fas fa-triangle-exclamation"></i> Stok rendah! Min: ' + threshold + ' ' + _escHtml(item.unit) + '</div>' : '') +
+        '<div class="pb-stock-card-actions">\
+          <button onclick="Pembukuan._showEditStockModal(\'' + item.id + '\')" class="pb-btn pb-btn-ghost pb-btn-sm" title="Edit"><i class="fas fa-pen"></i> Edit</button>\
+          <button onclick="Pembukuan._adjustStockModal(\'' + item.id + '\')" class="pb-btn pb-btn-ghost pb-btn-sm" title="Sesuaikan Stok"><i class="fas fa-plus-minus"></i> Stok</button>\
           <button onclick="Pembukuan._deleteStock(\'' + item.id + '\')" class="pb-btn pb-btn-danger pb-btn-sm" title="Hapus"><i class="fas fa-trash"></i></button>\
-        </td>\
-      </tr>';
+        </div>\
+      </div>';
     }
-    html += '</tbody></table>';
+    html += '</div>';
     list.innerHTML = html;
   }
 
@@ -1131,7 +1171,7 @@ var Pembukuan = (function() {
     if (_production.length === 0) {
       prodHistory = '<div class="pb-empty"><i class="fas fa-industry"></i><p>Belum ada riwayat produksi</p></div>';
     } else {
-      prodHistory = '<table class="pb-table"><thead><tr><th>Tanggal</th><th>Produk Jadi</th><th>Bahan Baku Dipakai</th><th></th></tr></thead><tbody>';
+      prodHistory = '<div class="pb-prod-list">';
       var shown = _production.slice().reverse().slice(0, 50);
       for (var p = 0; p < shown.length; p++) {
         var pr = _normalizeProductionRecord(shown[p]);
@@ -1139,14 +1179,18 @@ var Pembukuan = (function() {
         for (var bi = 0; bi < pr.inputs.length; bi++) {
           bahanList += (bi > 0 ? ', ' : '') + _escHtml(pr.inputs[bi].qty + ' ' + pr.inputs[bi].fromUnit + ' ' + pr.inputs[bi].fromName);
         }
-        prodHistory += '<tr>\
-          <td style="font-size:11px;color:#64748B">' + _fmtDT(pr.date) + '</td>\
-          <td style="font-weight:700;color:#059669">' + _escHtml(pr.toQty + ' ' + pr.toUnit + ' ' + pr.toName) + '</td>\
-          <td style="font-size:11px;color:#475569">' + bahanList + '</td>\
-          <td><button onclick="Pembukuan._delProduction(\'' + pr.id + '\')" class="pb-btn pb-btn-danger pb-btn-sm"><i class="fas fa-trash"></i></button></td>\
-        </tr>';
+        prodHistory += '<div class="pb-prod-card">\
+          <div class="pb-prod-card-top">\
+            <div class="pb-prod-card-info">\
+              <div class="pb-prod-card-name"><i class="fas fa-cube" style="color:#059669;margin-right:4px"></i>' + _escHtml(pr.toQty + ' ' + pr.toUnit + ' ' + pr.toName) + '</div>\
+              <div class="pb-prod-card-bahan">' + bahanList + '</div>\
+            </div>\
+            <button onclick="Pembukuan._delProduction(\'' + pr.id + '\')" class="pb-btn pb-btn-danger pb-btn-sm"><i class="fas fa-trash"></i></button>\
+          </div>\
+          <div class="pb-prod-card-date"><i class="fas fa-calendar-day"></i> ' + _fmtDT(pr.date) + '</div>\
+        </div>';
       }
-      prodHistory += '</tbody></table>';
+      prodHistory += '</div>';
     }
 
     // Quick-add status hints
@@ -1417,16 +1461,21 @@ var Pembukuan = (function() {
         </div>';
 
       var recentAuto = autoExps.slice().reverse().slice(0, 30);
-      autoSection += '<table class="pb-table"><thead><tr><th>Tanggal</th><th>Nama</th><th>Jumlah</th></tr></thead><tbody>';
+      autoSection += '<div class="pb-auto-list">';
       for (var ae = 0; ae < recentAuto.length; ae++) {
         var ax = recentAuto[ae];
-        autoSection += '<tr>\
-          <td style="font-size:11px;color:#64748B">' + _fmtDT(ax.date) + '</td>\
-          <td><span style="font-size:9px;background:#FDE68A;color:#92400E;padding:2px 5px;border-radius:4px;font-weight:600"><i class="fas fa-link" style="font-size:7px"></i> STOK</span> ' + _escHtml(ax.name) + '</td>\
-          <td style="font-weight:700;color:#B45309">-' + _fmtIDR(ax.amount) + '</td>\
-        </tr>';
+        autoSection += '<div class="pb-auto-card">\
+          <div class="pb-auto-card-top">\
+            <div class="pb-auto-card-info">\
+              <div class="pb-auto-card-name">' + _escHtml(ax.name) + '</div>\
+              <span style="font-size:9px;background:#FDE68A;color:#92400E;padding:2px 6px;border-radius:4px;font-weight:600"><i class="fas fa-link" style="font-size:7px"></i> STOK</span>\
+            </div>\
+            <div class="pb-auto-card-amount">-' + _fmtIDR(ax.amount) + '</div>\
+          </div>\
+          <div class="pb-auto-card-date"><i class="fas fa-calendar-day"></i> ' + _fmtDT(ax.date) + '</div>\
+        </div>';
       }
-      autoSection += '</tbody></table></div>';
+      autoSection += '</div></div>';
     } else {
       autoSection = '<div class="pb-card" style="border-left:4px solid #F59E0B;background:#FFFBEB">\
         <div class="pb-card-title"><i class="fas fa-box-open" style="color:#F59E0B"></i> Modal Bahan Baku <span style="font-size:10px;color:#94A3B8;font-weight:400">(otomatis dari Stok)</span></div>\
@@ -1439,24 +1488,30 @@ var Pembukuan = (function() {
     if (manualExps.length === 0) {
       manualList = '<div class="pb-empty"><i class="fas fa-receipt"></i><p>Belum ada pengeluaran operasional</p></div>';
     } else {
-      manualList = '<table class="pb-table"><thead><tr><th>Tanggal</th><th>Nama</th><th>Kategori</th><th>Jumlah</th><th></th></tr></thead><tbody>';
       var shown = manualExps.slice().reverse().slice(0, 100);
+      manualList = '<div class="pb-expense-list">';
       for (var e = 0; e < shown.length; e++) {
         var ex = shown[e];
         var catColor = _getCatColor(EXPENSE_CATS, ex.category);
         var catLabel = _getCatLabel(EXPENSE_CATS, ex.category);
-        manualList += '<tr>\
-          <td style="font-size:11px;color:#64748B">' + _fmtDT(ex.date) + '</td>\
-          <td style="font-weight:600">' + _escHtml(ex.name) + '</td>\
-          <td><span class="pb-chip pb-chip-' + catColor + '">' + _escHtml(catLabel) + '</span></td>\
-          <td style="font-weight:700;color:#DC2626">-' + _fmtIDR(ex.amount) + '</td>\
-          <td>\
-            <button onclick="Pembukuan._showEditExpModal(\'' + ex.id + '\')" class="pb-btn pb-btn-ghost pb-btn-sm"><i class="fas fa-pen"></i></button>\
-            <button onclick="Pembukuan._delExpense(\'' + ex.id + '\')" class="pb-btn pb-btn-danger pb-btn-sm"><i class="fas fa-trash"></i></button>\
-          </td>\
-        </tr>';
+        manualList += '<div class="pb-expense-card">\
+          <div class="pb-expense-card-top">\
+            <div class="pb-expense-card-info">\
+              <div class="pb-expense-card-name">' + _escHtml(ex.name) + '</div>\
+              <span class="pb-chip pb-chip-' + catColor + '">' + _escHtml(catLabel) + '</span>\
+            </div>\
+            <div class="pb-expense-card-amount">-' + _fmtIDR(ex.amount) + '</div>\
+          </div>\
+          <div class="pb-expense-card-bottom">\
+            <div class="pb-expense-card-date"><i class="fas fa-calendar-day"></i> ' + _fmtDT(ex.date) + '</div>\
+            <div class="pb-expense-card-actions">\
+              <button onclick="Pembukuan._showEditExpModal(\'' + ex.id + '\')" class="pb-btn pb-btn-ghost pb-btn-sm"><i class="fas fa-pen"></i></button>\
+              <button onclick="Pembukuan._delExpense(\'' + ex.id + '\')" class="pb-btn pb-btn-danger pb-btn-sm"><i class="fas fa-trash"></i></button>\
+            </div>\
+          </div>\
+        </div>';
       }
-      manualList += '</tbody></table>';
+      manualList += '</div>';
     }
 
     container.innerHTML = '\
