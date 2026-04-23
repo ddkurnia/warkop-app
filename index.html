@@ -826,7 +826,6 @@
       background: linear-gradient(90deg, #0C4A6E 0%, #0369A1 25%, #0EA5E9 50%, #EAB308 75%, #EF4444 100%);
       z-index: 1;
     }
-    #pos-app > header > div { position: relative; z-index: 2; }
 
     /* ----- FLOATING BOTTOM NAV ----- */
     #pos-app > nav.no-print {
@@ -872,6 +871,21 @@
       border: none !important;
       padding: 0 !important;
       margin: 0 !important;
+    }
+
+    /* --- HEADER LAYOUT: Precise vertical alignment --- */
+    #pos-app > header > div {
+      gap: 10px !important;
+      position: relative;
+      z-index: 2;
+    }
+    #header-shop-name {
+      line-height: 1.25 !important;
+      letter-spacing: -0.01em !important;
+    }
+    #header-shop-tagline {
+      line-height: 1.2 !important;
+      margin-top: 1px !important;
     }
 
     /* --- BOTTOM NAV: Clean pill indicator --- */
