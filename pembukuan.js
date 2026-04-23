@@ -490,10 +490,12 @@ var Pembukuan = (function() {
 .pb-content{max-width:700px;margin:0 auto;padding:16px;padding-bottom:40px;flex:1 1 0%!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}\
 .pb-card{background:white;border-radius:16px;border:1px solid #E5E7EB;padding:16px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,0.04);overflow-x:auto;-webkit-overflow-scrolling:touch}\
 .pb-card-title{font-size:14px;font-weight:700;color:#1E293B;margin-bottom:12px;display:flex;align-items:center;gap:8px}\
-.pb-stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px}\
-.pb-stat{background:white;border-radius:14px;border:1px solid #E5E7EB;padding:14px;text-align:center}\
-.pb-stat-label{font-size:11px;color:#64748B;font-weight:600;margin-bottom:4px}\
-.pb-stat-val{font-size:18px;font-weight:800}\
+.pb-stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}\
+.pb-stat{background:white;border-radius:12px;border:1px solid #E5E7EB;padding:10px 8px;text-align:center}\
+.pb-stat-label{font-size:10px;color:#64748B;font-weight:600;margin-bottom:2px;line-height:1.3}\
+.pb-stat-val{font-size:15px;font-weight:800}\
+@media(min-width:480px){.pb-stat-grid{grid-template-columns:repeat(3,1fr)}.pb-stat{padding:12px 10px}.pb-stat-val{font-size:18px}}\
+@media(min-width:640px){.pb-stat-grid{grid-template-columns:repeat(4,1fr)}}\
 .pb-stat-val.green{color:#059669}\
 .pb-stat-val.red{color:#DC2626}\
 .pb-stat-val.blue{color:#0284C7}\
@@ -525,7 +527,7 @@ var Pembukuan = (function() {
 .pb-expense-card-date{font-size:11px;color:#94A3B8;white-space:nowrap}\
 .pb-expense-card-date i{margin-right:3px;font-size:10px}\
 .pb-expense-card-actions{display:flex;gap:6px;flex-shrink:0}\
-.pb-auto-card{background:#fff;border-radius:12px;padding:12px 14px;margin-bottom:8px;border:1px solid #FDE68A;box-shadow:0 1px 4px rgba(0,0,0,0.04)}\
+.pb-auto-card{background:#fff;border-radius:12px;padding:12px 14px;border:1px solid #FDE68A;box-shadow:0 1px 4px rgba(0,0,0,0.04)}\
 .pb-auto-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px}\
 .pb-auto-card-info{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}\
 .pb-auto-card-name{font-size:14px;font-weight:600;color:#1E293B;word-wrap:break-word;overflow-wrap:break-word}\
@@ -846,7 +848,7 @@ var Pembukuan = (function() {
     catFilter += '</div>';
 
     container.innerHTML = '\
-      <div class="pb-stat-grid" style="grid-template-columns:1fr 1fr 1fr 1fr">\
+      <div class="pb-stat-grid">\
         <div class="pb-stat"><div class="pb-stat-label">Total Item</div><div class="pb-stat-val blue">' + totalItems + '</div></div>\
         <div class="pb-stat"><div class="pb-stat-label">Stok Rendah</div><div class="pb-stat-val red">' + lowStock + '</div></div>\
         <div class="pb-stat"><div class="pb-stat-label">Nilai Stok</div><div class="pb-stat-val emerald">' + _fmtIDR(totalValue) + '</div></div>\
@@ -862,8 +864,8 @@ var Pembukuan = (function() {
           <input type="text" class="pb-input" placeholder="Cari stok..." oninput="Pembukuan._filterStokSearch(this.value)">\
         </div>' +
         catFilter +
-        '<div id="pb-stock-list"></div>\
-      </div>';
+        '</div>\
+      <div id="pb-stock-list"></div>';
 
     _renderStockList(_inventory);
   }
@@ -1250,7 +1252,7 @@ var Pembukuan = (function() {
     }
 
     container.innerHTML = '\
-      <div class="pb-stat-grid" style="grid-template-columns:1fr 1fr 1fr 1fr">\
+      <div class="pb-stat-grid">\
         <div class="pb-stat"><div class="pb-stat-label">Produksi Hari Ini</div><div class="pb-stat-val blue">' + todayProd.length + '</div></div>\
         <div class="pb-stat"><div class="pb-stat-label">Total Produksi</div><div class="pb-stat-val emerald">' + _production.length + '</div></div>\
         <div class="pb-stat"><div class="pb-stat-label">Bahan Baku</div><div class="pb-stat-val">' + bahanBaku.length + '</div></div>\
@@ -1515,7 +1517,7 @@ var Pembukuan = (function() {
     }
 
     container.innerHTML = '\
-      <div class="pb-stat-grid" style="grid-template-columns:1fr 1fr 1fr 1fr">\
+      <div class="pb-stat-grid">\
         <div class="pb-stat"><div class="pb-stat-label">Operasional Hari Ini</div><div class="pb-stat-val red">' + _fmtIDR(totalToday) + '</div></div>\
         <div class="pb-stat"><div class="pb-stat-label">Total Operasional</div><div class="pb-stat-val red">' + _fmtIDR(totalAll) + '</div></div>\
         <div class="pb-stat"><div class="pb-stat-label">Bahan Baku Hari Ini</div><div class="pb-stat-val" style="color:#B45309;font-size:15px">' + (function(){var t=0;for(var x=0;x<autoExps.length;x++){if((autoExps[x].date||'').substring(0,10)===_today())t+=Number(autoExps[x].amount)||0;}return _fmtIDR(t);})() + '</div></div>\
@@ -1544,10 +1546,8 @@ var Pembukuan = (function() {
         <button onclick="Pembukuan._addExpenseUI()" class="pb-btn pb-btn-primary" style="width:100%"><i class="fas fa-plus"></i> Simpan Pengeluaran</button>\
       </div>' +
       autoSection +
-      '<div class="pb-card">\
-        <div class="pb-card-title"><i class="fas fa-clock-rotate-left" style="color:#64748B"></i> Riwayat Pengeluaran Operasional</div>' +
-        manualList +
-      '</div>';
+      '<div style="font-size:14px;font-weight:700;color:#1E293B;margin-bottom:10px;margin-top:4px;display:flex;align-items:center;gap:8px"><i class="fas fa-clock-rotate-left" style="color:#64748B"></i> Riwayat Pengeluaran Operasional</div>' +
+        manualList;
   }
 
   function _addExpenseUI() {
