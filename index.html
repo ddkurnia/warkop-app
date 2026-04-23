@@ -561,7 +561,7 @@
       .auth-form-area { max-width: 460px !important; }
       /* Header bigger on desktop */
       #pos-app > header > div { padding-left: 1.5rem !important; padding-right: 1.5rem !important; }
-      #header-shop-photo { width: 52px !important; height: 52px !important; min-width: 52px !important; min-height: 52px !important; max-width: 52px !important; max-height: 52px !important; }
+      #header-shop-photo { width: 52px !important; height: 52px !important; min-width: 52px !important; min-height: 52px !important; max-width: 52px !important; max-height: 52px !important; aspect-ratio: 1/1 !important; }
       #header-shop-name { font-size: 1.15rem !important; }
       #header-shop-tagline { font-size: 0.8rem !important; }
       #header-daily-total { font-size: 1rem !important; }
@@ -714,7 +714,7 @@
       /* POS App compact landscape */
       #pos-app.pos-visible > header > div { padding-top: 0.35rem !important; padding-bottom: 0.35rem !important; }
       #pos-app.pos-visible > header { position: relative !important; top: auto !important; }
-      #header-shop-photo { width: 36px !important; height: 36px !important; min-width: 36px !important; min-height: 36px !important; max-width: 36px !important; max-height: 36px !important; }
+      #header-shop-photo { width: 36px !important; height: 36px !important; min-width: 36px !important; min-height: 36px !important; max-width: 36px !important; max-height: 36px !important; aspect-ratio: 1/1 !important; }
       #header-shop-name { font-size: 0.85rem !important; }
       #header-shop-tagline { font-size: 0.65rem !important; }
       #header-daily-total { font-size: 0.75rem !important; }
@@ -845,6 +845,34 @@
       overflow: hidden;
     }
     /* ===== BOLD MODERN POS DESIGN ===== */
+
+    /* --- HEADER LOGO: Square, contained, no overflow --- */
+    #header-shop-photo {
+      width: 48px !important;
+      height: 48px !important;
+      min-width: 48px !important;
+      min-height: 48px !important;
+      max-width: 48px !important;
+      max-height: 48px !important;
+      aspect-ratio: 1 / 1 !important;
+      overflow: hidden !important;
+      flex-shrink: 0 !important;
+      border-radius: 12px !important;
+    }
+    #header-shop-photo img {
+      display: block !important;
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover !important;
+      object-position: center !important;
+      max-width: none !important;
+      max-height: none !important;
+      min-width: 0 !important;
+      min-height: 0 !important;
+      border: none !important;
+      padding: 0 !important;
+      margin: 0 !important;
+    }
 
     /* --- BOTTOM NAV: Clean pill indicator --- */
     .nav-btn {
