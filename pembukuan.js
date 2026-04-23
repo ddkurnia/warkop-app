@@ -487,8 +487,8 @@ var Pembukuan = (function() {
 .pb-nav-btn.nav-inactive{color:#94A3B8}\
 .pb-nav-btn i{font-size:16px}\
 .pb-nav-btn span{font-size:10px;font-weight:600}\
-.pb-content{max-width:700px;margin:0 auto;padding:16px;padding-bottom:40px;flex:1 1 0%!important;min-height:0!important;overflow-y:auto!important;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}\
-.pb-card{background:white;border-radius:16px;border:1px solid #E5E7EB;padding:16px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,0.04)}\
+.pb-content{max-width:700px;margin:0 auto;padding:16px;padding-bottom:40px;flex:1 1 0%!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}\
+.pb-card{background:white;border-radius:16px;border:1px solid #E5E7EB;padding:16px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,0.04);overflow-x:auto;-webkit-overflow-scrolling:touch}\
 .pb-card-title{font-size:14px;font-weight:700;color:#1E293B;margin-bottom:12px;display:flex;align-items:center;gap:8px}\
 .pb-stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px}\
 .pb-stat{background:white;border-radius:14px;border:1px solid #E5E7EB;padding:14px;text-align:center}\
@@ -511,9 +511,9 @@ var Pembukuan = (function() {
 .pb-select{padding:10px 12px;border:1.5px solid #D1D5DB;border-radius:10px;font-size:13px;outline:none;background:white;cursor:pointer;font-family:inherit}\
 .pb-select:focus{border-color:#10B981}\
 .pb-label{font-size:12px;font-weight:600;color:#374151;margin-bottom:4px;display:block}\
-.pb-table{width:100%;border-collapse:collapse;font-size:12px}\
-.pb-table th{text-align:left;padding:8px 10px;color:#64748B;font-weight:600;border-bottom:2px solid #E5E7EB;font-size:11px;text-transform:uppercase;letter-spacing:.5px}\
-.pb-table td{padding:10px;border-bottom:1px solid #F1F5F9;vertical-align:middle}\
+.pb-table{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed;min-width:480px}\
+.pb-table th{text-align:left;padding:8px 8px;color:#64748B;font-weight:600;border-bottom:2px solid #E5E7EB;font-size:11px;text-transform:uppercase;letter-spacing:.5px;word-wrap:break-word;overflow-wrap:break-word;white-space:normal}\
+.pb-table td{padding:8px;border-bottom:1px solid #F1F5F9;vertical-align:middle;word-wrap:break-word;overflow-wrap:break-word;white-space:normal}\
 .pb-table tr:hover td{background:#F8FAFC}\
 .pb-badge{display:inline-block;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600}\
 .pb-empty{text-align:center;padding:40px 20px;color:#94A3B8}\
