@@ -464,137 +464,137 @@ var Pembukuan = (function() {
     var css = document.createElement('style');
     css.id = 'pb-styles';
     css.textContent = '\
-#mode-select-overlay{position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#064E3B 0%,#065F46 30%,#047857 60%,#059669 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}\
+#mode-select-overlay{position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#3D2EAD 0%,#4A3BBF 30%,#5A4BD1 60%,#6C5CE7 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}\
 #mode-select-overlay.hidden{display:none}\
 .mode-card{background:white;border-radius:24px;padding:32px 24px;text-align:center;max-width:380px;width:100%;box-shadow:0 25px 60px rgba(0,0,0,0.3);animation:pbFadeUp .4s ease}\
 @keyframes pbFadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}\
-.mode-btn{display:flex;align-items:center;gap:14px;width:100%;padding:18px 20px;border-radius:16px;border:2px solid #E5E7EB;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;background:white}\
+.mode-btn{display:flex;align-items:center;gap:14px;width:100%;padding:18px 20px;border-radius:16px;border:2px solid #E2E5F0;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;background:white}\
 .mode-btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,0,0,0.1)}\
-.mode-btn-pos{color:#0369A1;border-color:#BAE6FD}\
-.mode-btn-pos:hover{background:#F0F9FF;border-color:#0EA5E9}\
-.mode-btn-pb{color:#065F46;border-color:#A7F3D0}\
-.mode-btn-pb:hover{background:#ECFDF5;border-color:#10B981}\
+.mode-btn-pos{color:#5A4BD1;border-color:#D5D0FF}\
+.mode-btn-pos:hover{background:#F0EEFF;border-color:#A29BFE}\
+.mode-btn-pb{color:#4A3BBF;border-color:#D5D0FF}\
+.mode-btn-pb:hover{background:#F0EEFF;border-color:#A29BFE}\
 .mode-btn .mode-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:20px}\
-.mode-btn-pos .mode-icon{background:linear-gradient(135deg,#0EA5E9,#0369A1);color:white}\
-.mode-btn-pb .mode-icon{background:linear-gradient(135deg,#10B981,#065F46);color:white}\
-#pembukuan-view{display:flex!important;flex-direction:column;height:100vh;height:100dvh;height:calc(var(--vh,1vh)*100);overflow:hidden;background:#F8FAFC}\
+.mode-btn-pos .mode-icon{background:linear-gradient(135deg,#A29BFE,#5A4BD1);color:white}\
+.mode-btn-pb .mode-icon{background:linear-gradient(135deg,#A29BFE,#4A3BBF);color:white}\
+#pembukuan-view{display:flex!important;flex-direction:column;height:100vh;height:100dvh;height:calc(var(--vh,1vh)*100);overflow:hidden;background:#F5F6FA}\
 #pembukuan-view.hidden{display:none!important}\
-.pb-header{background:linear-gradient(135deg,#065F46,#047857);color:white;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0!important;z-index:50;box-shadow:0 2px 8px rgba(0,0,0,0.1)}\
-.pb-subnav{background:white;border-bottom:1px solid #E5E7EB;overflow-x:auto;flex-shrink:0!important;z-index:40}\
+.pb-header{background:linear-gradient(135deg,#4A3BBF,#6C5CE7);color:white;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0!important;z-index:50;box-shadow:0 4px 20px rgba(108,92,231,0.2)}\
+.pb-subnav{background:white;border-bottom:1px solid #E2E5F0;overflow-x:auto;flex-shrink:0!important;z-index:40}\
 .pb-subnav-inner{display:flex;max-width:700px;margin:0 auto}\
 .pb-nav-btn{flex:1;padding:10px 4px;border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:all .15s;border-bottom:3px solid transparent;min-width:64px}\
-.pb-nav-btn.nav-active{color:#059669;border-bottom-color:#059669;background:#ECFDF5}\
-.pb-nav-btn.nav-inactive{color:#94A3B8}\
+.pb-nav-btn.nav-active{color:#6C5CE7;border-bottom-color:#6C5CE7;background:#F0EEFF}\
+.pb-nav-btn.nav-inactive{color:#9CA3AF}\
 .pb-nav-btn i{font-size:16px}\
 .pb-nav-btn span{font-size:10px;font-weight:600}\
 .pb-content{max-width:700px;margin:0 auto;padding:16px;padding-bottom:40px;flex:1 1 0%!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}\
-.pb-card{background:white;border-radius:16px;border:1px solid #E5E7EB;padding:16px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,0.04);overflow:hidden}\
-.pb-card-title{font-size:14px;font-weight:700;color:#1E293B;margin-bottom:12px;display:flex;align-items:center;gap:8px}\
+.pb-card{background:white;border-radius:16px;border:1px solid #E2E5F0;padding:16px;margin-bottom:12px;box-shadow:0 4px 16px rgba(108,92,231,0.05);overflow:hidden}\
+.pb-card-title{font-size:14px;font-weight:700;color:#2D3436;margin-bottom:12px;display:flex;align-items:center;gap:8px}\
 .pb-stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}\
-.pb-stat{background:white;border-radius:12px;border:1px solid #E5E7EB;padding:10px 8px;text-align:center}\
-.pb-stat-label{font-size:10px;color:#64748B;font-weight:600;margin-bottom:2px;line-height:1.3}\
+.pb-stat{background:white;border-radius:12px;border:1px solid #E2E5F0;padding:10px 8px;text-align:center}\
+.pb-stat-label{font-size:10px;color:#636E72;font-weight:600;margin-bottom:2px;line-height:1.3}\
 .pb-stat-val{font-size:15px;font-weight:800}\
 @media(min-width:480px){.pb-stat-grid{grid-template-columns:repeat(3,1fr)}.pb-stat{padding:12px 10px}.pb-stat-val{font-size:18px}}\
 @media(min-width:640px){.pb-stat-grid{grid-template-columns:repeat(4,1fr)}}\
-.pb-stat-val.green{color:#059669}\
-.pb-stat-val.red{color:#DC2626}\
-.pb-stat-val.blue{color:#0284C7}\
-.pb-stat-val.emerald{color:#047857}\
+.pb-stat-val.green{color:#2ECC71}\
+.pb-stat-val.red{color:#E74C3C}\
+.pb-stat-val.blue{color:#6C5CE7}\
+.pb-stat-val.emerald{color:#5A4BD1}\
 .pb-btn{padding:8px 16px;border-radius:10px;border:none;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px}\
-.pb-btn-primary{background:linear-gradient(135deg,#059669,#047857);color:white;box-shadow:0 2px 6px rgba(4,120,87,0.3)}\
-.pb-btn-primary:hover{box-shadow:0 4px 12px rgba(4,120,87,0.4);transform:translateY(-1px)}\
-.pb-btn-danger{background:#FEE2E2;color:#DC2626}\
-.pb-btn-danger:hover{background:#FECACA}\
-.pb-btn-ghost{background:#F1F5F9;color:#475569}\
-.pb-btn-ghost:hover{background:#E2E8F0}\
+.pb-btn-primary{background:linear-gradient(135deg,#6C5CE7,#5A4BD1);color:white;box-shadow:0 4px 16px rgba(108,92,231,0.3)}\
+.pb-btn-primary:hover{box-shadow:0 6px 24px rgba(108,92,231,0.4);transform:translateY(-1px)}\
+.pb-btn-danger{background:#FDECEC;color:#E74C3C}\
+.pb-btn-danger:hover{background:#FAD8D8}\
+.pb-btn-ghost{background:#F5F6FA;color:#2D3436}\
+.pb-btn-ghost:hover{background:#E8E5F0}\
 .pb-btn-sm{padding:5px 10px;font-size:11px;border-radius:8px}\
-.pb-input{width:100%;padding:10px 12px;border:1.5px solid #D1D5DB;border-radius:10px;font-size:13px;outline:none;transition:border-color .15s;background:white;font-family:inherit}\
-.pb-input:focus{border-color:#10B981;box-shadow:0 0 0 3px rgba(16,185,129,0.1)}\
-.pb-select{padding:10px 12px;border:1.5px solid #D1D5DB;border-radius:10px;font-size:13px;outline:none;background:white;cursor:pointer;font-family:inherit}\
-.pb-select:focus{border-color:#10B981}\
-.pb-label{font-size:12px;font-weight:600;color:#374151;margin-bottom:4px;display:block}\
+.pb-input{width:100%;padding:10px 12px;border:1.5px solid #DDD8F0;border-radius:10px;font-size:13px;outline:none;transition:border-color .15s;background:white;font-family:inherit}\
+.pb-input:focus{border-color:#6C5CE7;box-shadow:0 0 0 3px rgba(108,92,231,0.1)}\
+.pb-select{padding:10px 12px;border:1.5px solid #DDD8F0;border-radius:10px;font-size:13px;outline:none;background:white;cursor:pointer;font-family:inherit}\
+.pb-select:focus{border-color:#6C5CE7}\
+.pb-label{font-size:12px;font-weight:600;color:#2D3436;margin-bottom:4px;display:block}\
 .pb-table{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed;min-width:480px}\
-.pb-table th{text-align:left;padding:8px 8px;color:#64748B;font-weight:600;border-bottom:2px solid #E5E7EB;font-size:11px;text-transform:uppercase;letter-spacing:.5px;word-wrap:break-word;overflow-wrap:break-word;white-space:normal}\
-.pb-table td{padding:8px;border-bottom:1px solid #F1F5F9;vertical-align:middle;word-wrap:break-word;overflow-wrap:break-word;white-space:normal}\
-.pb-table tr:hover td{background:#F8FAFC}\
+.pb-table th{text-align:left;padding:8px 8px;color:#636E72;font-weight:600;border-bottom:2px solid #E2E5F0;font-size:11px;text-transform:uppercase;letter-spacing:.5px;word-wrap:break-word;overflow-wrap:break-word;white-space:normal}\
+.pb-table td{padding:8px;border-bottom:1px solid #F0EEFF;vertical-align:middle;word-wrap:break-word;overflow-wrap:break-word;white-space:normal}\
+.pb-table tr:hover td{background:#F5F6FA}\
 .pb-expense-list,.pb-auto-list,.pb-stock-list,.pb-prod-list{display:flex;flex-direction:column;gap:10px;max-width:100%;overflow:hidden}\
-.pb-expense-card{background:#fff;border-radius:14px;padding:14px 16px;box-shadow:0 2px 8px rgba(0,0,0,0.05);border:1px solid #F1F5F9}\
+.pb-expense-card{background:#fff;border-radius:14px;padding:14px 16px;box-shadow:0 4px 16px rgba(108,92,231,0.05);border:1px solid #F0EEFF}\
 .pb-expense-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px}\
 .pb-expense-card-info{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}\
-.pb-expense-card-name{font-size:15px;font-weight:700;color:#1E293B;word-wrap:break-word;overflow-wrap:break-word}\
-.pb-expense-card-amount{font-size:16px;font-weight:800;color:#DC2626;white-space:nowrap;flex-shrink:0}\
+.pb-expense-card-name{font-size:15px;font-weight:700;color:#2D3436;word-wrap:break-word;overflow-wrap:break-word}\
+.pb-expense-card-amount{font-size:16px;font-weight:800;color:#E74C3C;white-space:nowrap;flex-shrink:0}\
 .pb-expense-card-bottom{display:flex;justify-content:space-between;align-items:center;gap:8px}\
-.pb-expense-card-date{font-size:11px;color:#94A3B8;white-space:nowrap}\
+.pb-expense-card-date{font-size:11px;color:#9CA3AF;white-space:nowrap}\
 .pb-expense-card-date i{margin-right:3px;font-size:10px}\
 .pb-expense-card-actions{display:flex;gap:6px;flex-shrink:0}\
 .pb-auto-card{background:#fff;border-radius:12px;padding:12px 14px;border:1px solid #FDE68A;box-shadow:0 1px 4px rgba(0,0,0,0.04)}\
 .pb-auto-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px}\
 .pb-auto-card-info{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}\
-.pb-auto-card-name{font-size:14px;font-weight:600;color:#1E293B;word-wrap:break-word;overflow-wrap:break-word}\
-.pb-auto-card-amount{font-size:14px;font-weight:700;color:#B45309;white-space:nowrap;flex-shrink:0}\
-.pb-auto-card-date{font-size:11px;color:#94A3B8}\
+.pb-auto-card-name{font-size:14px;font-weight:600;color:#2D3436;word-wrap:break-word;overflow-wrap:break-word}\
+.pb-auto-card-amount{font-size:14px;font-weight:700;color:#8B5E3C;white-space:nowrap;flex-shrink:0}\
+.pb-auto-card-date{font-size:11px;color:#9CA3AF}\
 .pb-auto-card-date i{margin-right:3px;font-size:10px}\
-.pb-stock-card{background:#fff;border-radius:14px;padding:12px 14px;box-shadow:0 2px 8px rgba(0,0,0,0.05);border:1px solid #F1F5F9;max-width:100%;overflow:hidden}\
+.pb-stock-card{background:#fff;border-radius:14px;padding:12px 14px;box-shadow:0 4px 16px rgba(108,92,231,0.05);border:1px solid #F0EEFF;max-width:100%;overflow:hidden}\
 .pb-stock-card-top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px}\
 .pb-stock-card-info{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1;overflow:hidden}\
-.pb-stock-card-name{font-size:14px;font-weight:700;color:#1E293B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\
-.pb-stock-card-qty{font-size:15px;font-weight:800;white-space:nowrap;flex-shrink:0}\
+.pb-stock-card-name{font-size:14px;font-weight:700;color:#2D3436;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\
+.pb-stock-card-qty{font-size:15px;font-weight:800;color:#2ECC71;white-space:nowrap;flex-shrink:0}\
 .pb-stock-card-mid{display:flex;gap:10px;margin-bottom:4px;flex-wrap:wrap;overflow:hidden}\
-.pb-stock-card-price{font-size:11px;color:#64748B;white-space:nowrap}\
-.pb-stock-card-value{font-size:11px;font-weight:600;color:#1E293B;white-space:nowrap}\
+.pb-stock-card-price{font-size:11px;color:#636E72;white-space:nowrap}\
+.pb-stock-card-value{font-size:11px;font-weight:600;color:#2D3436;white-space:nowrap}\
 .pb-stock-card-actions{display:flex;gap:4px;margin-top:4px}\
-.pb-prod-card{background:#fff;border-radius:14px;padding:14px 16px;box-shadow:0 2px 8px rgba(0,0,0,0.05);border:1px solid #F1F5F9}\
+.pb-prod-card{background:#fff;border-radius:14px;padding:14px 16px;box-shadow:0 4px 16px rgba(108,92,231,0.05);border:1px solid #F0EEFF}\
 .pb-prod-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:6px}\
 .pb-prod-card-info{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}\
-.pb-prod-card-name{font-size:14px;font-weight:700;color:#059669;word-wrap:break-word;overflow-wrap:break-word}\
-.pb-prod-card-bahan{font-size:12px;color:#475569;line-height:1.4;word-wrap:break-word;overflow-wrap:break-word}\
-.pb-prod-card-date{font-size:11px;color:#94A3B8}\
+.pb-prod-card-name{font-size:14px;font-weight:700;color:#2ECC71;word-wrap:break-word;overflow-wrap:break-word}\
+.pb-prod-card-bahan{font-size:12px;color:#636E72;line-height:1.4;word-wrap:break-word;overflow-wrap:break-word}\
+.pb-prod-card-date{font-size:11px;color:#9CA3AF}\
 .pb-prod-card-date i{margin-right:3px;font-size:10px}\
 .pb-badge{display:inline-block;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:600}\
-.pb-empty{text-align:center;padding:40px 20px;color:#94A3B8}\
+.pb-empty{text-align:center;padding:40px 20px;color:#9CA3AF}\
 .pb-empty i{font-size:36px;margin-bottom:8px;display:block}\
 .pb-empty p{font-size:13px}\
-.pb-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:100;display:flex;align-items:center;justify-content:center;padding:16px;animation:pbFade .15s ease}\
+.pb-modal-bg{position:fixed;inset:0;background:rgba(74,59,191,0.4);z-index:100;display:flex;align-items:center;justify-content:center;padding:16px;animation:pbFade .15s ease}\
 @keyframes pbFade{from{opacity:0}to{opacity:1}}\
-.pb-modal{background:white;border-radius:20px;width:100%;max-width:420px;max-height:85vh;overflow-y:auto;box-shadow:0 25px 50px rgba(0,0,0,0.15);animation:pbSlideUp .2s ease}\
+.pb-modal{background:white;border-radius:20px;width:100%;max-width:420px;max-height:85vh;overflow-y:auto;box-shadow:0 25px 60px rgba(108,92,231,0.15);animation:pbSlideUp .2s ease}\
 @keyframes pbSlideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}\
-.pb-modal-header{padding:16px 20px;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;justify-content:space-between}\
-.pb-modal-header h3{font-size:15px;font-weight:700;color:#1E293B}\
+.pb-modal-header{padding:16px 20px;border-bottom:1px solid #E2E5F0;display:flex;align-items:center;justify-content:space-between}\
+.pb-modal-header h3{font-size:15px;font-weight:700;color:#2D3436}\
 .pb-modal-body{padding:20px}\
-.pb-modal-footer{padding:12px 20px;border-top:1px solid #E5E7EB;display:flex;gap:8px;justify-content:flex-end}\
+.pb-modal-footer{padding:12px 20px;border-top:1px solid #E2E5F0;display:flex;gap:8px;justify-content:flex-end}\
 .pb-chip{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:8px;font-size:11px;font-weight:600}\
 .pb-chip-amber{background:#FFFBEB;color:#B45309}\
-.pb-chip-blue{background:#EFF6FF;color:#1D4ED8}\
-.pb-chip-slate{background:#F1F5F9;color:#475569}\
-.pb-chip-green{background:#ECFDF5;color:#047857}\
-.pb-divider{border:none;border-top:1px solid #F1F5F9;margin:8px 0}\
+.pb-chip-blue{background:#F0EEFF;color:#5A4BD1}\
+.pb-chip-slate{background:#F5F6FA;color:#636E72}\
+.pb-chip-green{background:#E8F8F0;color:#2ECC71}\
+.pb-divider{border:none;border-top:1px solid #F0EEFF;margin:8px 0}\
 .pb-search{position:relative}\
-.pb-search i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#94A3B8;font-size:13px}\
+.pb-search i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#9CA3AF;font-size:13px}\
 .pb-search input{padding-left:36px}\
-.pb-guide-hero{background:linear-gradient(135deg,#065F46,#047857,#059669);border-radius:16px;padding:24px 20px;color:white;margin-bottom:16px;text-align:center}\
+.pb-guide-hero{background:linear-gradient(135deg,#4A3BBF,#6C5CE7,#A29BFE);border-radius:16px;padding:24px 20px;color:white;margin-bottom:16px;text-align:center}\
 .pb-guide-hero h2{font-size:20px;font-weight:800;margin-bottom:6px}\
 .pb-guide-hero p{font-size:12px;opacity:.85;line-height:1.5}\
-.pb-guide-section{background:white;border-radius:16px;border:1px solid #E5E7EB;padding:0;margin-bottom:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.04)}\
+.pb-guide-section{background:white;border-radius:16px;border:1px solid #E2E5F0;padding:0;margin-bottom:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.04)}\
 .pb-guide-sec-header{padding:14px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:background .15s;user-select:none}\
-.pb-guide-sec-header:hover{background:#F8FAFC}\
+.pb-guide-sec-header:hover{background:#F5F6FA}\
 .pb-guide-sec-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}\
-.pb-guide-sec-title{flex:1;font-size:14px;font-weight:700;color:#1E293B}\
-.pb-guide-sec-arrow{color:#94A3B8;font-size:12px;transition:transform .2s}\
+.pb-guide-sec-title{flex:1;font-size:14px;font-weight:700;color:#2D3436}\
+.pb-guide-sec-arrow{color:#9CA3AF;font-size:12px;transition:transform .2s}\
 .pb-guide-sec-arrow.open{transform:rotate(180deg)}\
 .pb-guide-sec-body{padding:0 16px 16px;display:none}\
 .pb-guide-sec-body.open{display:block}\
 .pb-guide-step{display:flex;gap:10px;margin-bottom:14px}\
 .pb-guide-step:last-child{margin-bottom:0}\
-.pb-guide-step-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:2px}\
-.pb-guide-step-text{flex:1;font-size:12px;color:#374151;line-height:1.6}\
-.pb-guide-step-text strong{color:#1E293B}\
-.pb-guide-tip{background:#FFFBEB;border:1px solid #FDE68A;border-radius:10px;padding:12px 14px;margin-top:12px;font-size:11px;color:#92400E;line-height:1.6;display:flex;gap:8px}\
-.pb-guide-tip i{color:#F59E0B;margin-top:2px;flex-shrink:0}\
-.pb-guide-example{background:#F0FDF4;border:1px solid #A7F3D0;border-radius:10px;padding:12px 14px;margin-top:10px;font-size:11px;color:#065F46;line-height:1.6}\
-.pb-guide-example strong{color:#047857}\
+.pb-guide-step-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:2px;background:#F0EEFF;color:#6C5CE7}\
+.pb-guide-step-text{flex:1;font-size:12px;color:#636E72;line-height:1.6}\
+.pb-guide-step-text strong{color:#2D3436}\
+.pb-guide-tip{background:#F0EEFF;border:1px solid #D5D0FF;border-radius:10px;padding:12px 14px;margin-top:12px;font-size:11px;color:#6B4226;line-height:1.6;display:flex;gap:8px}\
+.pb-guide-tip i{color:#6C5CE7;margin-top:2px;flex-shrink:0}\
+.pb-guide-example{background:#E8F8F0;border:1px solid #D5D0FF;border-radius:10px;padding:12px 14px;margin-top:10px;font-size:11px;color:#4A3BBF;line-height:1.6}\
+.pb-guide-example strong{color:#2ECC71}\
 .pb-guide-flow{display:flex;flex-direction:column;align-items:center;gap:0;margin:12px 0}\
-.pb-guide-flow-item{background:#F1F5F9;border:1px solid #E2E8F0;border-radius:10px;padding:8px 14px;font-size:11px;font-weight:600;color:#334155;text-align:center;width:100%}\
-.pb-guide-flow-arrow{color:#94A3B8;font-size:14px;line-height:1}\
+.pb-guide-flow-item{background:#F5F6FA;border:1px solid #E2E5F0;border-radius:10px;padding:8px 14px;font-size:11px;font-weight:600;color:#2D3436;text-align:center;width:100%}\
+.pb-guide-flow-arrow{color:#9CA3AF;font-size:14px;line-height:1}\
 ';
     document.head.appendChild(css);
   }
@@ -617,14 +617,14 @@ var Pembukuan = (function() {
           <div class="mode-icon"><i class="fas fa-calculator"></i></div>\
           <div style="text-align:left">\
             <div>Masuk POS</div>\
-            <div style="font-size:11px;font-weight:400;color:#64748B;margin-top:2px">Kasir, Pesanan, Struk</div>\
+            <div style="font-size:11px;font-weight:400;color:#636E72;margin-top:2px">Kasir, Pesanan, Struk</div>\
           </div>\
         </button>\
         <button class="mode-btn mode-btn-pb" onclick="selectMode(\'pembukuan\')">\
           <div class="mode-icon"><i class="fas fa-book-open"></i></div>\
           <div style="text-align:left">\
             <div>Masuk Pembukuan</div>\
-            <div style="font-size:11px;font-weight:400;color:#64748B;margin-top:2px">Stok, Produksi, Laporan</div>\
+            <div style="font-size:11px;font-weight:400;color:#636E72;margin-top:2px">Stok, Produksi, Laporan</div>\
           </div>\
         </button>\
       </div>\
@@ -856,7 +856,7 @@ var Pembukuan = (function() {
       </div>\
       <div class="pb-card">\
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">\
-          <div class="pb-card-title" style="margin-bottom:0"><i class="fas fa-boxes-stacked" style="color:#059669"></i> Daftar Stok</div>\
+          <div class="pb-card-title" style="margin-bottom:0"><i class="fas fa-boxes-stacked" style="color:#6C5CE7"></i> Daftar Stok</div>\
           <button onclick="Pembukuan._showAddStockModal()" class="pb-btn pb-btn-primary pb-btn-sm"><i class="fas fa-plus"></i> Tambah</button>\
         </div>\
         <div class="pb-search" style="margin-bottom:12px">\
@@ -884,7 +884,7 @@ var Pembukuan = (function() {
       var item = items[i];
       var threshold = item.lowStock || 5;
       var isLow = item.stock <= threshold;
-      var stockColor = isLow ? 'color:#DC2626' : 'color:#059669';
+      var stockColor = isLow ? 'color:#E74C3C' : 'color:#6C5CE7';
       var catLabel = _getCatLabel(STOCK_CATS, item.category);
       var nilai = (item.stock || 0) * (item.hargaBeli || 0);
       html += '<div class="pb-stock-card" id="pb-stock-row-' + item.id + '">\
@@ -899,7 +899,7 @@ var Pembukuan = (function() {
           <div class="pb-stock-card-price">' + (item.hargaBeli ? _fmtIDR(item.hargaBeli) + '/' + _escHtml(item.unit) : 'Rp -') + '</div>\
           <div class="pb-stock-card-value">Nilai: ' + _fmtIDR(nilai) + '</div>\
         </div>' +
-        (isLow ? '<div style="font-size:11px;color:#DC2626;padding:2px 0"><i class="fas fa-triangle-exclamation"></i> Stok rendah! Min: ' + threshold + ' ' + _escHtml(item.unit) + '</div>' : '') +
+        (isLow ? '<div style="font-size:11px;color:#E74C3C;padding:2px 0"><i class="fas fa-triangle-exclamation"></i> Stok rendah! Min: ' + threshold + ' ' + _escHtml(item.unit) + '</div>' : '') +
         '<div class="pb-stock-card-actions">\
           <button onclick="Pembukuan._showEditStockModal(\'' + item.id + '\')" class="pb-btn pb-btn-ghost pb-btn-sm" title="Edit"><i class="fas fa-pen"></i></button>\
           <button onclick="Pembukuan._adjustStockModal(\'' + item.id + '\')" class="pb-btn pb-btn-ghost pb-btn-sm" title="Sesuaikan Stok"><i class="fas fa-plus-minus"></i></button>\
@@ -982,8 +982,8 @@ var Pembukuan = (function() {
     modal.innerHTML = '\
       <div class="pb-modal">\
         <div class="pb-modal-header">\
-          <h3><i class="fas fa-box mr-2" style="color:#059669"></i>' + title + '</h3>\
-          <button onclick="this.closest(\'.pb-modal-bg\').remove()" style="background:none;border:none;cursor:pointer;color:#94A3B8;font-size:16px"><i class="fas fa-xmark"></i></button>\
+          <h3><i class="fas fa-box mr-2" style="color:#6C5CE7"></i>' + title + '</h3>\
+          <button onclick="this.closest(\'.pb-modal-bg\').remove()" style="background:none;border:none;cursor:pointer;color:#9CA3AF;font-size:16px"><i class="fas fa-xmark"></i></button>\
         </div>\
         <div class="pb-modal-body">\
           <div style="margin-bottom:12px">\
@@ -1004,17 +1004,17 @@ var Pembukuan = (function() {
             <div>\
               <label class="pb-label">Harga Beli / ' + (isEdit ? _escHtml(item.unit) : 'unit') + '</label>\
               <input type="number" id="pb-stock-price" class="pb-input" placeholder="0" min="0" value="' + (isEdit && item.hargaBeli ? item.hargaBeli : '') + '" oninput="Pembukuan._updateStockValuePreview()">\
-              <div style="font-size:10px;color:#94A3B8;margin-top:2px">Harga modal per satuan</div>\
+              <div style="font-size:10px;color:#9CA3AF;margin-top:2px">Harga modal per satuan</div>\
             </div>\
             <div>\
               <label class="pb-label">Batas Stok Rendah</label>\
               <input type="number" id="pb-stock-low" class="pb-input" placeholder="5" min="0" value="' + (isEdit && item.lowStock ? item.lowStock : 5) + '" oninput="Pembukuan._updateStockValuePreview()">\
-              <div style="font-size:10px;color:#94A3B8;margin-top:2px">Peringatan jika stok di bawah ini</div>\
+              <div style="font-size:10px;color:#9CA3AF;margin-top:2px">Peringatan jika stok di bawah ini</div>\
             </div>\
           </div>\
           <div id="pb-stock-preview" style="background:#F0FDF4;border:1px solid #A7F3D0;border-radius:10px;padding:10px;text-align:center;display:none">\
-            <div style="font-size:11px;color:#64748B">Total Nilai Stok</div>\
-            <div style="font-size:16px;font-weight:800;color:#047857" id="pb-stock-preview-val">Rp 0</div>\
+            <div style="font-size:11px;color:#636E72">Total Nilai Stok</div>\
+            <div style="font-size:16px;font-weight:800;color:#5A4BD1" id="pb-stock-preview-val">Rp 0</div>\
           </div>\
           <div id="pb-stock-auto-exp-note" style="font-size:10px;color:#B45309;display:none;margin-top:4px;text-align:center"><i class="fas fa-link"></i> Otomatis tercatat sebagai Pengeluaran Bahan Baku</div>\
           <div>\
@@ -1080,14 +1080,14 @@ var Pembukuan = (function() {
     modal.innerHTML = '\
       <div class="pb-modal">\
         <div class="pb-modal-header">\
-          <h3><i class="fas fa-plus-minus mr-2" style="color:#059669"></i>Sesuaikan Stok</h3>\
-          <button onclick="this.closest(\'.pb-modal-bg\').remove()" style="background:none;border:none;cursor:pointer;color:#94A3B8;font-size:16px"><i class="fas fa-xmark"></i></button>\
+          <h3><i class="fas fa-plus-minus mr-2" style="color:#6C5CE7"></i>Sesuaikan Stok</h3>\
+          <button onclick="this.closest(\'.pb-modal-bg\').remove()" style="background:none;border:none;cursor:pointer;color:#9CA3AF;font-size:16px"><i class="fas fa-xmark"></i></button>\
         </div>\
         <div class="pb-modal-body">\
           <div style="text-align:center;margin-bottom:16px">\
-            <div style="font-size:13px;color:#64748B">Item</div>\
-            <div style="font-size:18px;font-weight:700;color:#1E293B">' + _escHtml(item.name) + '</div>\
-            <div style="font-size:13px;color:#64748B">Stok saat ini: <b style="color:#059669">' + item.stock + ' ' + _escHtml(item.unit) + '</b></div>\
+            <div style="font-size:13px;color:#636E72">Item</div>\
+            <div style="font-size:18px;font-weight:700;color:#2D3436">' + _escHtml(item.name) + '</div>\
+            <div style="font-size:13px;color:#636E72">Stok saat ini: <b style="color:#6C5CE7">' + item.stock + ' ' + _escHtml(item.unit) + '</b></div>\
           </div>\
           <div style="display:flex;gap:8px;align-items:center;justify-content:center;margin-bottom:12px">\
             <button onclick="Pembukuan._adjStockDelta(-1)" class="pb-btn pb-btn-danger pb-btn-sm" style="font-size:16px;padding:8px 14px"><i class="fas fa-minus"></i></button>\
@@ -1101,7 +1101,7 @@ var Pembukuan = (function() {
             <button onclick="document.getElementById(\'pb-adj-amount\').value=50" class="pb-btn pb-btn-ghost pb-btn-sm">50</button>\
           </div>' + (item.hargaBeli ? '\
           <div style="margin-top:14px;padding:10px;background:#FFFBEB;border:1px solid #FDE68A;border-radius:10px;display:flex;align-items:flex-start;gap:8px">\
-            <input type="checkbox" id="pb-adj-auto-exp" checked style="width:18px;height:18px;accent-color:#059669;margin-top:2px">\
+            <input type="checkbox" id="pb-adj-auto-exp" checked style="width:18px;height:18px;accent-color:#6C5CE7;margin-top:2px">\
             <label for="pb-adj-auto-exp" style="font-size:12px;color:#92400E">\
               <b>Catat ke Pengeluaran Bahan Baku</b><br>\
               <span style="font-size:10px;color:#B45309">Harga beli: ' + _fmtIDR(item.hargaBeli) + '/' + _escHtml(item.unit) + '</span>\
@@ -1184,7 +1184,7 @@ var Pembukuan = (function() {
         prodHistory += '<div class="pb-prod-card">\
           <div class="pb-prod-card-top">\
             <div class="pb-prod-card-info">\
-              <div class="pb-prod-card-name"><i class="fas fa-cube" style="color:#059669;margin-right:4px"></i>' + _escHtml(pr.toQty + ' ' + pr.toUnit + ' ' + pr.toName) + '</div>\
+              <div class="pb-prod-card-name"><i class="fas fa-cube" style="color:#6C5CE7;margin-right:4px"></i>' + _escHtml(pr.toQty + ' ' + pr.toUnit + ' ' + pr.toName) + '</div>\
               <div class="pb-prod-card-bahan">' + bahanList + '</div>\
             </div>\
             <button onclick="Pembukuan._delProduction(\'' + pr.id + '\')" class="pb-btn pb-btn-danger pb-btn-sm"><i class="fas fa-trash"></i></button>\
@@ -1211,22 +1211,22 @@ var Pembukuan = (function() {
     // --- Stok Bahan Baku Overview ---
     var stokBBHtml = '';
     if (bahanBaku.length === 0) {
-      stokBBHtml = '<div style="text-align:center;padding:14px;color:#94A3B8;font-size:12px"><i class="fas fa-box-open" style="font-size:20px;display:block;margin-bottom:4px;opacity:.5"></i>Belum ada bahan baku</div>';
+      stokBBHtml = '<div style="text-align:center;padding:14px;color:#9CA3AF;font-size:12px"><i class="fas fa-box-open" style="font-size:20px;display:block;margin-bottom:4px;opacity:.5"></i>Belum ada bahan baku</div>';
     } else {
       stokBBHtml = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px">';
       for (var bb = 0; bb < bahanBaku.length; bb++) {
         var bbItem = bahanBaku[bb];
         var bbThreshold = bbItem.lowStock || 5;
         var bbIsLow = bbItem.stock <= bbThreshold;
-        var bbBorder = bbIsLow ? 'border-color:#FECACA;background:#FEF2F2' : 'border-color:#E5E7EB;background:white';
-        var bbStockColor = bbIsLow ? 'color:#DC2626' : 'color:#059669';
-        var bbWarn = bbIsLow ? '<div style="font-size:9px;color:#DC2626"><i class="fas fa-triangle-exclamation"></i> Rendah</div>' : '';
+        var bbBorder = bbIsLow ? 'border-color:#FAD8D8;background:#FDECEC' : 'border-color:#E2E5F0;background:white';
+        var bbStockColor = bbIsLow ? 'color:#E74C3C' : 'color:#6C5CE7';
+        var bbWarn = bbIsLow ? '<div style="font-size:9px;color:#E74C3C"><i class="fas fa-triangle-exclamation"></i> Rendah</div>' : '';
         var bbNilai = (bbItem.hargaBeli || 0) > 0
-          ? '<div style="font-size:9px;color:#94A3B8">' + _fmtIDR(bbItem.stock * bbItem.hargaBeli) + '</div>'
+          ? '<div style="font-size:9px;color:#9CA3AF">' + _fmtIDR(bbItem.stock * bbItem.hargaBeli) + '</div>'
           : '';
         stokBBHtml += '\
           <div style="border:1px solid;border-radius:10px;padding:10px;' + bbBorder + '">\
-            <div style="font-size:11px;font-weight:700;color:#1E293B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + _escHtml(bbItem.name) + '</div>\
+            <div style="font-size:11px;font-weight:700;color:#2D3436;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + _escHtml(bbItem.name) + '</div>\
             <div style="font-size:16px;font-weight:800;' + bbStockColor + ';margin:2px 0">' + bbItem.stock + ' <span style="font-size:10px;font-weight:500">' + _escHtml(bbItem.unit) + '</span></div>\
             ' + bbNilai + bbWarn + '\
           </div>';
@@ -1238,14 +1238,14 @@ var Pembukuan = (function() {
     var stokPJHtml = '';
     if (produkJadi.length > 0) {
       stokPJHtml = '<div style="margin-top:10px;padding-top:10px;border-top:1px dashed #E5E7EB">\
-        <div style="font-size:11px;font-weight:600;color:#64748B;margin-bottom:8px"><i class="fas fa-utensils mr-1"></i>Stok Produk Jadi</div>\
+        <div style="font-size:11px;font-weight:600;color:#636E72;margin-bottom:8px"><i class="fas fa-utensils mr-1"></i>Stok Produk Jadi</div>\
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px">';
       for (var pj = 0; pj < produkJadi.length; pj++) {
         var pjItem = produkJadi[pj];
         stokPJHtml += '\
-          <div style="background:#ECFDF5;border:1px solid #A7F3D0;border-radius:8px;padding:8px;text-align:center">\
-            <div style="font-size:10px;font-weight:600;color:#1E293B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + _escHtml(pjItem.name) + '</div>\
-            <div style="font-size:15px;font-weight:800;color:#047857">' + pjItem.stock + ' <span style="font-size:9px;font-weight:500">' + _escHtml(pjItem.unit) + '</span></div>\
+          <div style="background:#F0EEFF;border:1px solid #A7F3D0;border-radius:8px;padding:8px;text-align:center">\
+            <div style="font-size:10px;font-weight:600;color:#2D3436;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + _escHtml(pjItem.name) + '</div>\
+            <div style="font-size:15px;font-weight:800;color:#5A4BD1">' + pjItem.stock + ' <span style="font-size:9px;font-weight:500">' + _escHtml(pjItem.unit) + '</span></div>\
           </div>';
       }
       stokPJHtml += '</div></div>';
@@ -1259,11 +1259,11 @@ var Pembukuan = (function() {
         <div class="pb-stat"><div class="pb-stat-label">Produk Jadi</div><div class="pb-stat-val">' + produkJadi.length + '</div></div>\
       </div>\
       <div class="pb-card">\
-        <div class="pb-card-title"><i class="fas fa-boxes-stacked" style="color:#059669"></i> Stok Tersedia <span style="font-size:10px;color:#94A3B8;font-weight:400">otomatis update saat ada penambahan</span></div>' +
+        <div class="pb-card-title"><i class="fas fa-boxes-stacked" style="color:#6C5CE7"></i> Stok Tersedia <span style="font-size:10px;color:#9CA3AF;font-weight:400">otomatis update saat ada penambahan</span></div>' +
         stokBBHtml + stokPJHtml + '\
       </div>\
       <div class="pb-card">\
-        <div class="pb-card-title"><i class="fas fa-industry" style="color:#059669"></i> Produksi Baru</div>\
+        <div class="pb-card-title"><i class="fas fa-industry" style="color:#6C5CE7"></i> Produksi Baru</div>\
         <div id="pb-prod-result" style="margin-bottom:12px"></div>\
         <div style="margin-bottom:12px">\
           <label class="pb-label"><i class="fas fa-utensils mr-1"></i>Hasil Produksi (Produk Jadi)</label>\
@@ -1287,7 +1287,7 @@ var Pembukuan = (function() {
       </div>\
       <div class="pb-card">\
         <div class="pb-card-title"><i class="fas fa-bolt" style="color:#F59E0B"></i> Quick Add Stok</div>\
-        <div style="font-size:11px;color:#64748B;margin-bottom:10px">Tambahkan bahan baku atau produk jadi langsung di sini. Stok akan otomatis muncul di atas.</div>\
+        <div style="font-size:11px;color:#636E72;margin-bottom:10px">Tambahkan bahan baku atau produk jadi langsung di sini. Stok akan otomatis muncul di atas.</div>\
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:8px;margin-bottom:8px;align-items:end">\
           <div>\
             <label class="pb-label">Nama</label>\
@@ -1310,7 +1310,7 @@ var Pembukuan = (function() {
         </div>\
       </div>\
       <div class="pb-card">\
-        <div class="pb-card-title"><i class="fas fa-clock-rotate-left" style="color:#64748B"></i> Riwayat Produksi</div>' +
+        <div class="pb-card-title"><i class="fas fa-clock-rotate-left" style="color:#636E72"></i> Riwayat Produksi</div>' +
         prodHistory +
       '</div>';
   }
@@ -1397,13 +1397,13 @@ var Pembukuan = (function() {
     var resultEl = document.getElementById('pb-prod-result');
     if (result.ok) {
       resultEl.innerHTML = '\
-        <div style="background:#ECFDF5;border:1px solid #A7F3D0;border-radius:10px;padding:10px;font-size:12px;color:#047857">\
+        <div style="background:#F0EEFF;border:1px solid #A7F3D0;border-radius:10px;padding:10px;font-size:12px;color:#5A4BD1">\
           <i class="fas fa-check-circle mr-1"></i> ' + _escHtml(result.msg) + '\
         </div>';
       _renderProduksi(document.getElementById('pb-content'));
     } else {
       resultEl.innerHTML = '\
-        <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:10px;padding:10px;font-size:12px;color:#DC2626">\
+        <div style="background:#FDECEC;border:1px solid #FAD8D8;border-radius:10px;padding:10px;font-size:12px;color:#E74C3C">\
           <i class="fas fa-circle-exclamation mr-1"></i> ' + _escHtml(result.msg) + '\
         </div>';
     }
@@ -1456,7 +1456,7 @@ var Pembukuan = (function() {
       for (var aa = 0; aa < autoExps.length; aa++) totalAutoAll += Number(autoExps[aa].amount) || 0;
 
       autoSection = '<div class="pb-card" style="border-left:4px solid #F59E0B;background:#FFFBEB">\
-        <div class="pb-card-title" style="margin-bottom:8px"><i class="fas fa-box-open" style="color:#F59E0B"></i> Modal Bahan Baku <span style="font-size:10px;color:#94A3B8;font-weight:400">(otomatis dari Stok)</span></div>\
+        <div class="pb-card-title" style="margin-bottom:8px"><i class="fas fa-box-open" style="color:#F59E0B"></i> Modal Bahan Baku <span style="font-size:10px;color:#9CA3AF;font-weight:400">(otomatis dari Stok)</span></div>\
         <div style="display:flex;gap:16px;margin-bottom:10px">\
           <div style="font-size:12px;color:#92400E">Hari ini: <b style="color:#B45309">' + _fmtIDR(totalAutoToday) + '</b></div>\
           <div style="font-size:12px;color:#92400E">Total: <b style="color:#B45309">' + _fmtIDR(totalAutoAll) + '</b></div>\
@@ -1480,7 +1480,7 @@ var Pembukuan = (function() {
       autoSection += '</div></div>';
     } else {
       autoSection = '<div class="pb-card" style="border-left:4px solid #F59E0B;background:#FFFBEB">\
-        <div class="pb-card-title"><i class="fas fa-box-open" style="color:#F59E0B"></i> Modal Bahan Baku <span style="font-size:10px;color:#94A3B8;font-weight:400">(otomatis dari Stok)</span></div>\
+        <div class="pb-card-title"><i class="fas fa-box-open" style="color:#F59E0B"></i> Modal Bahan Baku <span style="font-size:10px;color:#9CA3AF;font-weight:400">(otomatis dari Stok)</span></div>\
         <div style="text-align:center;padding:16px;color:#B45309;font-size:12px"><i class="fas fa-info-circle" style="font-size:20px;display:block;margin-bottom:6px;opacity:.5"></i>Belum ada stok masuk. Tambah stok dengan Harga Beli di menu <b>Stok</b> untuk otomatis mencatat pengeluaran bahan baku.</div>\
       </div>';
     }
@@ -1524,7 +1524,7 @@ var Pembukuan = (function() {
         <div class="pb-stat"><div class="pb-stat-label">Jumlah Operasional</div><div class="pb-stat-val blue">' + manualExps.length + '</div></div>\
       </div>\
       <div class="pb-card">\
-        <div class="pb-card-title"><i class="fas fa-plus-circle" style="color:#059669"></i> Tambah Pengeluaran Operasional</div>\
+        <div class="pb-card-title"><i class="fas fa-plus-circle" style="color:#6C5CE7"></i> Tambah Pengeluaran Operasional</div>\
         <div style="margin-bottom:10px">\
           <label class="pb-label">Nama Pengeluaran</label>\
           <input type="text" id="pb-exp-name" class="pb-input" placeholder="Contoh: Bayar Listrik, Gaji Karyawan">\
@@ -1546,7 +1546,7 @@ var Pembukuan = (function() {
         <button onclick="Pembukuan._addExpenseUI()" class="pb-btn pb-btn-primary" style="width:100%"><i class="fas fa-plus"></i> Simpan Pengeluaran</button>\
       </div>' +
       autoSection +
-      '<div style="font-size:14px;font-weight:700;color:#1E293B;margin-bottom:10px;margin-top:4px;display:flex;align-items:center;gap:8px"><i class="fas fa-clock-rotate-left" style="color:#64748B"></i> Riwayat Pengeluaran Operasional</div>' +
+      '<div style="font-size:14px;font-weight:700;color:#2D3436;margin-bottom:10px;margin-top:4px;display:flex;align-items:center;gap:8px"><i class="fas fa-clock-rotate-left" style="color:#636E72"></i> Riwayat Pengeluaran Operasional</div>' +
         manualList;
   }
 
@@ -1597,8 +1597,8 @@ var Pembukuan = (function() {
     modal.innerHTML = '\
       <div class="pb-modal">\
         <div class="pb-modal-header">\
-          <h3><i class="fas fa-pen mr-2" style="color:#059669"></i>Edit Pengeluaran</h3>\
-          <button onclick="this.closest(\'.pb-modal-bg\').remove()" style="background:none;border:none;cursor:pointer;color:#94A3B8;font-size:16px"><i class="fas fa-xmark"></i></button>\
+          <h3><i class="fas fa-pen mr-2" style="color:#6C5CE7"></i>Edit Pengeluaran</h3>\
+          <button onclick="this.closest(\'.pb-modal-bg\').remove()" style="background:none;border:none;cursor:pointer;color:#9CA3AF;font-size:16px"><i class="fas fa-xmark"></i></button>\
         </div>\
         <div class="pb-modal-body">\
           <div style="margin-bottom:12px">\
@@ -1666,14 +1666,14 @@ var Pembukuan = (function() {
     container.innerHTML = '\
       <div class="pb-card">\
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">\
-          <i class="fas fa-filter" style="color:#64748B"></i>\
+          <i class="fas fa-filter" style="color:#636E72"></i>\
           <input type="date" id="pb-sales-date" class="pb-input" style="flex:1" value="' + _reportDate + '" onchange="Pembukuan._loadSalesView()">\
         </div>\
         <div id="pb-sales-summary"></div>\
       </div>\
       <div class="pb-card">\
-        <div class="pb-card-title"><i class="fas fa-chart-line" style="color:#0284C7"></i> Daftar Transaksi</div>\
-        <div id="pb-sales-list"><div style="text-align:center;padding:20px;color:#94A3B8;font-size:13px"><i class="fas fa-spinner fa-spin"></i> Memuat data...</div></div>\
+        <div class="pb-card-title"><i class="fas fa-chart-line" style="color:#6C5CE7"></i> Daftar Transaksi</div>\
+        <div id="pb-sales-list"><div style="text-align:center;padding:20px;color:#9CA3AF;font-size:13px"><i class="fas fa-spinner fa-spin"></i> Memuat data...</div></div>\
       </div>';
 
     _loadSalesView();
@@ -1699,13 +1699,13 @@ var Pembukuan = (function() {
       if (summaryEl) {
         summaryEl.innerHTML = '\
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">\
-            <div style="background:#EFF6FF;border-radius:12px;padding:14px;text-align:center">\
-              <div style="font-size:11px;color:#64748B;font-weight:600">Transaksi</div>\
-              <div style="font-size:24px;font-weight:800;color:#0284C7">' + filtered.length + '</div>\
+            <div style="background:#F0EEFF;border-radius:12px;padding:14px;text-align:center">\
+              <div style="font-size:11px;color:#636E72;font-weight:600">Transaksi</div>\
+              <div style="font-size:24px;font-weight:800;color:#6C5CE7">' + filtered.length + '</div>\
             </div>\
-            <div style="background:#ECFDF5;border-radius:12px;padding:14px;text-align:center">\
-              <div style="font-size:11px;color:#64748B;font-weight:600">Total Penjualan</div>\
-              <div style="font-size:24px;font-weight:800;color:#059669">' + _fmtIDR(totalSales) + '</div>\
+            <div style="background:#F0EEFF;border-radius:12px;padding:14px;text-align:center">\
+              <div style="font-size:11px;color:#636E72;font-weight:600">Total Penjualan</div>\
+              <div style="font-size:24px;font-weight:800;color:#6C5CE7">' + _fmtIDR(totalSales) + '</div>\
             </div>\
           </div>';
       }
@@ -1726,7 +1726,7 @@ var Pembukuan = (function() {
         var itemsHtml = '';
         for (var k = 0; k < (trx.items || []).length; k++) {
           itemsHtml += '<div style="display:flex;justify-content:space-between;font-size:11px;padding:2px 0">\
-            <span style="color:#475569">' + _escHtml(trx.items[k].nama_menu) + ' x' + trx.items[k].qty + '</span>\
+            <span style="color:#636E72">' + _escHtml(trx.items[k].nama_menu) + ' x' + trx.items[k].qty + '</span>\
             <span style="font-weight:600">' + _fmtIDR(trx.items[k].harga * trx.items[k].qty) + '</span>\
           </div>';
         }
@@ -1735,15 +1735,15 @@ var Pembukuan = (function() {
           <div style="border:1px solid #E5E7EB;border-radius:12px;padding:12px;margin-bottom:8px">\
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">\
               <div>\
-                <span style="font-size:11px;color:#64748B">' + _fmtDT(trx.date) + '</span>\
+                <span style="font-size:11px;color:#636E72">' + _fmtDT(trx.date) + '</span>\
                 <span class="pb-chip pb-chip-green" style="margin-left:6px">' + _escHtml(trx.table || '-') + '</span>\
               </div>\
-              <div style="font-weight:800;color:#059669;font-size:14px">' + _fmtIDR(trx.total) + '</div>\
+              <div style="font-weight:800;color:#6C5CE7;font-size:14px">' + _fmtIDR(trx.total) + '</div>\
             </div>\
             <div style="border-top:1px dashed #E5E7EB;padding-top:6px">\
               ' + itemsHtml + '\
             </div>\
-            <div style="margin-top:6px;font-size:11px;color:#94A3B8">\
+            <div style="margin-top:6px;font-size:11px;color:#9CA3AF">\
               <i class="fas fa-' + (trx.paymentMethod === 'Tunai' ? 'money-bill-wave' : trx.paymentMethod === 'QRIS' ? 'qrcode' : 'building-columns') + ' mr-1"></i>' + _escHtml(trx.paymentMethod || '-') + '\
               ' + (trx.cashier ? '&middot; <i class="fas fa-user mr-1"></i>' + _escHtml(trx.cashier) : '') + '\
             </div>\
@@ -1764,7 +1764,7 @@ var Pembukuan = (function() {
 
     container.innerHTML = '\
       <div class="pb-card">\
-        <div class="pb-card-title"><i class="fas fa-calendar-days" style="color:#059669"></i> Filter Laporan</div>\
+        <div class="pb-card-title"><i class="fas fa-calendar-days" style="color:#6C5CE7"></i> Filter Laporan</div>\
         <div style="display:flex;gap:8px;margin-bottom:12px">\
           <button onclick="Pembukuan._setReportPeriod(\'daily\')" id="pb-rpt-daily" class="pb-btn pb-btn-primary pb-btn-sm">Harian</button>\
           <button onclick="Pembukuan._setReportPeriod(\'monthly\')" id="pb-rpt-monthly" class="pb-btn pb-btn-ghost pb-btn-sm">Bulanan</button>\
@@ -1773,7 +1773,7 @@ var Pembukuan = (function() {
           <input type="date" id="pb-rpt-date" class="pb-input" value="' + dateVal + '" onchange="Pembukuan._loadReport()">\
         </div>\
       </div>\
-      <div id="pb-rpt-content"><div style="text-align:center;padding:30px;color:#94A3B8"><i class="fas fa-spinner fa-spin"></i> Memuat laporan...</div></div>';
+      <div id="pb-rpt-content"><div style="text-align:center;padding:30px;color:#9CA3AF"><i class="fas fa-spinner fa-spin"></i> Memuat laporan...</div></div>';
 
     // Set active period button
     if (_reportPeriod === 'monthly') {
@@ -1810,7 +1810,7 @@ var Pembukuan = (function() {
     if (!contentEl) return;
 
     calcReport(_reportPeriod, dateVal).then(function(report) {
-      var profitColor = report.profit >= 0 ? 'color:#059669' : 'color:#DC2626';
+      var profitColor = report.profit >= 0 ? 'color:#6C5CE7' : 'color:#E74C3C';
       var profitIcon = report.profit >= 0 ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down';
 
       // Expense breakdown
@@ -1818,7 +1818,7 @@ var Pembukuan = (function() {
       var cats = Object.keys(report.expByCat);
       if (cats.length > 0) {
         expBreakdown = '<div style="margin-top:12px;border-top:1px dashed #E5E7EB;padding-top:12px">\
-          <div style="font-size:12px;font-weight:600;color:#64748B;margin-bottom:8px">Rincian Pengeluaran:</div>';
+          <div style="font-size:12px;font-weight:600;color:#636E72;margin-bottom:8px">Rincian Pengeluaran:</div>';
         for (var c = 0; c < cats.length; c++) {
           var catColor = _getCatColor(EXPENSE_CATS, cats[c]);
           var catLabel = _getCatLabel(EXPENSE_CATS, cats[c]);
@@ -1826,7 +1826,7 @@ var Pembukuan = (function() {
           expBreakdown += '\
             <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0">\
               <span class="pb-chip pb-chip-' + catColor + '">' + _escHtml(catLabel) + '</span>\
-              <span style="font-weight:600;color:#DC2626;font-size:12px">' + _fmtIDR(report.expByCat[cats[c]]) + ' <span style="color:#94A3B8;font-weight:400">(' + pct + '%)</span></span>\
+              <span style="font-weight:600;color:#E74C3C;font-size:12px">' + _fmtIDR(report.expByCat[cats[c]]) + ' <span style="color:#9CA3AF;font-weight:400">(' + pct + '%)</span></span>\
             </div>';
         }
         expBreakdown += '</div>';
@@ -1834,15 +1834,15 @@ var Pembukuan = (function() {
 
       contentEl.innerHTML = '\
         <div class="pb-stat-grid" style="grid-template-columns:1fr 1fr">\
-          <div class="pb-stat" style="border-left:4px solid #0284C7">\
+          <div class="pb-stat" style="border-left:4px solid #6C5CE7">\
             <div class="pb-stat-label"><i class="fas fa-cart-shopping mr-1"></i>Penjualan</div>\
             <div class="pb-stat-val blue">' + _fmtIDR(report.totalSales) + '</div>\
-            <div style="font-size:10px;color:#94A3B8;margin-top:2px">' + report.trxCount + ' transaksi</div>\
+            <div style="font-size:10px;color:#9CA3AF;margin-top:2px">' + report.trxCount + ' transaksi</div>\
           </div>\
-          <div class="pb-stat" style="border-left:4px solid ' + (report.profit >= 0 ? '#059669' : '#DC2626') + '">\
+          <div class="pb-stat" style="border-left:4px solid ' + (report.profit >= 0 ? '#6C5CE7' : '#E74C3C') + '">\
             <div class="pb-stat-label"><i class="fas ' + profitIcon + ' mr-1"></i>PROFIT</div>\
             <div class="pb-stat-val" style="' + profitColor + '">' + (report.profit >= 0 ? '' : '-') + _fmtIDR(Math.abs(report.profit)) + '</div>\
-            <div style="font-size:10px;color:#94A3B8;margin-top:2px">' + (report.profit >= 0 ? 'Untung' : 'Rugi') + '</div>\
+            <div style="font-size:10px;color:#9CA3AF;margin-top:2px">' + (report.profit >= 0 ? 'Untung' : 'Rugi') + '</div>\
           </div>\
         </div>\
         <div class="pb-stat-grid" style="grid-template-columns:1fr 1fr 1fr">\
@@ -1854,19 +1854,19 @@ var Pembukuan = (function() {
             <div class="pb-stat-label"><i class="fas fa-wrench mr-1"></i>Operasional</div>\
             <div class="pb-stat-val" style="color:#4F46E5;font-size:15px">' + _fmtIDR(report.totalExpOps) + '</div>\
           </div>\
-          <div class="pb-stat" style="border-left:3px solid #10B981">\
+          <div class="pb-stat" style="border-left:3px solid #A29BFE">\
             <div class="pb-stat-label"><i class="fas fa-warehouse mr-1"></i>Nilai Stok</div>\
-            <div class="pb-stat-val" style="color:#047857;font-size:15px">' + _fmtIDR(report.totalInventoryValue) + '</div>\
+            <div class="pb-stat-val" style="color:#5A4BD1;font-size:15px">' + _fmtIDR(report.totalInventoryValue) + '</div>\
           </div>\
         </div>\
-        <div class="pb-card" style="background:linear-gradient(135deg,#F0FDF4,#ECFDF5);border-color:#A7F3D0">\
+        <div class="pb-card" style="background:linear-gradient(135deg,#F0FDF4,#F0EEFF);border-color:#A7F3D0">\
           <div style="text-align:center;padding:8px 0">\
-            <div style="font-size:12px;color:#64748B;font-weight:600;margin-bottom:4px">Rumus: Penjualan - Modal Bahan - Operasional = Profit</div>\
-            <div style="font-size:13px;color:#475569">\
+            <div style="font-size:12px;color:#636E72;font-weight:600;margin-bottom:4px">Rumus: Penjualan - Modal Bahan - Operasional = Profit</div>\
+            <div style="font-size:13px;color:#636E72">\
               <b>' + _fmtIDR(report.totalSales) + '</b> - <b style="color:#B45309">' + _fmtIDR(report.totalExpBB) + '</b> - <b style="color:#4F46E5">' + _fmtIDR(report.totalExpOps) + '</b> = \
               <b style="' + profitColor + '">' + (report.profit >= 0 ? '' : '-') + _fmtIDR(Math.abs(report.profit)) + '</b>\
             </div>\
-            <div style="font-size:11px;color:#94A3B8;margin-top:6px"><i class="fas fa-warehouse mr-1"></i>Nilai Stok Saat Ini: <b style="color:#047857">' + _fmtIDR(report.totalInventoryValue) + '</b> (stok x harga beli, bukan periode)</div>\
+            <div style="font-size:11px;color:#9CA3AF;margin-top:6px"><i class="fas fa-warehouse mr-1"></i>Nilai Stok Saat Ini: <b style="color:#5A4BD1">' + _fmtIDR(report.totalInventoryValue) + '</b> (stok x harga beli, bukan periode)</div>\
           </div>' +
           expBreakdown +
         '</div>';
@@ -1895,28 +1895,28 @@ var Pembukuan = (function() {
       <!-- 1. ALUR KERJA -->\
       <div class="pb-guide-section">\
         <div class="pb-guide-sec-header" onclick="Pembukuan._toggleGuideSection(\'pb-guide-1\')">\
-          <div class="pb-guide-sec-icon" style="background:#ECFDF5;color:#047857"><i class="fas fa-route"></i></div>\
+          <div class="pb-guide-sec-icon" style="background:#F0EEFF;color:#5A4BD1"><i class="fas fa-route"></i></div>\
           <div class="pb-guide-sec-title">Alur Kerja Pembukuan</div>\
           <i class="fas fa-chevron-down pb-guide-sec-arrow" id="pb-guide-1-arrow"></i>\
         </div>\
         <div class="pb-guide-sec-body" id="pb-guide-1">\
-          <div style="font-size:12px;color:#374151;line-height:1.7;margin-bottom:12px">\
+          <div style="font-size:12px;color:#2D3436;line-height:1.7;margin-bottom:12px">\
             Pembukuan WARKOPOS dirancang agar sesuai dengan alur kerja usaha Anda sehari-hari. Berikut adalah urutan yang direkomendasikan agar catatan keuangan Anda akurat dan terintegrasi secara otomatis.\
           </div>\
           <div class="pb-guide-flow">\
-            <div class="pb-guide-flow-item"><i class="fas fa-1" style="color:#059669;margin-right:6px"></i> Belanja Bahan Baku di Pasar</div>\
+            <div class="pb-guide-flow-item"><i class="fas fa-1" style="color:#6C5CE7;margin-right:6px"></i> Belanja Bahan Baku di Pasar</div>\
             <div class="pb-guide-flow-arrow"><i class="fas fa-arrow-down"></i></div>\
-            <div class="pb-guide-flow-item"><i class="fas fa-2" style="color:#059669;margin-right:6px"></i> Catat di <strong>Stok</strong> (nama, jumlah, harga beli)</div>\
+            <div class="pb-guide-flow-item"><i class="fas fa-2" style="color:#6C5CE7;margin-right:6px"></i> Catat di <strong>Stok</strong> (nama, jumlah, harga beli)</div>\
             <div class="pb-guide-flow-arrow"><i class="fas fa-arrow-down"></i></div>\
-            <div class="pb-guide-flow-item" style="background:#ECFDF5;border-color:#A7F3D0"><i class="fas fa-robot" style="color:#047857;margin-right:6px"></i> Otomatis masuk ke <strong>Pengeluaran (Bahan Baku)</strong></div>\
+            <div class="pb-guide-flow-item" style="background:#F0EEFF;border-color:#A7F3D0"><i class="fas fa-robot" style="color:#5A4BD1;margin-right:6px"></i> Otomatis masuk ke <strong>Pengeluaran (Bahan Baku)</strong></div>\
             <div class="pb-guide-flow-arrow"><i class="fas fa-arrow-down"></i></div>\
-            <div class="pb-guide-flow-item"><i class="fas fa-3" style="color:#059669;margin-right:6px"></i> Proses Bahan Baku di <strong>Produksi</strong></div>\
+            <div class="pb-guide-flow-item"><i class="fas fa-3" style="color:#6C5CE7;margin-right:6px"></i> Proses Bahan Baku di <strong>Produksi</strong></div>\
             <div class="pb-guide-flow-arrow"><i class="fas fa-arrow-down"></i></div>\
-            <div class="pb-guide-flow-item"><i class="fas fa-4" style="color:#059669;margin-right:6px"></i> Jualan berjalan (tercatat otomatis di <strong>Penjualan</strong>)</div>\
+            <div class="pb-guide-flow-item"><i class="fas fa-4" style="color:#6C5CE7;margin-right:6px"></i> Jualan berjalan (tercatat otomatis di <strong>Penjualan</strong>)</div>\
             <div class="pb-guide-flow-arrow"><i class="fas fa-arrow-down"></i></div>\
-            <div class="pb-guide-flow-item"><i class="fas fa-5" style="color:#059669;margin-right:6px"></i> Catat Pengeluaran <strong>Operasional</strong> jika ada</div>\
+            <div class="pb-guide-flow-item"><i class="fas fa-5" style="color:#6C5CE7;margin-right:6px"></i> Catat Pengeluaran <strong>Operasional</strong> jika ada</div>\
             <div class="pb-guide-flow-arrow"><i class="fas fa-arrow-down"></i></div>\
-            <div class="pb-guide-flow-item" style="background:#EFF6FF;border-color:#BAE6FD"><i class="fas fa-chart-pie" style="color:#0284C7;margin-right:6px"></i> Cek <strong>Laporan</strong> di akhir hari</div>\
+            <div class="pb-guide-flow-item" style="background:#F0EEFF;border-color:#D5D0FF"><i class="fas fa-chart-pie" style="color:#6C5CE7;margin-right:6px"></i> Cek <strong>Laporan</strong> di akhir hari</div>\
           </div>\
           <div class="pb-guide-tip">\
             <i class="fas fa-lightbulb"></i>\
@@ -1927,28 +1927,28 @@ var Pembukuan = (function() {
       <!-- 2. STOK -->\
       <div class="pb-guide-section">\
         <div class="pb-guide-sec-header" onclick="Pembukuan._toggleGuideSection(\'pb-guide-2\')">\
-          <div class="pb-guide-sec-icon" style="background:#EFF6FF;color:#0284C7"><i class="fas fa-boxes-stacked"></i></div>\
+          <div class="pb-guide-sec-icon" style="background:#F0EEFF;color:#6C5CE7"><i class="fas fa-boxes-stacked"></i></div>\
           <div class="pb-guide-sec-title">Stok (Gudang Barang)</div>\
           <i class="fas fa-chevron-down pb-guide-sec-arrow" id="pb-guide-2-arrow"></i>\
         </div>\
         <div class="pb-guide-sec-body" id="pb-guide-2">\
-          <div style="font-size:12px;color:#374151;line-height:1.7;margin-bottom:12px">\
+          <div style="font-size:12px;color:#2D3436;line-height:1.7;margin-bottom:12px">\
             Fitur Stok adalah tempat Anda mencatat semua barang yang dimiliki, baik bahan baku mentah maupun produk jadi yang siap dijual. Ini adalah <strong>titik awal</strong> dari seluruh alur pembukuan.\
           </div>\
           <div class="pb-guide-step">\
-            <div class="pb-guide-step-num" style="background:#EFF6FF;color:#0284C7">1</div>\
+            <div class="pb-guide-step-num" style="background:#F0EEFF;color:#6C5CE7">1</div>\
             <div class="pb-guide-step-text"><strong>Tambah Stok Baru</strong><br>Klik tombol <strong>"+ Tambah"</strong> di halaman Stok. Isi formulir: Nama Item (contoh: Ayam Mentah), Jumlah yang dibeli, Satuan (kg, pcs, liter, dll), Kategori (Bahan Baku / Produk Jadi), <strong>Harga Beli per satuan</strong>, dan Batas Stok Rendah (peringatan jika stok hampir habis).</div>\
           </div>\
           <div class="pb-guide-step">\
-            <div class="pb-guide-step-num" style="background:#EFF6FF;color:#0284C7">2</div>\
+            <div class="pb-guide-step-num" style="background:#F0EEFF;color:#6C5CE7">2</div>\
             <div class="pb-guide-step-text"><strong>Pengeluaran Otomatis</strong><br>Ketika Anda mengisi Harga Beli, sistem <strong>secara otomatis</strong> akan membuat catatan di Pengeluaran dengan kategori "Bahan Baku". Entri ini ditandai dengan lencana kuning <strong>"STOK"</strong> dan tidak bisa diedit atau dihapus manual, karena datanya bersumber dari Stok.</div>\
           </div>\
           <div class="pb-guide-step">\
-            <div class="pb-guide-step-num" style="background:#EFF6FF;color:#0284C7">3</div>\
+            <div class="pb-guide-step-num" style="background:#F0EEFF;color:#6C5CE7">3</div>\
             <div class="pb-guide-step-text"><strong>Sesuaikan Stok (+/-)</strong><br>Klik ikon <strong>plus-minus</strong> untuk menambah atau mengurangi stok secara manual. Gunakan saat ada barang masuk tanpa beli (misal: barang kiriman) atau saat ada barang rusak/expired. Jika menambah stok dan mengisi harga, Anda bisa memilih apakah dicatat ke pengeluaran atau tidak.</div>\
           </div>\
           <div class="pb-guide-step">\
-            <div class="pb-guide-step-num" style="background:#EFF6FF;color:#0284C7">4</div>\
+            <div class="pb-guide-step-num" style="background:#F0EEFF;color:#6C5CE7">4</div>\
             <div class="pb-guide-step-text"><strong>Edit & Hapus</strong><br>Klik ikon <strong>pensil</strong> untuk mengubah data stok (nama, harga, kategori, dll). Klik ikon <strong>tempat sampah</strong> untuk menghapus item dari daftar stok.</div>\
           </div>\
           <div class="pb-guide-example">\
@@ -1970,7 +1970,7 @@ var Pembukuan = (function() {
           <i class="fas fa-chevron-down pb-guide-sec-arrow" id="pb-guide-3-arrow"></i>\
         </div>\
         <div class="pb-guide-sec-body" id="pb-guide-3">\
-          <div style="font-size:12px;color:#374151;line-height:1.7;margin-bottom:12px">\
+          <div style="font-size:12px;color:#2D3436;line-height:1.7;margin-bottom:12px">\
             Fitur Produksi digunakan ketika Anda mengolah beberapa bahan baku menjadi satu produk jadi yang siap dijual. Misalnya, mengolah tepung, ayam, dan minyak menjadi ayam goreng. Di sini, stok bahan baku akan <strong>berkurang otomatis</strong> dan stok produk jadi akan <strong>bertambah otomatis</strong>.\
           </div>\
           <div class="pb-guide-step">\
@@ -2004,12 +2004,12 @@ var Pembukuan = (function() {
       <!-- 4. PENGELUARAN -->\
       <div class="pb-guide-section">\
         <div class="pb-guide-sec-header" onclick="Pembukuan._toggleGuideSection(\'pb-guide-4\')">\
-          <div class="pb-guide-sec-icon" style="background:#FEF2F2;color:#DC2626"><i class="fas fa-receipt"></i></div>\
+          <div class="pb-guide-sec-icon" style="background:#FEF2F2;color:#E74C3C"><i class="fas fa-receipt"></i></div>\
           <div class="pb-guide-sec-title">Pengeluaran (Uang Keluar)</div>\
           <i class="fas fa-chevron-down pb-guide-sec-arrow" id="pb-guide-4-arrow"></i>\
         </div>\
         <div class="pb-guide-sec-body" id="pb-guide-4">\
-          <div style="font-size:12px;color:#374151;line-height:1.7;margin-bottom:12px">\
+          <div style="font-size:12px;color:#2D3436;line-height:1.7;margin-bottom:12px">\
             Fitur Pengeluaran mencatat semua uang yang keluar dari kas usaha Anda. Ada dua jenis pengeluaran yang ditangani secara berbeda oleh sistem, dan penting untuk memahami perbedaannya.\
           </div>\
           <div style="background:white;border:1px solid #E5E7EB;border-radius:10px;padding:12px;margin-bottom:12px">\
@@ -2018,22 +2018,22 @@ var Pembukuan = (function() {
                 <div style="font-size:11px;font-weight:700;color:#B45309;margin-bottom:4px"><i class="fas fa-box-open" style="margin-right:4px"></i> Bahan Baku</div>\
                 <div style="font-size:10px;color:#92400E;line-height:1.5"><strong>Otomatis dari Stok.</strong> Tidak perlu dicatat manual. Entri ini muncul sendiri saat Anda menambah stok dengan harga beli. Ditandai dengan lencana kuning "STOK".</div>\
               </div>\
-              <div style="flex:1;background:#EFF6FF;border:1px solid #BAE6FD;border-radius:8px;padding:10px">\
-                <div style="font-size:11px;font-weight:700;color:#1D4ED8;margin-bottom:4px"><i class="fas fa-wrench" style="margin-right:4px"></i> Operasional</div>\
-                <div style="font-size:10px;color:#1E40AF;line-height:1.5"><strong>Dicatat manual.</strong> Untuk biaya sehari-hari: gas, listrik, gaji karyawan, sewa, transportasi, dll. Gunakan tombol "+ Tambah".</div>\
+              <div style="flex:1;background:#F0EEFF;border:1px solid #D5D0FF;border-radius:8px;padding:10px">\
+                <div style="font-size:11px;font-weight:700;color:#5A4BD1;margin-bottom:4px"><i class="fas fa-wrench" style="margin-right:4px"></i> Operasional</div>\
+                <div style="font-size:10px;color:#5A4BD1;line-height:1.5"><strong>Dicatat manual.</strong> Untuk biaya sehari-hari: gas, listrik, gaji karyawan, sewa, transportasi, dll. Gunakan tombol "+ Tambah".</div>\
               </div>\
             </div>\
           </div>\
           <div class="pb-guide-step">\
-            <div class="pb-guide-step-num" style="background:#FEF2F2;color:#DC2626">1</div>\
+            <div class="pb-guide-step-num" style="background:#FEF2F2;color:#E74C3C">1</div>\
             <div class="pb-guide-step-text"><strong>Menambah Pengeluaran Manual</strong><br>Klik tombol <strong>"+ Tambah"</strong>. Isi: Nama pengeluaran (contoh: "Beli Gas LPG 5kg"), Kategori (Operasional / Lainnya), Jumlah uang (Rp), dan Tanggal. Klik Simpan.</div>\
           </div>\
           <div class="pb-guide-step">\
-            <div class="pb-guide-step-num" style="background:#FEF2F2;color:#DC2626">2</div>\
+            <div class="pb-guide-step-num" style="background:#FEF2F2;color:#E74C3C">2</div>\
             <div class="pb-guide-step-text"><strong>Entri Otomatis (STOK)</strong><br>Entri berwarna <strong>kuning</strong> dengan lencana "STOK" adalah pengeluaran bahan baku yang dibuat otomatis dari fitur Stok. Entri ini <strong>tidak bisa diedit atau dihapus</strong> secara manual. Untuk mengubahnya, edit data Stok terkait.</div>\
           </div>\
           <div class="pb-guide-step">\
-            <div class="pb-guide-step-num" style="background:#FEF2F2;color:#DC2626">3</div>\
+            <div class="pb-guide-step-num" style="background:#FEF2F2;color:#E74C3C">3</div>\
             <div class="pb-guide-step-text"><strong>Edit & Hapus</strong><br>Hanya pengeluaran manual (Operasional/Lainnya) yang bisa diedit atau dihapus. Klik ikon pensil untuk mengubah atau ikon tempat sampah untuk menghapus.</div>\
           </div>\
           <div class="pb-guide-tip">\
@@ -2045,24 +2045,24 @@ var Pembukuan = (function() {
       <!-- 5. PENJUALAN -->\
       <div class="pb-guide-section">\
         <div class="pb-guide-sec-header" onclick="Pembukuan._toggleGuideSection(\'pb-guide-5\')">\
-          <div class="pb-guide-sec-icon" style="background:#ECFDF5;color:#047857"><i class="fas fa-chart-line"></i></div>\
+          <div class="pb-guide-sec-icon" style="background:#F0EEFF;color:#5A4BD1"><i class="fas fa-chart-line"></i></div>\
           <div class="pb-guide-sec-title">Penjualan (Uang Masuk)</div>\
           <i class="fas fa-chevron-down pb-guide-sec-arrow" id="pb-guide-5-arrow"></i>\
         </div>\
         <div class="pb-guide-sec-body" id="pb-guide-5">\
-          <div style="font-size:12px;color:#374151;line-height:1.7;margin-bottom:12px">\
+          <div style="font-size:12px;color:#2D3436;line-height:1.7;margin-bottom:12px">\
             Fitur Penjualan menampilkan data transaksi yang berasal dari <strong>mesin POS (Kasir)</strong>. Data ini diambil secara otomatis, artinya Anda tidak perlu mencatat penjualan manual di pembukuan. Setiap kali Anda menyelesaikan transaksi di POS, data penjualan akan langsung muncul di sini.\
           </div>\
           <div class="pb-guide-step">\
-            <div class="pb-guide-step-num" style="background:#ECFDF5;color:#047857">1</div>\
+            <div class="pb-guide-step-num" style="background:#F0EEFF;color:#5A4BD1">1</div>\
             <div class="pb-guide-step-text"><strong>Daftar Transaksi</strong><br>Halaman Penjualan menampilkan semua riwayat transaksi: tanggal, nama pesanan, jumlah item, dan total harga. Anda bisa menggunakan fitur pencarian untuk menemukan transaksi tertentu berdasarkan nama menu atau nomor meja.</div>\
           </div>\
           <div class="pb-guide-step">\
-            <div class="pb-guide-step-num" style="background:#ECFDF5;color:#047857">2</div>\
+            <div class="pb-guide-step-num" style="background:#F0EEFF;color:#5A4BD1">2</div>\
             <div class="pb-guide-step-text"><strong>Ringkasan Hari Ini</strong><br>Di bagian atas ditampilkan ringkasan: total pendapatan hari ini dan jumlah transaksi. Ini membantu Anda memantau performa penjualan secara real-time tanpa harus menghitung manual.</div>\
           </div>\
           <div class="pb-guide-step">\
-            <div class="pb-guide-step-num" style="background:#ECFDF5;color:#047857">3</div>\
+            <div class="pb-guide-step-num" style="background:#F0EEFF;color:#5A4BD1">3</div>\
             <div class="pb-guide-step-text"><strong>Data Read-Only</strong><br>Data penjualan tidak bisa diedit atau dihapus dari Pembukuan karena bersumber langsung dari POS. Jika ada kesalahan transaksi, perbaiki melalui fitur Riwayat di halaman POS.</div>\
           </div>\
           <div class="pb-guide-tip">\
@@ -2079,7 +2079,7 @@ var Pembukuan = (function() {
           <i class="fas fa-chevron-down pb-guide-sec-arrow" id="pb-guide-6-arrow"></i>\
         </div>\
         <div class="pb-guide-sec-body" id="pb-guide-6">\
-          <div style="font-size:12px;color:#374151;line-height:1.7;margin-bottom:12px">\
+          <div style="font-size:12px;color:#2D3436;line-height:1.7;margin-bottom:12px">\
             Fitur Laporan adalah tujuan akhir dari seluruh pembukuan. Di sini Anda bisa melihat ringkasan keuangan: berapa uang masuk, berapa uang keluar, dan berapa keuntungan bersih dalam satu hari atau satu bulan. Laporan mengambil data dari Penjualan, Pengeluaran, dan Stok secara otomatis.\
           </div>\
           <div class="pb-guide-step">\
@@ -2089,11 +2089,11 @@ var Pembukuan = (function() {
           <div class="pb-guide-step">\
             <div class="pb-guide-step-num" style="background:#FFF7ED;color:#EA580C">2</div>\
             <div class="pb-guide-step-text"><strong>Membaca Angka-angka Laporan</strong><br>\
-              <strong style="color:#059669">Penjualan:</strong> Total uang masuk dari semua transaksi POS di periode tersebut.<br>\
+              <strong style="color:#6C5CE7">Penjualan:</strong> Total uang masuk dari semua transaksi POS di periode tersebut.<br>\
               <strong style="color:#B45309">Pengeluaran Bahan Baku:</strong> Total uang keluar untuk belanja bahan (otomatis dari Stok).<br>\
-              <strong style="color:#1D4ED8">Pengeluaran Operasional:</strong> Total biaya operasional (dicatat manual).<br>\
+              <strong style="color:#5A4BD1">Pengeluaran Operasional:</strong> Total biaya operasional (dicatat manual).<br>\
               <strong style="display:inline-block;padding:1px 8px;border-radius:4px;font-size:11px" class="pb-badge">Profit</strong> = Penjualan - Pengeluaran Bahan Baku - Pengeluaran Operasional.<br>\
-              <strong style="color:#64748B">Nilai Stok:</strong> Perkiraan nilai total barang yang masih tersisa di gudang (stok x harga beli). Ini hanya informasi, bukan uang kas.\
+              <strong style="color:#636E72">Nilai Stok:</strong> Perkiraan nilai total barang yang masih tersisa di gudang (stok x harga beli). Ini hanya informasi, bukan uang kas.\
             </div>\
           </div>\
           <div class="pb-guide-step">\
@@ -2117,47 +2117,47 @@ var Pembukuan = (function() {
       <!-- 7. ISTILAH & FAQ -->\
       <div class="pb-guide-section">\
         <div class="pb-guide-sec-header" onclick="Pembukuan._toggleGuideSection(\'pb-guide-7\')">\
-          <div class="pb-guide-sec-icon" style="background:#F1F5F9;color:#475569"><i class="fas fa-circle-question"></i></div>\
+          <div class="pb-guide-sec-icon" style="background:#F0EEFF;color:#636E72"><i class="fas fa-circle-question"></i></div>\
           <div class="pb-guide-sec-title">Istilah Penting & Pertanyaan Umum</div>\
           <i class="fas fa-chevron-down pb-guide-sec-arrow" id="pb-guide-7-arrow"></i>\
         </div>\
         <div class="pb-guide-sec-body" id="pb-guide-7">\
-          <div style="font-size:13px;font-weight:700;color:#1E293B;margin-bottom:10px">Istilah yang Perlu Dipahami:</div>\
+          <div style="font-size:13px;font-weight:700;color:#2D3436;margin-bottom:10px">Istilah yang Perlu Dipahami:</div>\
           <div style="margin-bottom:14px">\
-            <div style="font-size:12px;color:#374151;line-height:1.7;padding:8px 0;border-bottom:1px solid #F1F5F9">\
+            <div style="font-size:12px;color:#2D3436;line-height:1.7;padding:8px 0;border-bottom:1px solid #F0EEFF">\
               <strong>Bahan Baku</strong> &mdash; Bahan mentah yang dibeli untuk diolah menjadi produk jual. Contoh: ayam mentah, tepung, minyak goreng, gula, kopi.\
             </div>\
-            <div style="font-size:12px;color:#374151;line-height:1.7;padding:8px 0;border-bottom:1px solid #F1F5F9">\
+            <div style="font-size:12px;color:#2D3436;line-height:1.7;padding:8px 0;border-bottom:1px solid #F0EEFF">\
               <strong>Produk Jadi</strong> &mdash; Hasil olahan dari bahan baku yang siap dijual ke pelanggan. Contoh: ayam goreng, kopi susu, nasi goreng.\
             </div>\
-            <div style="font-size:12px;color:#374151;line-height:1.7;padding:8px 0;border-bottom:1px solid #F1F5F9">\
+            <div style="font-size:12px;color:#2D3436;line-height:1.7;padding:8px 0;border-bottom:1px solid #F0EEFF">\
               <strong>Harga Beli</strong> &mdash; Harga modal per satuan saat Anda membeli bahan baku. Bukan harga jual ke pelanggan. Contoh: Rp 35.000/kg untuk ayam mentah.\
             </div>\
-            <div style="font-size:12px;color:#374151;line-height:1.7;padding:8px 0;border-bottom:1px solid #F1F5F9">\
+            <div style="font-size:12px;color:#2D3436;line-height:1.7;padding:8px 0;border-bottom:1px solid #F0EEFF">\
               <strong>Nilai Stok</strong> &mdash; Perkiraan nilai uang yang "terikat" di barang yang masih tersisa di gudang. Dihitung: jumlah stok x harga beli. Ini hanya informasi referensi, bukan uang kas yang benar-benar ada.\
             </div>\
-            <div style="font-size:12px;color:#374151;line-height:1.7;padding:8px 0;border-bottom:1px solid #F1F5F9">\
+            <div style="font-size:12px;color:#2D3436;line-height:1.7;padding:8px 0;border-bottom:1px solid #F0EEFF">\
               <strong>Profit</strong> &mdash; Keuntungan bersih = Total Penjualan dikurangi Total Pengeluaran (Bahan Baku + Operasional). Angka ini menunjukkan apakah usaha Anda untung atau rugi di periode tersebut.\
             </div>\
-            <div style="font-size:12px;color:#374151;line-height:1.7;padding:8px 0">\
+            <div style="font-size:12px;color:#2D3436;line-height:1.7;padding:8px 0">\
               <strong>Operasional</strong> &mdash; Biaya harian untuk menjalankan usaha selain bahan baku. Contoh: gas LPG, listrik, air, gaji karyawan, sewa tempat, transportasi.\
             </div>\
           </div>\
-          <div style="font-size:13px;font-weight:700;color:#1E293B;margin-bottom:10px">Pertanyaan Umum (FAQ):</div>\
+          <div style="font-size:13px;font-weight:700;color:#2D3436;margin-bottom:10px">Pertanyaan Umum (FAQ):</div>\
           <div style="margin-bottom:14px">\
-            <div style="font-size:12px;color:#374151;line-height:1.7;padding:8px 0;border-bottom:1px solid #F1F5F9">\
+            <div style="font-size:12px;color:#2D3436;line-height:1.7;padding:8px 0;border-bottom:1px solid #F0EEFF">\
               <strong>Q: Kenapa ada pengeluaran yang tidak bisa dihapus?</strong><br>\
               A: Pengeluaran dengan lencana kuning "STOK" dibuat otomatis dari fitur Stok. Untuk mengubahnya, edit atau hapus item stok terkait di halaman Stok.\
             </div>\
-            <div style="font-size:12px;color:#374151;line-height:1.7;padding:8px 0;border-bottom:1px solid #F1F5F9">\
+            <div style="font-size:12px;color:#2D3436;line-height:1.7;padding:8px 0;border-bottom:1px solid #F0EEFF">\
               <strong>Q: Apakah "Nilai Stok" dihitung sebagai uang keluar?</strong><br>\
               A: Tidak. Nilai Stok hanya menampilkan perkiraan nilai barang di gudang. Nilai Stok tidak masuk ke perhitungan Profit. Profit dihitung hanya dari Penjualan dikurangi Pengeluaran yang sudah terjadi.\
             </div>\
-            <div style="font-size:12px;color:#374151;line-height:1.7;padding:8px 0;border-bottom:1px solid #F1F5F9">\
+            <div style="font-size:12px;color:#2D3436;line-height:1.7;padding:8px 0;border-bottom:1px solid #F0EEFF">\
               <strong>Q: Bagaimana jika saya beli bahan tapi tidak ingat harga per satuan?</strong><br>\
               A: Isi saja total harga beli pada jumlah satuan yang Anda catat. Misal, beli 3 kg ayam total Rp 100.000, maka isi harga beli: Rp 33.333/kg (dibagi rata). Sistem akan menghitung pengeluaran otomatis berdasarkan harga yang Anda isi.\
             </div>\
-            <div style="font-size:12px;color:#374151;line-height:1.7;padding:8px 0">\
+            <div style="font-size:12px;color:#2D3436;line-height:1.7;padding:8px 0">\
               <strong>Q: Data pembukuan tersimpan di mana?</strong><br>\
               A: Semua data disimpan di perangkat Anda (localStorage browser). Data tidak dikirim ke server manapun. Pastikan tidak menghapus data browser jika tidak ingin kehilangan catatan.\
             </div>\
@@ -2165,7 +2165,7 @@ var Pembukuan = (function() {
         </div>\
       </div>\
       <!-- FOOTER -->\
-      <div style="text-align:center;padding:16px 0 8px;font-size:11px;color:#94A3B8">\
+      <div style="text-align:center;padding:16px 0 8px;font-size:11px;color:#9CA3AF">\
         <i class="fas fa-heart" style="color:#F87171;margin:0 2px"></i> WARKOPOS Pembukuan v2.0 &mdash; Sistem pembukuan sederhana untuk usaha Anda\
       </div>';
   }
