@@ -488,7 +488,7 @@ var Pembukuan = (function() {
 .pb-nav-btn i{font-size:16px}\
 .pb-nav-btn span{font-size:10px;font-weight:600}\
 .pb-content{max-width:700px;margin:0 auto;padding:16px;padding-bottom:40px;flex:1 1 0%!important;min-height:0!important;overflow-y:auto!important;overflow-x:hidden!important;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}\
-.pb-card{background:white;border-radius:16px;border:1px solid #E5E7EB;padding:16px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,0.04);overflow-x:auto;-webkit-overflow-scrolling:touch}\
+.pb-card{background:white;border-radius:16px;border:1px solid #E5E7EB;padding:16px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,0.04);overflow:hidden}\
 .pb-card-title{font-size:14px;font-weight:700;color:#1E293B;margin-bottom:12px;display:flex;align-items:center;gap:8px}\
 .pb-stat-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px}\
 .pb-stat{background:white;border-radius:12px;border:1px solid #E5E7EB;padding:10px 8px;text-align:center}\
@@ -517,7 +517,7 @@ var Pembukuan = (function() {
 .pb-table th{text-align:left;padding:8px 8px;color:#64748B;font-weight:600;border-bottom:2px solid #E5E7EB;font-size:11px;text-transform:uppercase;letter-spacing:.5px;word-wrap:break-word;overflow-wrap:break-word;white-space:normal}\
 .pb-table td{padding:8px;border-bottom:1px solid #F1F5F9;vertical-align:middle;word-wrap:break-word;overflow-wrap:break-word;white-space:normal}\
 .pb-table tr:hover td{background:#F8FAFC}\
-.pb-expense-list,.pb-auto-list,.pb-stock-list,.pb-prod-list{display:flex;flex-direction:column;gap:10px}\
+.pb-expense-list,.pb-auto-list,.pb-stock-list,.pb-prod-list{display:flex;flex-direction:column;gap:10px;max-width:100%;overflow:hidden}\
 .pb-expense-card{background:#fff;border-radius:14px;padding:14px 16px;box-shadow:0 2px 8px rgba(0,0,0,0.05);border:1px solid #F1F5F9}\
 .pb-expense-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px}\
 .pb-expense-card-info{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}\
@@ -534,15 +534,15 @@ var Pembukuan = (function() {
 .pb-auto-card-amount{font-size:14px;font-weight:700;color:#B45309;white-space:nowrap;flex-shrink:0}\
 .pb-auto-card-date{font-size:11px;color:#94A3B8}\
 .pb-auto-card-date i{margin-right:3px;font-size:10px}\
-.pb-stock-card{background:#fff;border-radius:14px;padding:14px 16px;box-shadow:0 2px 8px rgba(0,0,0,0.05);border:1px solid #F1F5F9}\
-.pb-stock-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:6px}\
-.pb-stock-card-info{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}\
-.pb-stock-card-name{font-size:15px;font-weight:700;color:#1E293B;word-wrap:break-word;overflow-wrap:break-word}\
-.pb-stock-card-qty{font-size:18px;font-weight:800;white-space:nowrap;flex-shrink:0}\
-.pb-stock-card-mid{display:flex;gap:16px;margin-bottom:8px;flex-wrap:wrap}\
-.pb-stock-card-price{font-size:12px;color:#64748B}\
-.pb-stock-card-value{font-size:12px;font-weight:600;color:#1E293B}\
-.pb-stock-card-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}\
+.pb-stock-card{background:#fff;border-radius:14px;padding:12px 14px;box-shadow:0 2px 8px rgba(0,0,0,0.05);border:1px solid #F1F5F9;max-width:100%;overflow:hidden}\
+.pb-stock-card-top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px}\
+.pb-stock-card-info{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1;overflow:hidden}\
+.pb-stock-card-name{font-size:14px;font-weight:700;color:#1E293B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\
+.pb-stock-card-qty{font-size:15px;font-weight:800;white-space:nowrap;flex-shrink:0}\
+.pb-stock-card-mid{display:flex;gap:10px;margin-bottom:4px;flex-wrap:wrap;overflow:hidden}\
+.pb-stock-card-price{font-size:11px;color:#64748B;white-space:nowrap}\
+.pb-stock-card-value{font-size:11px;font-weight:600;color:#1E293B;white-space:nowrap}\
+.pb-stock-card-actions{display:flex;gap:4px;margin-top:4px}\
 .pb-prod-card{background:#fff;border-radius:14px;padding:14px 16px;box-shadow:0 2px 8px rgba(0,0,0,0.05);border:1px solid #F1F5F9}\
 .pb-prod-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:6px}\
 .pb-prod-card-info{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}\
@@ -835,7 +835,7 @@ var Pembukuan = (function() {
     }
 
     var catFilter = '\
-      <div style="display:flex;gap:6px;margin-bottom:12px;overflow-x:auto">\
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">\
         <button onclick="Pembukuan._renderStokFiltered(\'all\')" class="pb-btn pb-btn-primary pb-btn-sm" id="pb-stock-cat-all">Semua (' + totalItems + ')</button>';
     for (var c = 0; c < STOCK_CATS.length; c++) {
       var catCount = 0;
@@ -901,8 +901,8 @@ var Pembukuan = (function() {
         </div>' +
         (isLow ? '<div style="font-size:11px;color:#DC2626;padding:2px 0"><i class="fas fa-triangle-exclamation"></i> Stok rendah! Min: ' + threshold + ' ' + _escHtml(item.unit) + '</div>' : '') +
         '<div class="pb-stock-card-actions">\
-          <button onclick="Pembukuan._showEditStockModal(\'' + item.id + '\')" class="pb-btn pb-btn-ghost pb-btn-sm" title="Edit"><i class="fas fa-pen"></i> Edit</button>\
-          <button onclick="Pembukuan._adjustStockModal(\'' + item.id + '\')" class="pb-btn pb-btn-ghost pb-btn-sm" title="Sesuaikan Stok"><i class="fas fa-plus-minus"></i> Stok</button>\
+          <button onclick="Pembukuan._showEditStockModal(\'' + item.id + '\')" class="pb-btn pb-btn-ghost pb-btn-sm" title="Edit"><i class="fas fa-pen"></i></button>\
+          <button onclick="Pembukuan._adjustStockModal(\'' + item.id + '\')" class="pb-btn pb-btn-ghost pb-btn-sm" title="Sesuaikan Stok"><i class="fas fa-plus-minus"></i></button>\
           <button onclick="Pembukuan._deleteStock(\'' + item.id + '\')" class="pb-btn pb-btn-danger pb-btn-sm" title="Hapus"><i class="fas fa-trash"></i></button>\
         </div>\
       </div>';
